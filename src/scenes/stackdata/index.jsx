@@ -229,7 +229,6 @@ GS_LSL_021: row.device_data?.["GS-LSL-021"] !== undefined && row.device_data?.["
       setLoading(false);
     }
   };
-
   const handleFetchData = () => {
     if (startDate && endDate) {
       fetchData(startDate, endDate, 1, pageSize); // Pass selected dates and pagination params
