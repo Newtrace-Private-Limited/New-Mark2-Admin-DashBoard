@@ -1,0 +1,2249 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.5.0
+2 info using node@v21.7.1
+3 timing npm:load:whichnode Completed in 2ms
+4 timing config:load:defaults Completed in 2ms
+5 timing config:load:file:C:\Program Files\nodejs\node_modules\npm\npmrc Completed in 4ms
+6 timing config:load:builtin Completed in 4ms
+7 timing config:load:cli Completed in 2ms
+8 timing config:load:env Completed in 0ms
+9 timing config:load:file:D:\React\react-admin-dashboard\.npmrc Completed in 0ms
+10 timing config:load:project Completed in 1ms
+11 timing config:load:file:C:\Users\Chetan\.npmrc Completed in 0ms
+12 timing config:load:user Completed in 0ms
+13 timing config:load:file:C:\Users\Chetan\AppData\Roaming\npm\etc\npmrc Completed in 0ms
+14 timing config:load:global Completed in 0ms
+15 timing config:load:setEnvs Completed in 1ms
+16 timing config:load Completed in 13ms
+17 timing npm:load:configload Completed in 13ms
+18 timing config:load:flatten Completed in 2ms
+19 timing npm:load:mkdirpcache Completed in 0ms
+20 timing npm:load:mkdirplogs Completed in 1ms
+21 verbose title npm ci
+22 verbose argv "ci" "--cache" ".npm" "--prefer-offline" "--force"
+23 timing npm:load:setTitle Completed in 0ms
+24 timing npm:load:display Completed in 1ms
+25 verbose logfile logs-max:10 dir:D:\React\react-admin-dashboard\.npm\_logs\2024-04-08T06_13_40_531Z-
+26 verbose logfile D:\React\react-admin-dashboard\.npm\_logs\2024-04-08T06_13_40_531Z-debug-0.log
+27 timing npm:load:logFile Completed in 13ms
+28 timing npm:load:timers Completed in 0ms
+29 timing npm:load:configScope Completed in 0ms
+30 warn using --force Recommended protections disabled.
+31 timing npm:load Completed in 59ms
+32 timing arborist:ctor Completed in 0ms
+33 silly logfile done cleaning log files
+34 timing idealTree:init Completed in 419ms
+35 timing idealTree:userRequests Completed in 1ms
+36 silly idealTree buildDeps
+37 silly fetch manifest @nivo/core@^0.79.0
+38 http fetch GET 200 https://registry.npmjs.org/npm 1020ms
+39 http fetch GET 200 https://registry.npmjs.org/@nivo%2fcore 199ms (cache miss)
+40 silly fetch manifest @nivo/tooltip@0.79.0
+41 http fetch GET 200 https://registry.npmjs.org/@nivo%2ftooltip 119ms (cache miss)
+42 silly fetch manifest prop-types@>= 15.5.10 < 16.0.0
+43 http fetch GET 200 https://registry.npmjs.org/prop-types 59ms (cache miss)
+44 silly fetch manifest react@^18.2.0
+45 http fetch GET 200 https://registry.npmjs.org/react 211ms (cache miss)
+46 silly fetch manifest react@>= 16.14.0 < 18.0.0
+47 silly placeDep ROOT @nivo/core@0.79.0 CONFLICT for: react-admin@0.1.0 want: ^0.79.0
+48 warn ERESOLVE overriding peer dependency {
+48 warn ERESOLVE   code: 'ERESOLVE',
+48 warn ERESOLVE   edge: {
+48 warn ERESOLVE     type: 'peer',
+48 warn ERESOLVE     name: '@nivo/core',
+48 warn ERESOLVE     spec: '0.80.0',
+48 warn ERESOLVE     from: {
+48 warn ERESOLVE       name: '@nivo/bar',
+48 warn ERESOLVE       version: '0.80.0',
+48 warn ERESOLVE       location: 'node_modules/@nivo/bar',
+48 warn ERESOLVE       isWorkspace: false,
+48 warn ERESOLVE       dependents: [Array]
+48 warn ERESOLVE     }
+48 warn ERESOLVE   },
+48 warn ERESOLVE   dep: {
+48 warn ERESOLVE     name: '@nivo/core',
+48 warn ERESOLVE     version: '0.79.0',
+48 warn ERESOLVE     whileInstalling: {
+48 warn ERESOLVE       name: 'react-admin',
+48 warn ERESOLVE       version: '0.1.0',
+48 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard'
+48 warn ERESOLVE     },
+48 warn ERESOLVE     location: 'node_modules/@nivo/core',
+48 warn ERESOLVE     isWorkspace: false,
+48 warn ERESOLVE     dependents: [ [Object] ]
+48 warn ERESOLVE   },
+48 warn ERESOLVE   force: true,
+48 warn ERESOLVE   isMine: true,
+48 warn ERESOLVE   strictPeerDeps: false,
+48 warn ERESOLVE   current: {
+48 warn ERESOLVE     name: '@nivo/core',
+48 warn ERESOLVE     version: '0.80.0',
+48 warn ERESOLVE     location: 'node_modules/@nivo/core',
+48 warn ERESOLVE     isWorkspace: false,
+48 warn ERESOLVE     dependents: [
+48 warn ERESOLVE       [Object], [Object],
+48 warn ERESOLVE       [Object], [Object],
+48 warn ERESOLVE       [Object], [Object],
+48 warn ERESOLVE       [Object], [Object],
+48 warn ERESOLVE       [Object], [Object],
+48 warn ERESOLVE       [Object], [Object],
+48 warn ERESOLVE       [Object], [Object]
+48 warn ERESOLVE     ]
+48 warn ERESOLVE   },
+48 warn ERESOLVE   peerConflict: {
+48 warn ERESOLVE     current: {
+48 warn ERESOLVE       name: '@nivo/tooltip',
+48 warn ERESOLVE       version: '0.80.0',
+48 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+48 warn ERESOLVE       isWorkspace: false,
+48 warn ERESOLVE       dependents: [Array]
+48 warn ERESOLVE     },
+48 warn ERESOLVE     peer: {
+48 warn ERESOLVE       name: '@nivo/tooltip',
+48 warn ERESOLVE       version: '0.79.0',
+48 warn ERESOLVE       whileInstalling: [Object],
+48 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+48 warn ERESOLVE       isWorkspace: false,
+48 warn ERESOLVE       dependents: [Array]
+48 warn ERESOLVE     }
+48 warn ERESOLVE   }
+48 warn ERESOLVE }
+49 warn ERESOLVE overriding peer dependency {
+49 warn ERESOLVE   code: 'ERESOLVE',
+49 warn ERESOLVE   edge: {
+49 warn ERESOLVE     type: 'peer',
+49 warn ERESOLVE     name: '@nivo/core',
+49 warn ERESOLVE     spec: '0.80.0',
+49 warn ERESOLVE     from: {
+49 warn ERESOLVE       name: '@nivo/geo',
+49 warn ERESOLVE       version: '0.80.0',
+49 warn ERESOLVE       location: 'node_modules/@nivo/geo',
+49 warn ERESOLVE       isWorkspace: false,
+49 warn ERESOLVE       dependents: [Array]
+49 warn ERESOLVE     }
+49 warn ERESOLVE   },
+49 warn ERESOLVE   dep: {
+49 warn ERESOLVE     name: '@nivo/core',
+49 warn ERESOLVE     version: '0.79.0',
+49 warn ERESOLVE     whileInstalling: {
+49 warn ERESOLVE       name: 'react-admin',
+49 warn ERESOLVE       version: '0.1.0',
+49 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard'
+49 warn ERESOLVE     },
+49 warn ERESOLVE     location: 'node_modules/@nivo/core',
+49 warn ERESOLVE     isWorkspace: false,
+49 warn ERESOLVE     dependents: [ [Object] ]
+49 warn ERESOLVE   },
+49 warn ERESOLVE   force: true,
+49 warn ERESOLVE   isMine: true,
+49 warn ERESOLVE   strictPeerDeps: false,
+49 warn ERESOLVE   current: {
+49 warn ERESOLVE     name: '@nivo/core',
+49 warn ERESOLVE     version: '0.80.0',
+49 warn ERESOLVE     location: 'node_modules/@nivo/core',
+49 warn ERESOLVE     isWorkspace: false,
+49 warn ERESOLVE     dependents: [
+49 warn ERESOLVE       [Object], [Object],
+49 warn ERESOLVE       [Object], [Object],
+49 warn ERESOLVE       [Object], [Object],
+49 warn ERESOLVE       [Object], [Object],
+49 warn ERESOLVE       [Object], [Object],
+49 warn ERESOLVE       [Object], [Object],
+49 warn ERESOLVE       [Object], [Object]
+49 warn ERESOLVE     ]
+49 warn ERESOLVE   },
+49 warn ERESOLVE   peerConflict: {
+49 warn ERESOLVE     current: {
+49 warn ERESOLVE       name: '@nivo/tooltip',
+49 warn ERESOLVE       version: '0.80.0',
+49 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+49 warn ERESOLVE       isWorkspace: false,
+49 warn ERESOLVE       dependents: [Array]
+49 warn ERESOLVE     },
+49 warn ERESOLVE     peer: {
+49 warn ERESOLVE       name: '@nivo/tooltip',
+49 warn ERESOLVE       version: '0.79.0',
+49 warn ERESOLVE       whileInstalling: [Object],
+49 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+49 warn ERESOLVE       isWorkspace: false,
+49 warn ERESOLVE       dependents: [Array]
+49 warn ERESOLVE     }
+49 warn ERESOLVE   }
+49 warn ERESOLVE }
+50 warn ERESOLVE overriding peer dependency {
+50 warn ERESOLVE   code: 'ERESOLVE',
+50 warn ERESOLVE   edge: {
+50 warn ERESOLVE     type: 'peer',
+50 warn ERESOLVE     name: '@nivo/core',
+50 warn ERESOLVE     spec: '0.80.0',
+50 warn ERESOLVE     from: {
+50 warn ERESOLVE       name: '@nivo/pie',
+50 warn ERESOLVE       version: '0.80.0',
+50 warn ERESOLVE       location: 'node_modules/@nivo/pie',
+50 warn ERESOLVE       isWorkspace: false,
+50 warn ERESOLVE       dependents: [Array]
+50 warn ERESOLVE     }
+50 warn ERESOLVE   },
+50 warn ERESOLVE   dep: {
+50 warn ERESOLVE     name: '@nivo/core',
+50 warn ERESOLVE     version: '0.79.0',
+50 warn ERESOLVE     whileInstalling: {
+50 warn ERESOLVE       name: 'react-admin',
+50 warn ERESOLVE       version: '0.1.0',
+50 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard'
+50 warn ERESOLVE     },
+50 warn ERESOLVE     location: 'node_modules/@nivo/core',
+50 warn ERESOLVE     isWorkspace: false,
+50 warn ERESOLVE     dependents: [ [Object] ]
+50 warn ERESOLVE   },
+50 warn ERESOLVE   force: true,
+50 warn ERESOLVE   isMine: true,
+50 warn ERESOLVE   strictPeerDeps: false,
+50 warn ERESOLVE   current: {
+50 warn ERESOLVE     name: '@nivo/core',
+50 warn ERESOLVE     version: '0.80.0',
+50 warn ERESOLVE     location: 'node_modules/@nivo/core',
+50 warn ERESOLVE     isWorkspace: false,
+50 warn ERESOLVE     dependents: [
+50 warn ERESOLVE       [Object], [Object],
+50 warn ERESOLVE       [Object], [Object],
+50 warn ERESOLVE       [Object], [Object],
+50 warn ERESOLVE       [Object], [Object],
+50 warn ERESOLVE       [Object], [Object],
+50 warn ERESOLVE       [Object], [Object],
+50 warn ERESOLVE       [Object], [Object]
+50 warn ERESOLVE     ]
+50 warn ERESOLVE   },
+50 warn ERESOLVE   peerConflict: {
+50 warn ERESOLVE     current: {
+50 warn ERESOLVE       name: '@nivo/tooltip',
+50 warn ERESOLVE       version: '0.80.0',
+50 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+50 warn ERESOLVE       isWorkspace: false,
+50 warn ERESOLVE       dependents: [Array]
+50 warn ERESOLVE     },
+50 warn ERESOLVE     peer: {
+50 warn ERESOLVE       name: '@nivo/tooltip',
+50 warn ERESOLVE       version: '0.79.0',
+50 warn ERESOLVE       whileInstalling: [Object],
+50 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+50 warn ERESOLVE       isWorkspace: false,
+50 warn ERESOLVE       dependents: [Array]
+50 warn ERESOLVE     }
+50 warn ERESOLVE   }
+50 warn ERESOLVE }
+51 warn ERESOLVE overriding peer dependency {
+51 warn ERESOLVE   code: 'ERESOLVE',
+51 warn ERESOLVE   edge: {
+51 warn ERESOLVE     type: 'peer',
+51 warn ERESOLVE     name: '@nivo/core',
+51 warn ERESOLVE     spec: '0.80.0',
+51 warn ERESOLVE     from: {
+51 warn ERESOLVE       name: '@nivo/tooltip',
+51 warn ERESOLVE       version: '0.80.0',
+51 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+51 warn ERESOLVE       isWorkspace: false,
+51 warn ERESOLVE       dependents: [Array]
+51 warn ERESOLVE     }
+51 warn ERESOLVE   },
+51 warn ERESOLVE   dep: {
+51 warn ERESOLVE     name: '@nivo/core',
+51 warn ERESOLVE     version: '0.79.0',
+51 warn ERESOLVE     whileInstalling: {
+51 warn ERESOLVE       name: 'react-admin',
+51 warn ERESOLVE       version: '0.1.0',
+51 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard'
+51 warn ERESOLVE     },
+51 warn ERESOLVE     location: 'node_modules/@nivo/core',
+51 warn ERESOLVE     isWorkspace: false,
+51 warn ERESOLVE     dependents: [ [Object] ]
+51 warn ERESOLVE   },
+51 warn ERESOLVE   force: true,
+51 warn ERESOLVE   isMine: true,
+51 warn ERESOLVE   strictPeerDeps: false,
+51 warn ERESOLVE   current: {
+51 warn ERESOLVE     name: '@nivo/core',
+51 warn ERESOLVE     version: '0.80.0',
+51 warn ERESOLVE     location: 'node_modules/@nivo/core',
+51 warn ERESOLVE     isWorkspace: false,
+51 warn ERESOLVE     dependents: [
+51 warn ERESOLVE       [Object], [Object],
+51 warn ERESOLVE       [Object], [Object],
+51 warn ERESOLVE       [Object], [Object],
+51 warn ERESOLVE       [Object], [Object],
+51 warn ERESOLVE       [Object], [Object],
+51 warn ERESOLVE       [Object], [Object],
+51 warn ERESOLVE       [Object], [Object]
+51 warn ERESOLVE     ]
+51 warn ERESOLVE   },
+51 warn ERESOLVE   peerConflict: {
+51 warn ERESOLVE     current: {
+51 warn ERESOLVE       name: '@nivo/tooltip',
+51 warn ERESOLVE       version: '0.80.0',
+51 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+51 warn ERESOLVE       isWorkspace: false,
+51 warn ERESOLVE       dependents: [Array]
+51 warn ERESOLVE     },
+51 warn ERESOLVE     peer: {
+51 warn ERESOLVE       name: '@nivo/tooltip',
+51 warn ERESOLVE       version: '0.79.0',
+51 warn ERESOLVE       whileInstalling: [Object],
+51 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+51 warn ERESOLVE       isWorkspace: false,
+51 warn ERESOLVE       dependents: [Array]
+51 warn ERESOLVE     }
+51 warn ERESOLVE   }
+51 warn ERESOLVE }
+52 warn ERESOLVE overriding peer dependency {
+52 warn ERESOLVE   code: 'ERESOLVE',
+52 warn ERESOLVE   edge: {
+52 warn ERESOLVE     type: 'peer',
+52 warn ERESOLVE     name: '@nivo/core',
+52 warn ERESOLVE     spec: '0.80.0',
+52 warn ERESOLVE     from: {
+52 warn ERESOLVE       name: '@nivo/tooltip',
+52 warn ERESOLVE       version: '0.80.0',
+52 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+52 warn ERESOLVE       isWorkspace: false,
+52 warn ERESOLVE       dependents: [Array]
+52 warn ERESOLVE     }
+52 warn ERESOLVE   },
+52 warn ERESOLVE   dep: {
+52 warn ERESOLVE     name: '@nivo/core',
+52 warn ERESOLVE     version: '0.79.0',
+52 warn ERESOLVE     whileInstalling: {
+52 warn ERESOLVE       name: 'react-admin',
+52 warn ERESOLVE       version: '0.1.0',
+52 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard'
+52 warn ERESOLVE     },
+52 warn ERESOLVE     location: 'node_modules/@nivo/core',
+52 warn ERESOLVE     isWorkspace: false,
+52 warn ERESOLVE     dependents: [ [Object] ]
+52 warn ERESOLVE   },
+52 warn ERESOLVE   force: true,
+52 warn ERESOLVE   isMine: true,
+52 warn ERESOLVE   strictPeerDeps: false,
+52 warn ERESOLVE   current: {
+52 warn ERESOLVE     name: '@nivo/core',
+52 warn ERESOLVE     version: '0.80.0',
+52 warn ERESOLVE     location: 'node_modules/@nivo/core',
+52 warn ERESOLVE     isWorkspace: false,
+52 warn ERESOLVE     dependents: [
+52 warn ERESOLVE       [Object], [Object],
+52 warn ERESOLVE       [Object], [Object],
+52 warn ERESOLVE       [Object], [Object],
+52 warn ERESOLVE       [Object], [Object],
+52 warn ERESOLVE       [Object], [Object],
+52 warn ERESOLVE       [Object], [Object],
+52 warn ERESOLVE       [Object], [Object]
+52 warn ERESOLVE     ]
+52 warn ERESOLVE   },
+52 warn ERESOLVE   peerConflict: {
+52 warn ERESOLVE     current: {
+52 warn ERESOLVE       name: '@nivo/tooltip',
+52 warn ERESOLVE       version: '0.80.0',
+52 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+52 warn ERESOLVE       isWorkspace: false,
+52 warn ERESOLVE       dependents: [Array]
+52 warn ERESOLVE     },
+52 warn ERESOLVE     peer: {
+52 warn ERESOLVE       name: '@nivo/tooltip',
+52 warn ERESOLVE       version: '0.79.0',
+52 warn ERESOLVE       whileInstalling: [Object],
+52 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+52 warn ERESOLVE       isWorkspace: false,
+52 warn ERESOLVE       dependents: [Array]
+52 warn ERESOLVE     }
+52 warn ERESOLVE   }
+52 warn ERESOLVE }
+53 warn ERESOLVE overriding peer dependency {
+53 warn ERESOLVE   code: 'ERESOLVE',
+53 warn ERESOLVE   edge: {
+53 warn ERESOLVE     type: 'peer',
+53 warn ERESOLVE     name: '@nivo/core',
+53 warn ERESOLVE     spec: '0.80.0',
+53 warn ERESOLVE     from: {
+53 warn ERESOLVE       name: '@nivo/tooltip',
+53 warn ERESOLVE       version: '0.80.0',
+53 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+53 warn ERESOLVE       isWorkspace: false,
+53 warn ERESOLVE       dependents: [Array]
+53 warn ERESOLVE     }
+53 warn ERESOLVE   },
+53 warn ERESOLVE   dep: {
+53 warn ERESOLVE     name: '@nivo/core',
+53 warn ERESOLVE     version: '0.79.0',
+53 warn ERESOLVE     whileInstalling: {
+53 warn ERESOLVE       name: 'react-admin',
+53 warn ERESOLVE       version: '0.1.0',
+53 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard'
+53 warn ERESOLVE     },
+53 warn ERESOLVE     location: 'node_modules/@nivo/core',
+53 warn ERESOLVE     isWorkspace: false,
+53 warn ERESOLVE     dependents: [ [Object] ]
+53 warn ERESOLVE   },
+53 warn ERESOLVE   force: true,
+53 warn ERESOLVE   isMine: true,
+53 warn ERESOLVE   strictPeerDeps: false,
+53 warn ERESOLVE   current: {
+53 warn ERESOLVE     name: '@nivo/core',
+53 warn ERESOLVE     version: '0.80.0',
+53 warn ERESOLVE     location: 'node_modules/@nivo/core',
+53 warn ERESOLVE     isWorkspace: false,
+53 warn ERESOLVE     dependents: [
+53 warn ERESOLVE       [Object], [Object],
+53 warn ERESOLVE       [Object], [Object],
+53 warn ERESOLVE       [Object], [Object],
+53 warn ERESOLVE       [Object], [Object],
+53 warn ERESOLVE       [Object], [Object],
+53 warn ERESOLVE       [Object], [Object],
+53 warn ERESOLVE       [Object], [Object]
+53 warn ERESOLVE     ]
+53 warn ERESOLVE   },
+53 warn ERESOLVE   peerConflict: {
+53 warn ERESOLVE     current: {
+53 warn ERESOLVE       name: '@nivo/tooltip',
+53 warn ERESOLVE       version: '0.80.0',
+53 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+53 warn ERESOLVE       isWorkspace: false,
+53 warn ERESOLVE       dependents: [Array]
+53 warn ERESOLVE     },
+53 warn ERESOLVE     peer: {
+53 warn ERESOLVE       name: '@nivo/tooltip',
+53 warn ERESOLVE       version: '0.79.0',
+53 warn ERESOLVE       whileInstalling: [Object],
+53 warn ERESOLVE       location: 'node_modules/@nivo/tooltip',
+53 warn ERESOLVE       isWorkspace: false,
+53 warn ERESOLVE       dependents: [Array]
+53 warn ERESOLVE     }
+53 warn ERESOLVE   }
+53 warn ERESOLVE }
+54 silly placeDep ROOT @nivo/tooltip@0.79.0 OK for: @nivo/core@0.79.0 want: 0.79.0
+55 silly fetch manifest @nivo/recompose@0.79.0
+56 silly fetch manifest @react-spring/web@9.3.1
+57 http fetch GET 200 https://registry.npmjs.org/@nivo%2frecompose 160ms (cache miss)
+58 http fetch GET 200 https://registry.npmjs.org/@react-spring%2fweb 2505ms (cache miss)
+59 timing idealTree:#root Completed in 3421ms
+60 silly fetch manifest @nivo/annotations@0.80.0
+61 http fetch GET 200 https://registry.npmjs.org/@nivo%2fannotations 2396ms (cache miss)
+62 silly fetch manifest @nivo/core@0.80.0
+63 silly fetch manifest @nivo/tooltip@0.80.0
+64 silly fetch manifest react@>= 16.14.0 < 19.0.0
+65 silly fetch manifest @nivo/axes@0.80.0
+66 http fetch GET 200 https://registry.npmjs.org/@nivo%2faxes 2517ms (cache miss)
+67 silly fetch manifest @nivo/colors@0.80.0
+68 http fetch GET 200 https://registry.npmjs.org/@nivo%2fcolors 2443ms (cache miss)
+69 silly fetch manifest @nivo/legends@0.80.0
+70 http fetch GET 200 https://registry.npmjs.org/@nivo%2flegends 2423ms (cache miss)
+71 silly placeDep node_modules/@nivo/bar @nivo/annotations@0.80.0 CONFLICT for: @nivo/bar@0.80.0 want: 0.80.0
+72 warn ERESOLVE overriding peer dependency {
+72 warn ERESOLVE   code: 'ERESOLVE',
+72 warn ERESOLVE   edge: {
+72 warn ERESOLVE     type: 'peer',
+72 warn ERESOLVE     name: '@nivo/core',
+72 warn ERESOLVE     spec: '0.80.0',
+72 warn ERESOLVE     error: 'INVALID',
+72 warn ERESOLVE     from: {
+72 warn ERESOLVE       name: '@nivo/annotations',
+72 warn ERESOLVE       version: '0.80.0',
+72 warn ERESOLVE       location: 'node_modules/@nivo/bar/node_modules/@nivo/annotations',
+72 warn ERESOLVE       isWorkspace: false,
+72 warn ERESOLVE       dependents: [Array]
+72 warn ERESOLVE     }
+72 warn ERESOLVE   },
+72 warn ERESOLVE   dep: {
+72 warn ERESOLVE     name: '@nivo/core',
+72 warn ERESOLVE     version: '0.80.0',
+72 warn ERESOLVE     whileInstalling: {
+72 warn ERESOLVE       name: '@nivo/bar',
+72 warn ERESOLVE       version: '0.80.0',
+72 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\bar'
+72 warn ERESOLVE     },
+72 warn ERESOLVE     location: 'node_modules/@nivo/core',
+72 warn ERESOLVE     isWorkspace: false,
+72 warn ERESOLVE     dependents: [ [Object] ]
+72 warn ERESOLVE   },
+72 warn ERESOLVE   force: true,
+72 warn ERESOLVE   isMine: false,
+72 warn ERESOLVE   strictPeerDeps: false,
+72 warn ERESOLVE   current: {
+72 warn ERESOLVE     name: '@nivo/core',
+72 warn ERESOLVE     version: '0.79.0',
+72 warn ERESOLVE     location: 'node_modules/@nivo/core',
+72 warn ERESOLVE     isWorkspace: false,
+72 warn ERESOLVE     dependents: [ [Object] ]
+72 warn ERESOLVE   },
+72 warn ERESOLVE   peerConflict: {
+72 warn ERESOLVE     name: '@nivo/core',
+72 warn ERESOLVE     version: '0.79.0',
+72 warn ERESOLVE     location: 'node_modules/@nivo/core',
+72 warn ERESOLVE     isWorkspace: false,
+72 warn ERESOLVE     dependents: [ [Object] ]
+72 warn ERESOLVE   }
+72 warn ERESOLVE }
+73 silly placeDep node_modules/@nivo/bar @nivo/axes@0.80.0 CONFLICT for: @nivo/bar@0.80.0 want: 0.80.0
+74 warn ERESOLVE overriding peer dependency {
+74 warn ERESOLVE   code: 'ERESOLVE',
+74 warn ERESOLVE   edge: {
+74 warn ERESOLVE     type: 'peer',
+74 warn ERESOLVE     name: '@nivo/core',
+74 warn ERESOLVE     spec: '0.80.0',
+74 warn ERESOLVE     error: 'INVALID',
+74 warn ERESOLVE     from: {
+74 warn ERESOLVE       name: '@nivo/axes',
+74 warn ERESOLVE       version: '0.80.0',
+74 warn ERESOLVE       location: 'node_modules/@nivo/bar/node_modules/@nivo/axes',
+74 warn ERESOLVE       isWorkspace: false,
+74 warn ERESOLVE       dependents: [Array]
+74 warn ERESOLVE     }
+74 warn ERESOLVE   },
+74 warn ERESOLVE   dep: {
+74 warn ERESOLVE     name: '@nivo/core',
+74 warn ERESOLVE     version: '0.80.0',
+74 warn ERESOLVE     whileInstalling: {
+74 warn ERESOLVE       name: '@nivo/bar',
+74 warn ERESOLVE       version: '0.80.0',
+74 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\bar'
+74 warn ERESOLVE     },
+74 warn ERESOLVE     location: 'node_modules/@nivo/core',
+74 warn ERESOLVE     isWorkspace: false,
+74 warn ERESOLVE     dependents: [ [Object] ]
+74 warn ERESOLVE   },
+74 warn ERESOLVE   force: true,
+74 warn ERESOLVE   isMine: false,
+74 warn ERESOLVE   strictPeerDeps: false,
+74 warn ERESOLVE   current: {
+74 warn ERESOLVE     name: '@nivo/core',
+74 warn ERESOLVE     version: '0.79.0',
+74 warn ERESOLVE     location: 'node_modules/@nivo/core',
+74 warn ERESOLVE     isWorkspace: false,
+74 warn ERESOLVE     dependents: [ [Object] ]
+74 warn ERESOLVE   },
+74 warn ERESOLVE   peerConflict: {
+74 warn ERESOLVE     name: '@nivo/core',
+74 warn ERESOLVE     version: '0.79.0',
+74 warn ERESOLVE     location: 'node_modules/@nivo/core',
+74 warn ERESOLVE     isWorkspace: false,
+74 warn ERESOLVE     dependents: [ [Object] ]
+74 warn ERESOLVE   }
+74 warn ERESOLVE }
+75 silly placeDep node_modules/@nivo/bar @nivo/colors@0.80.0 CONFLICT for: @nivo/bar@0.80.0 want: 0.80.0
+76 warn ERESOLVE overriding peer dependency {
+76 warn ERESOLVE   code: 'ERESOLVE',
+76 warn ERESOLVE   edge: {
+76 warn ERESOLVE     type: 'peer',
+76 warn ERESOLVE     name: '@nivo/core',
+76 warn ERESOLVE     spec: '0.80.0',
+76 warn ERESOLVE     error: 'INVALID',
+76 warn ERESOLVE     from: {
+76 warn ERESOLVE       name: '@nivo/colors',
+76 warn ERESOLVE       version: '0.80.0',
+76 warn ERESOLVE       location: 'node_modules/@nivo/bar/node_modules/@nivo/colors',
+76 warn ERESOLVE       isWorkspace: false,
+76 warn ERESOLVE       dependents: [Array]
+76 warn ERESOLVE     }
+76 warn ERESOLVE   },
+76 warn ERESOLVE   dep: {
+76 warn ERESOLVE     name: '@nivo/core',
+76 warn ERESOLVE     version: '0.80.0',
+76 warn ERESOLVE     whileInstalling: {
+76 warn ERESOLVE       name: '@nivo/bar',
+76 warn ERESOLVE       version: '0.80.0',
+76 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\bar'
+76 warn ERESOLVE     },
+76 warn ERESOLVE     location: 'node_modules/@nivo/core',
+76 warn ERESOLVE     isWorkspace: false,
+76 warn ERESOLVE     dependents: [ [Object] ]
+76 warn ERESOLVE   },
+76 warn ERESOLVE   force: true,
+76 warn ERESOLVE   isMine: false,
+76 warn ERESOLVE   strictPeerDeps: false,
+76 warn ERESOLVE   current: {
+76 warn ERESOLVE     name: '@nivo/core',
+76 warn ERESOLVE     version: '0.79.0',
+76 warn ERESOLVE     location: 'node_modules/@nivo/core',
+76 warn ERESOLVE     isWorkspace: false,
+76 warn ERESOLVE     dependents: [ [Object] ]
+76 warn ERESOLVE   },
+76 warn ERESOLVE   peerConflict: {
+76 warn ERESOLVE     name: '@nivo/core',
+76 warn ERESOLVE     version: '0.79.0',
+76 warn ERESOLVE     location: 'node_modules/@nivo/core',
+76 warn ERESOLVE     isWorkspace: false,
+76 warn ERESOLVE     dependents: [ [Object] ]
+76 warn ERESOLVE   }
+76 warn ERESOLVE }
+77 silly placeDep node_modules/@nivo/bar @nivo/legends@0.80.0 CONFLICT for: @nivo/bar@0.80.0 want: 0.80.0
+78 warn ERESOLVE overriding peer dependency {
+78 warn ERESOLVE   code: 'ERESOLVE',
+78 warn ERESOLVE   edge: {
+78 warn ERESOLVE     type: 'peer',
+78 warn ERESOLVE     name: '@nivo/core',
+78 warn ERESOLVE     spec: '0.80.0',
+78 warn ERESOLVE     error: 'INVALID',
+78 warn ERESOLVE     from: {
+78 warn ERESOLVE       name: '@nivo/legends',
+78 warn ERESOLVE       version: '0.80.0',
+78 warn ERESOLVE       location: 'node_modules/@nivo/bar/node_modules/@nivo/legends',
+78 warn ERESOLVE       isWorkspace: false,
+78 warn ERESOLVE       dependents: [Array]
+78 warn ERESOLVE     }
+78 warn ERESOLVE   },
+78 warn ERESOLVE   dep: {
+78 warn ERESOLVE     name: '@nivo/core',
+78 warn ERESOLVE     version: '0.80.0',
+78 warn ERESOLVE     whileInstalling: {
+78 warn ERESOLVE       name: '@nivo/bar',
+78 warn ERESOLVE       version: '0.80.0',
+78 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\bar'
+78 warn ERESOLVE     },
+78 warn ERESOLVE     location: 'node_modules/@nivo/core',
+78 warn ERESOLVE     isWorkspace: false,
+78 warn ERESOLVE     dependents: [ [Object] ]
+78 warn ERESOLVE   },
+78 warn ERESOLVE   force: true,
+78 warn ERESOLVE   isMine: false,
+78 warn ERESOLVE   strictPeerDeps: false,
+78 warn ERESOLVE   current: {
+78 warn ERESOLVE     name: '@nivo/core',
+78 warn ERESOLVE     version: '0.79.0',
+78 warn ERESOLVE     location: 'node_modules/@nivo/core',
+78 warn ERESOLVE     isWorkspace: false,
+78 warn ERESOLVE     dependents: [ [Object] ]
+78 warn ERESOLVE   },
+78 warn ERESOLVE   peerConflict: {
+78 warn ERESOLVE     name: '@nivo/core',
+78 warn ERESOLVE     version: '0.79.0',
+78 warn ERESOLVE     location: 'node_modules/@nivo/core',
+78 warn ERESOLVE     isWorkspace: false,
+78 warn ERESOLVE     dependents: [ [Object] ]
+78 warn ERESOLVE   }
+78 warn ERESOLVE }
+79 silly placeDep node_modules/@nivo/bar @nivo/tooltip@0.80.0 CONFLICT for: @nivo/bar@0.80.0 want: 0.80.0
+80 warn ERESOLVE overriding peer dependency {
+80 warn ERESOLVE   code: 'ERESOLVE',
+80 warn ERESOLVE   edge: {
+80 warn ERESOLVE     type: 'peer',
+80 warn ERESOLVE     name: '@nivo/core',
+80 warn ERESOLVE     spec: '0.80.0',
+80 warn ERESOLVE     error: 'INVALID',
+80 warn ERESOLVE     from: {
+80 warn ERESOLVE       name: '@nivo/tooltip',
+80 warn ERESOLVE       version: '0.80.0',
+80 warn ERESOLVE       location: 'node_modules/@nivo/bar/node_modules/@nivo/tooltip',
+80 warn ERESOLVE       isWorkspace: false,
+80 warn ERESOLVE       dependents: [Array]
+80 warn ERESOLVE     }
+80 warn ERESOLVE   },
+80 warn ERESOLVE   dep: {
+80 warn ERESOLVE     name: '@nivo/core',
+80 warn ERESOLVE     version: '0.80.0',
+80 warn ERESOLVE     whileInstalling: {
+80 warn ERESOLVE       name: '@nivo/bar',
+80 warn ERESOLVE       version: '0.80.0',
+80 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\bar'
+80 warn ERESOLVE     },
+80 warn ERESOLVE     location: 'node_modules/@nivo/core',
+80 warn ERESOLVE     isWorkspace: false,
+80 warn ERESOLVE     dependents: [ [Object] ]
+80 warn ERESOLVE   },
+80 warn ERESOLVE   force: true,
+80 warn ERESOLVE   isMine: false,
+80 warn ERESOLVE   strictPeerDeps: false,
+80 warn ERESOLVE   current: {
+80 warn ERESOLVE     name: '@nivo/core',
+80 warn ERESOLVE     version: '0.79.0',
+80 warn ERESOLVE     location: 'node_modules/@nivo/core',
+80 warn ERESOLVE     isWorkspace: false,
+80 warn ERESOLVE     dependents: [ [Object] ]
+80 warn ERESOLVE   },
+80 warn ERESOLVE   peerConflict: {
+80 warn ERESOLVE     name: '@nivo/core',
+80 warn ERESOLVE     version: '0.79.0',
+80 warn ERESOLVE     location: 'node_modules/@nivo/core',
+80 warn ERESOLVE     isWorkspace: false,
+80 warn ERESOLVE     dependents: [ [Object] ]
+80 warn ERESOLVE   }
+80 warn ERESOLVE }
+81 timing idealTree:node_modules/@nivo/bar Completed in 9863ms
+82 silly fetch manifest react-dom@^16.8.0  || ^17.0.0
+83 http fetch GET 200 https://registry.npmjs.org/react-dom 293ms (cache miss)
+84 silly placeDep node_modules/@nivo/core @nivo/recompose@0.79.0 CONFLICT for: @nivo/core@0.79.0 want: 0.79.0
+85 warn ERESOLVE overriding peer dependency {
+85 warn ERESOLVE   code: 'ERESOLVE',
+85 warn ERESOLVE   edge: {
+85 warn ERESOLVE     type: 'peer',
+85 warn ERESOLVE     name: 'react',
+85 warn ERESOLVE     spec: '>= 16.14.0 < 18.0.0',
+85 warn ERESOLVE     error: 'INVALID',
+85 warn ERESOLVE     from: {
+85 warn ERESOLVE       name: '@nivo/recompose',
+85 warn ERESOLVE       version: '0.79.0',
+85 warn ERESOLVE       location: 'node_modules/@nivo/core/node_modules/@nivo/recompose',
+85 warn ERESOLVE       isWorkspace: false,
+85 warn ERESOLVE       dependents: [Array]
+85 warn ERESOLVE     }
+85 warn ERESOLVE   },
+85 warn ERESOLVE   dep: {
+85 warn ERESOLVE     name: 'react',
+85 warn ERESOLVE     version: '17.0.2',
+85 warn ERESOLVE     whileInstalling: {
+85 warn ERESOLVE       name: '@nivo/core',
+85 warn ERESOLVE       version: '0.79.0',
+85 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\core'
+85 warn ERESOLVE     },
+85 warn ERESOLVE     location: 'node_modules/react',
+85 warn ERESOLVE     isWorkspace: false,
+85 warn ERESOLVE     dependents: [ [Object] ]
+85 warn ERESOLVE   },
+85 warn ERESOLVE   force: true,
+85 warn ERESOLVE   isMine: false,
+85 warn ERESOLVE   strictPeerDeps: false,
+85 warn ERESOLVE   current: {
+85 warn ERESOLVE     name: 'react',
+85 warn ERESOLVE     version: '18.2.0',
+85 warn ERESOLVE     location: 'node_modules/react',
+85 warn ERESOLVE     isWorkspace: false,
+85 warn ERESOLVE     dependents: [ [Object] ]
+85 warn ERESOLVE   },
+85 warn ERESOLVE   peerConflict: {
+85 warn ERESOLVE     name: 'react',
+85 warn ERESOLVE     version: '18.2.0',
+85 warn ERESOLVE     location: 'node_modules/react',
+85 warn ERESOLVE     isWorkspace: false,
+85 warn ERESOLVE     dependents: [ [Object] ]
+85 warn ERESOLVE   }
+85 warn ERESOLVE }
+86 silly placeDep node_modules/@nivo/core @react-spring/web@9.3.1 CONFLICT for: @nivo/core@0.79.0 want: 9.3.1
+87 warn ERESOLVE overriding peer dependency {
+87 warn ERESOLVE   code: 'ERESOLVE',
+87 warn ERESOLVE   edge: {
+87 warn ERESOLVE     type: 'peer',
+87 warn ERESOLVE     name: 'react',
+87 warn ERESOLVE     spec: '^16.8.0  || ^17.0.0',
+87 warn ERESOLVE     error: 'INVALID',
+87 warn ERESOLVE     from: {
+87 warn ERESOLVE       name: '@react-spring/web',
+87 warn ERESOLVE       version: '9.3.1',
+87 warn ERESOLVE       location: 'node_modules/@nivo/core/node_modules/@react-spring/web',
+87 warn ERESOLVE       isWorkspace: false,
+87 warn ERESOLVE       dependents: [Array]
+87 warn ERESOLVE     }
+87 warn ERESOLVE   },
+87 warn ERESOLVE   dep: {
+87 warn ERESOLVE     name: 'react',
+87 warn ERESOLVE     version: '17.0.2',
+87 warn ERESOLVE     whileInstalling: {
+87 warn ERESOLVE       name: '@nivo/core',
+87 warn ERESOLVE       version: '0.79.0',
+87 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\core'
+87 warn ERESOLVE     },
+87 warn ERESOLVE     location: 'node_modules/react',
+87 warn ERESOLVE     isWorkspace: false,
+87 warn ERESOLVE     dependents: [ [Object] ]
+87 warn ERESOLVE   },
+87 warn ERESOLVE   force: true,
+87 warn ERESOLVE   isMine: false,
+87 warn ERESOLVE   strictPeerDeps: false,
+87 warn ERESOLVE   current: {
+87 warn ERESOLVE     name: 'react',
+87 warn ERESOLVE     version: '18.2.0',
+87 warn ERESOLVE     location: 'node_modules/react',
+87 warn ERESOLVE     isWorkspace: false,
+87 warn ERESOLVE     dependents: [ [Object] ]
+87 warn ERESOLVE   },
+87 warn ERESOLVE   peerConflict: {
+87 warn ERESOLVE     name: 'react',
+87 warn ERESOLVE     version: '18.2.0',
+87 warn ERESOLVE     location: 'node_modules/react',
+87 warn ERESOLVE     isWorkspace: false,
+87 warn ERESOLVE     dependents: [ [Object] ]
+87 warn ERESOLVE   }
+87 warn ERESOLVE }
+88 silly placeDep node_modules/@nivo/core react-dom@17.0.2 CONFLICT for: @react-spring/web@9.3.1 want: ^16.8.0  || ^17.0.0
+89 warn ERESOLVE overriding peer dependency {
+89 warn ERESOLVE   code: 'ERESOLVE',
+89 warn ERESOLVE   edge: {
+89 warn ERESOLVE     type: 'peer',
+89 warn ERESOLVE     name: 'react',
+89 warn ERESOLVE     spec: '17.0.2',
+89 warn ERESOLVE     error: 'INVALID',
+89 warn ERESOLVE     from: {
+89 warn ERESOLVE       name: 'react-dom',
+89 warn ERESOLVE       version: '17.0.2',
+89 warn ERESOLVE       location: 'node_modules/@nivo/core/node_modules/react-dom',
+89 warn ERESOLVE       isWorkspace: false,
+89 warn ERESOLVE       dependents: [Array]
+89 warn ERESOLVE     }
+89 warn ERESOLVE   },
+89 warn ERESOLVE   dep: {
+89 warn ERESOLVE     name: 'react',
+89 warn ERESOLVE     version: '17.0.2',
+89 warn ERESOLVE     whileInstalling: {
+89 warn ERESOLVE       name: '@nivo/core',
+89 warn ERESOLVE       version: '0.79.0',
+89 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\core'
+89 warn ERESOLVE     },
+89 warn ERESOLVE     location: 'node_modules/react',
+89 warn ERESOLVE     isWorkspace: false,
+89 warn ERESOLVE     dependents: [ [Object] ]
+89 warn ERESOLVE   },
+89 warn ERESOLVE   force: true,
+89 warn ERESOLVE   isMine: false,
+89 warn ERESOLVE   strictPeerDeps: false,
+89 warn ERESOLVE   current: {
+89 warn ERESOLVE     name: 'react',
+89 warn ERESOLVE     version: '18.2.0',
+89 warn ERESOLVE     location: 'node_modules/react',
+89 warn ERESOLVE     isWorkspace: false,
+89 warn ERESOLVE     dependents: [ [Object] ]
+89 warn ERESOLVE   },
+89 warn ERESOLVE   peerConflict: {
+89 warn ERESOLVE     name: 'react',
+89 warn ERESOLVE     version: '18.2.0',
+89 warn ERESOLVE     location: 'node_modules/react',
+89 warn ERESOLVE     isWorkspace: false,
+89 warn ERESOLVE     dependents: [ [Object] ]
+89 warn ERESOLVE   }
+89 warn ERESOLVE }
+90 warn ERESOLVE overriding peer dependency {
+90 warn ERESOLVE   code: 'ERESOLVE',
+90 warn ERESOLVE   edge: {
+90 warn ERESOLVE     type: 'peer',
+90 warn ERESOLVE     name: 'react',
+90 warn ERESOLVE     spec: '>= 16.14.0 < 18.0.0',
+90 warn ERESOLVE     error: 'INVALID',
+90 warn ERESOLVE     from: {
+90 warn ERESOLVE       name: '@nivo/core',
+90 warn ERESOLVE       version: '0.79.0',
+90 warn ERESOLVE       location: 'node_modules/@nivo/core',
+90 warn ERESOLVE       isWorkspace: false,
+90 warn ERESOLVE       dependents: [Array]
+90 warn ERESOLVE     }
+90 warn ERESOLVE   },
+90 warn ERESOLVE   dep: {
+90 warn ERESOLVE     name: 'react',
+90 warn ERESOLVE     version: '17.0.2',
+90 warn ERESOLVE     whileInstalling: {
+90 warn ERESOLVE       name: '@nivo/core',
+90 warn ERESOLVE       version: '0.79.0',
+90 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\core'
+90 warn ERESOLVE     },
+90 warn ERESOLVE     location: 'node_modules/react',
+90 warn ERESOLVE     isWorkspace: false,
+90 warn ERESOLVE     dependents: [ [Object] ]
+90 warn ERESOLVE   },
+90 warn ERESOLVE   force: true,
+90 warn ERESOLVE   isMine: true,
+90 warn ERESOLVE   strictPeerDeps: false,
+90 warn ERESOLVE   current: {
+90 warn ERESOLVE     name: 'react',
+90 warn ERESOLVE     version: '18.2.0',
+90 warn ERESOLVE     location: 'node_modules/react',
+90 warn ERESOLVE     isWorkspace: false,
+90 warn ERESOLVE     dependents: [ [Object] ]
+90 warn ERESOLVE   },
+90 warn ERESOLVE   peerConflict: {
+90 warn ERESOLVE     current: {
+90 warn ERESOLVE       name: 'react',
+90 warn ERESOLVE       version: '18.2.0',
+90 warn ERESOLVE       location: 'node_modules/react',
+90 warn ERESOLVE       isWorkspace: false,
+90 warn ERESOLVE       dependents: [Array]
+90 warn ERESOLVE     },
+90 warn ERESOLVE     peer: {
+90 warn ERESOLVE       name: 'react',
+90 warn ERESOLVE       version: '17.0.2',
+90 warn ERESOLVE       whileInstalling: [Object],
+90 warn ERESOLVE       location: 'node_modules/react',
+90 warn ERESOLVE       isWorkspace: false,
+90 warn ERESOLVE       dependents: [Array]
+90 warn ERESOLVE     }
+90 warn ERESOLVE   }
+90 warn ERESOLVE }
+91 silly fetch manifest react-lifecycles-compat@^3.0.4
+92 silly fetch manifest react@^16.8.0  || ^17.0.0
+93 silly fetch manifest @react-spring/animated@~9.3.0
+94 silly fetch manifest @react-spring/core@~9.3.0
+95 http fetch GET 200 https://registry.npmjs.org/react-lifecycles-compat 66ms (cache miss)
+96 silly fetch manifest @react-spring/shared@~9.3.0
+97 http fetch GET 200 https://registry.npmjs.org/@react-spring%2fanimated 2372ms (cache miss)
+98 silly fetch manifest @react-spring/types@~9.3.0
+99 http fetch GET 200 https://registry.npmjs.org/@react-spring%2fshared 2351ms (cache miss)
+100 silly fetch manifest react@17.0.2
+101 silly fetch manifest scheduler@^0.20.2
+102 http fetch GET 200 https://registry.npmjs.org/@react-spring%2fcore 2432ms (cache miss)
+103 http fetch GET 200 https://registry.npmjs.org/scheduler 295ms (cache miss)
+104 http fetch GET 200 https://registry.npmjs.org/@react-spring%2ftypes 2343ms (cache miss)
+105 timing idealTree:node_modules/@nivo/core Completed in 5189ms
+106 silly placeDep node_modules/@nivo/geo @nivo/colors@0.80.0 CONFLICT for: @nivo/geo@0.80.0 want: 0.80.0
+107 warn ERESOLVE overriding peer dependency {
+107 warn ERESOLVE   code: 'ERESOLVE',
+107 warn ERESOLVE   edge: {
+107 warn ERESOLVE     type: 'peer',
+107 warn ERESOLVE     name: '@nivo/core',
+107 warn ERESOLVE     spec: '0.80.0',
+107 warn ERESOLVE     error: 'INVALID',
+107 warn ERESOLVE     from: {
+107 warn ERESOLVE       name: '@nivo/colors',
+107 warn ERESOLVE       version: '0.80.0',
+107 warn ERESOLVE       location: 'node_modules/@nivo/geo/node_modules/@nivo/colors',
+107 warn ERESOLVE       isWorkspace: false,
+107 warn ERESOLVE       dependents: [Array]
+107 warn ERESOLVE     }
+107 warn ERESOLVE   },
+107 warn ERESOLVE   dep: {
+107 warn ERESOLVE     name: '@nivo/core',
+107 warn ERESOLVE     version: '0.80.0',
+107 warn ERESOLVE     whileInstalling: {
+107 warn ERESOLVE       name: '@nivo/geo',
+107 warn ERESOLVE       version: '0.80.0',
+107 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\geo'
+107 warn ERESOLVE     },
+107 warn ERESOLVE     location: 'node_modules/@nivo/core',
+107 warn ERESOLVE     isWorkspace: false,
+107 warn ERESOLVE     dependents: [ [Object] ]
+107 warn ERESOLVE   },
+107 warn ERESOLVE   force: true,
+107 warn ERESOLVE   isMine: false,
+107 warn ERESOLVE   strictPeerDeps: false,
+107 warn ERESOLVE   current: {
+107 warn ERESOLVE     name: '@nivo/core',
+107 warn ERESOLVE     version: '0.79.0',
+107 warn ERESOLVE     location: 'node_modules/@nivo/core',
+107 warn ERESOLVE     isWorkspace: false,
+107 warn ERESOLVE     dependents: [ [Object] ]
+107 warn ERESOLVE   },
+107 warn ERESOLVE   peerConflict: {
+107 warn ERESOLVE     name: '@nivo/core',
+107 warn ERESOLVE     version: '0.79.0',
+107 warn ERESOLVE     location: 'node_modules/@nivo/core',
+107 warn ERESOLVE     isWorkspace: false,
+107 warn ERESOLVE     dependents: [ [Object] ]
+107 warn ERESOLVE   }
+107 warn ERESOLVE }
+108 silly placeDep node_modules/@nivo/geo @nivo/legends@0.80.0 CONFLICT for: @nivo/geo@0.80.0 want: 0.80.0
+109 warn ERESOLVE overriding peer dependency {
+109 warn ERESOLVE   code: 'ERESOLVE',
+109 warn ERESOLVE   edge: {
+109 warn ERESOLVE     type: 'peer',
+109 warn ERESOLVE     name: '@nivo/core',
+109 warn ERESOLVE     spec: '0.80.0',
+109 warn ERESOLVE     error: 'INVALID',
+109 warn ERESOLVE     from: {
+109 warn ERESOLVE       name: '@nivo/legends',
+109 warn ERESOLVE       version: '0.80.0',
+109 warn ERESOLVE       location: 'node_modules/@nivo/geo/node_modules/@nivo/legends',
+109 warn ERESOLVE       isWorkspace: false,
+109 warn ERESOLVE       dependents: [Array]
+109 warn ERESOLVE     }
+109 warn ERESOLVE   },
+109 warn ERESOLVE   dep: {
+109 warn ERESOLVE     name: '@nivo/core',
+109 warn ERESOLVE     version: '0.80.0',
+109 warn ERESOLVE     whileInstalling: {
+109 warn ERESOLVE       name: '@nivo/geo',
+109 warn ERESOLVE       version: '0.80.0',
+109 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\geo'
+109 warn ERESOLVE     },
+109 warn ERESOLVE     location: 'node_modules/@nivo/core',
+109 warn ERESOLVE     isWorkspace: false,
+109 warn ERESOLVE     dependents: [ [Object] ]
+109 warn ERESOLVE   },
+109 warn ERESOLVE   force: true,
+109 warn ERESOLVE   isMine: false,
+109 warn ERESOLVE   strictPeerDeps: false,
+109 warn ERESOLVE   current: {
+109 warn ERESOLVE     name: '@nivo/core',
+109 warn ERESOLVE     version: '0.79.0',
+109 warn ERESOLVE     location: 'node_modules/@nivo/core',
+109 warn ERESOLVE     isWorkspace: false,
+109 warn ERESOLVE     dependents: [ [Object] ]
+109 warn ERESOLVE   },
+109 warn ERESOLVE   peerConflict: {
+109 warn ERESOLVE     name: '@nivo/core',
+109 warn ERESOLVE     version: '0.79.0',
+109 warn ERESOLVE     location: 'node_modules/@nivo/core',
+109 warn ERESOLVE     isWorkspace: false,
+109 warn ERESOLVE     dependents: [ [Object] ]
+109 warn ERESOLVE   }
+109 warn ERESOLVE }
+110 silly placeDep node_modules/@nivo/geo @nivo/tooltip@0.80.0 CONFLICT for: @nivo/geo@0.80.0 want: 0.80.0
+111 warn ERESOLVE overriding peer dependency {
+111 warn ERESOLVE   code: 'ERESOLVE',
+111 warn ERESOLVE   edge: {
+111 warn ERESOLVE     type: 'peer',
+111 warn ERESOLVE     name: '@nivo/core',
+111 warn ERESOLVE     spec: '0.80.0',
+111 warn ERESOLVE     error: 'INVALID',
+111 warn ERESOLVE     from: {
+111 warn ERESOLVE       name: '@nivo/tooltip',
+111 warn ERESOLVE       version: '0.80.0',
+111 warn ERESOLVE       location: 'node_modules/@nivo/geo/node_modules/@nivo/tooltip',
+111 warn ERESOLVE       isWorkspace: false,
+111 warn ERESOLVE       dependents: [Array]
+111 warn ERESOLVE     }
+111 warn ERESOLVE   },
+111 warn ERESOLVE   dep: {
+111 warn ERESOLVE     name: '@nivo/core',
+111 warn ERESOLVE     version: '0.80.0',
+111 warn ERESOLVE     whileInstalling: {
+111 warn ERESOLVE       name: '@nivo/geo',
+111 warn ERESOLVE       version: '0.80.0',
+111 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\geo'
+111 warn ERESOLVE     },
+111 warn ERESOLVE     location: 'node_modules/@nivo/core',
+111 warn ERESOLVE     isWorkspace: false,
+111 warn ERESOLVE     dependents: [ [Object] ]
+111 warn ERESOLVE   },
+111 warn ERESOLVE   force: true,
+111 warn ERESOLVE   isMine: false,
+111 warn ERESOLVE   strictPeerDeps: false,
+111 warn ERESOLVE   current: {
+111 warn ERESOLVE     name: '@nivo/core',
+111 warn ERESOLVE     version: '0.79.0',
+111 warn ERESOLVE     location: 'node_modules/@nivo/core',
+111 warn ERESOLVE     isWorkspace: false,
+111 warn ERESOLVE     dependents: [ [Object] ]
+111 warn ERESOLVE   },
+111 warn ERESOLVE   peerConflict: {
+111 warn ERESOLVE     name: '@nivo/core',
+111 warn ERESOLVE     version: '0.79.0',
+111 warn ERESOLVE     location: 'node_modules/@nivo/core',
+111 warn ERESOLVE     isWorkspace: false,
+111 warn ERESOLVE     dependents: [ [Object] ]
+111 warn ERESOLVE   }
+111 warn ERESOLVE }
+112 timing idealTree:node_modules/@nivo/geo Completed in 25ms
+113 warn ERESOLVE overriding peer dependency {
+113 warn ERESOLVE   code: 'ERESOLVE',
+113 warn ERESOLVE   edge: {
+113 warn ERESOLVE     type: 'peer',
+113 warn ERESOLVE     name: 'react',
+113 warn ERESOLVE     spec: '>= 16.14.0 < 18.0.0',
+113 warn ERESOLVE     error: 'INVALID',
+113 warn ERESOLVE     from: {
+113 warn ERESOLVE       name: '@nivo/line',
+113 warn ERESOLVE       version: '0.79.1',
+113 warn ERESOLVE       location: 'node_modules/@nivo/line',
+113 warn ERESOLVE       isWorkspace: false,
+113 warn ERESOLVE       dependents: [Array]
+113 warn ERESOLVE     }
+113 warn ERESOLVE   },
+113 warn ERESOLVE   dep: {
+113 warn ERESOLVE     name: 'react',
+113 warn ERESOLVE     version: '17.0.2',
+113 warn ERESOLVE     whileInstalling: {
+113 warn ERESOLVE       name: '@nivo/line',
+113 warn ERESOLVE       version: '0.79.1',
+113 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\line'
+113 warn ERESOLVE     },
+113 warn ERESOLVE     location: 'node_modules/react',
+113 warn ERESOLVE     isWorkspace: false,
+113 warn ERESOLVE     dependents: [ [Object] ]
+113 warn ERESOLVE   },
+113 warn ERESOLVE   force: true,
+113 warn ERESOLVE   isMine: true,
+113 warn ERESOLVE   strictPeerDeps: false,
+113 warn ERESOLVE   current: {
+113 warn ERESOLVE     name: 'react',
+113 warn ERESOLVE     version: '18.2.0',
+113 warn ERESOLVE     location: 'node_modules/react',
+113 warn ERESOLVE     isWorkspace: false,
+113 warn ERESOLVE     dependents: [ [Object] ]
+113 warn ERESOLVE   },
+113 warn ERESOLVE   peerConflict: {
+113 warn ERESOLVE     current: {
+113 warn ERESOLVE       name: 'react',
+113 warn ERESOLVE       version: '18.2.0',
+113 warn ERESOLVE       location: 'node_modules/react',
+113 warn ERESOLVE       isWorkspace: false,
+113 warn ERESOLVE       dependents: [Array]
+113 warn ERESOLVE     },
+113 warn ERESOLVE     peer: {
+113 warn ERESOLVE       name: 'react',
+113 warn ERESOLVE       version: '17.0.2',
+113 warn ERESOLVE       whileInstalling: [Object],
+113 warn ERESOLVE       location: 'node_modules/react',
+113 warn ERESOLVE       isWorkspace: false,
+113 warn ERESOLVE       dependents: [Array]
+113 warn ERESOLVE     }
+113 warn ERESOLVE   }
+113 warn ERESOLVE }
+114 timing idealTree:node_modules/@nivo/line Completed in 36ms
+115 silly fetch manifest @nivo/arcs@0.80.0
+116 http fetch GET 200 https://registry.npmjs.org/@nivo%2farcs 2374ms (cache miss)
+117 silly placeDep node_modules/@nivo/pie @nivo/arcs@0.80.0 CONFLICT for: @nivo/pie@0.80.0 want: 0.80.0
+118 warn ERESOLVE overriding peer dependency {
+118 warn ERESOLVE   code: 'ERESOLVE',
+118 warn ERESOLVE   edge: {
+118 warn ERESOLVE     type: 'peer',
+118 warn ERESOLVE     name: '@nivo/core',
+118 warn ERESOLVE     spec: '0.80.0',
+118 warn ERESOLVE     error: 'INVALID',
+118 warn ERESOLVE     from: {
+118 warn ERESOLVE       name: '@nivo/arcs',
+118 warn ERESOLVE       version: '0.80.0',
+118 warn ERESOLVE       location: 'node_modules/@nivo/pie/node_modules/@nivo/arcs',
+118 warn ERESOLVE       isWorkspace: false,
+118 warn ERESOLVE       dependents: [Array]
+118 warn ERESOLVE     }
+118 warn ERESOLVE   },
+118 warn ERESOLVE   dep: {
+118 warn ERESOLVE     name: '@nivo/core',
+118 warn ERESOLVE     version: '0.80.0',
+118 warn ERESOLVE     whileInstalling: {
+118 warn ERESOLVE       name: '@nivo/pie',
+118 warn ERESOLVE       version: '0.80.0',
+118 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\pie'
+118 warn ERESOLVE     },
+118 warn ERESOLVE     location: 'node_modules/@nivo/core',
+118 warn ERESOLVE     isWorkspace: false,
+118 warn ERESOLVE     dependents: [ [Object] ]
+118 warn ERESOLVE   },
+118 warn ERESOLVE   force: true,
+118 warn ERESOLVE   isMine: false,
+118 warn ERESOLVE   strictPeerDeps: false,
+118 warn ERESOLVE   current: {
+118 warn ERESOLVE     name: '@nivo/core',
+118 warn ERESOLVE     version: '0.79.0',
+118 warn ERESOLVE     location: 'node_modules/@nivo/core',
+118 warn ERESOLVE     isWorkspace: false,
+118 warn ERESOLVE     dependents: [ [Object] ]
+118 warn ERESOLVE   },
+118 warn ERESOLVE   peerConflict: {
+118 warn ERESOLVE     name: '@nivo/core',
+118 warn ERESOLVE     version: '0.79.0',
+118 warn ERESOLVE     location: 'node_modules/@nivo/core',
+118 warn ERESOLVE     isWorkspace: false,
+118 warn ERESOLVE     dependents: [ [Object] ]
+118 warn ERESOLVE   }
+118 warn ERESOLVE }
+119 silly placeDep node_modules/@nivo/pie @nivo/colors@0.80.0 CONFLICT for: @nivo/pie@0.80.0 want: 0.80.0
+120 warn ERESOLVE overriding peer dependency {
+120 warn ERESOLVE   code: 'ERESOLVE',
+120 warn ERESOLVE   edge: {
+120 warn ERESOLVE     type: 'peer',
+120 warn ERESOLVE     name: '@nivo/core',
+120 warn ERESOLVE     spec: '0.80.0',
+120 warn ERESOLVE     error: 'INVALID',
+120 warn ERESOLVE     from: {
+120 warn ERESOLVE       name: '@nivo/colors',
+120 warn ERESOLVE       version: '0.80.0',
+120 warn ERESOLVE       location: 'node_modules/@nivo/pie/node_modules/@nivo/colors',
+120 warn ERESOLVE       isWorkspace: false,
+120 warn ERESOLVE       dependents: [Array]
+120 warn ERESOLVE     }
+120 warn ERESOLVE   },
+120 warn ERESOLVE   dep: {
+120 warn ERESOLVE     name: '@nivo/core',
+120 warn ERESOLVE     version: '0.80.0',
+120 warn ERESOLVE     whileInstalling: {
+120 warn ERESOLVE       name: '@nivo/pie',
+120 warn ERESOLVE       version: '0.80.0',
+120 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\pie'
+120 warn ERESOLVE     },
+120 warn ERESOLVE     location: 'node_modules/@nivo/core',
+120 warn ERESOLVE     isWorkspace: false,
+120 warn ERESOLVE     dependents: [ [Object] ]
+120 warn ERESOLVE   },
+120 warn ERESOLVE   force: true,
+120 warn ERESOLVE   isMine: false,
+120 warn ERESOLVE   strictPeerDeps: false,
+120 warn ERESOLVE   current: {
+120 warn ERESOLVE     name: '@nivo/core',
+120 warn ERESOLVE     version: '0.79.0',
+120 warn ERESOLVE     location: 'node_modules/@nivo/core',
+120 warn ERESOLVE     isWorkspace: false,
+120 warn ERESOLVE     dependents: [ [Object] ]
+120 warn ERESOLVE   },
+120 warn ERESOLVE   peerConflict: {
+120 warn ERESOLVE     name: '@nivo/core',
+120 warn ERESOLVE     version: '0.79.0',
+120 warn ERESOLVE     location: 'node_modules/@nivo/core',
+120 warn ERESOLVE     isWorkspace: false,
+120 warn ERESOLVE     dependents: [ [Object] ]
+120 warn ERESOLVE   }
+120 warn ERESOLVE }
+121 silly placeDep node_modules/@nivo/pie @nivo/legends@0.80.0 CONFLICT for: @nivo/pie@0.80.0 want: 0.80.0
+122 warn ERESOLVE overriding peer dependency {
+122 warn ERESOLVE   code: 'ERESOLVE',
+122 warn ERESOLVE   edge: {
+122 warn ERESOLVE     type: 'peer',
+122 warn ERESOLVE     name: '@nivo/core',
+122 warn ERESOLVE     spec: '0.80.0',
+122 warn ERESOLVE     error: 'INVALID',
+122 warn ERESOLVE     from: {
+122 warn ERESOLVE       name: '@nivo/legends',
+122 warn ERESOLVE       version: '0.80.0',
+122 warn ERESOLVE       location: 'node_modules/@nivo/pie/node_modules/@nivo/legends',
+122 warn ERESOLVE       isWorkspace: false,
+122 warn ERESOLVE       dependents: [Array]
+122 warn ERESOLVE     }
+122 warn ERESOLVE   },
+122 warn ERESOLVE   dep: {
+122 warn ERESOLVE     name: '@nivo/core',
+122 warn ERESOLVE     version: '0.80.0',
+122 warn ERESOLVE     whileInstalling: {
+122 warn ERESOLVE       name: '@nivo/pie',
+122 warn ERESOLVE       version: '0.80.0',
+122 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\pie'
+122 warn ERESOLVE     },
+122 warn ERESOLVE     location: 'node_modules/@nivo/core',
+122 warn ERESOLVE     isWorkspace: false,
+122 warn ERESOLVE     dependents: [ [Object] ]
+122 warn ERESOLVE   },
+122 warn ERESOLVE   force: true,
+122 warn ERESOLVE   isMine: false,
+122 warn ERESOLVE   strictPeerDeps: false,
+122 warn ERESOLVE   current: {
+122 warn ERESOLVE     name: '@nivo/core',
+122 warn ERESOLVE     version: '0.79.0',
+122 warn ERESOLVE     location: 'node_modules/@nivo/core',
+122 warn ERESOLVE     isWorkspace: false,
+122 warn ERESOLVE     dependents: [ [Object] ]
+122 warn ERESOLVE   },
+122 warn ERESOLVE   peerConflict: {
+122 warn ERESOLVE     name: '@nivo/core',
+122 warn ERESOLVE     version: '0.79.0',
+122 warn ERESOLVE     location: 'node_modules/@nivo/core',
+122 warn ERESOLVE     isWorkspace: false,
+122 warn ERESOLVE     dependents: [ [Object] ]
+122 warn ERESOLVE   }
+122 warn ERESOLVE }
+123 silly placeDep node_modules/@nivo/pie @nivo/tooltip@0.80.0 CONFLICT for: @nivo/pie@0.80.0 want: 0.80.0
+124 warn ERESOLVE overriding peer dependency {
+124 warn ERESOLVE   code: 'ERESOLVE',
+124 warn ERESOLVE   edge: {
+124 warn ERESOLVE     type: 'peer',
+124 warn ERESOLVE     name: '@nivo/core',
+124 warn ERESOLVE     spec: '0.80.0',
+124 warn ERESOLVE     error: 'INVALID',
+124 warn ERESOLVE     from: {
+124 warn ERESOLVE       name: '@nivo/tooltip',
+124 warn ERESOLVE       version: '0.80.0',
+124 warn ERESOLVE       location: 'node_modules/@nivo/pie/node_modules/@nivo/tooltip',
+124 warn ERESOLVE       isWorkspace: false,
+124 warn ERESOLVE       dependents: [Array]
+124 warn ERESOLVE     }
+124 warn ERESOLVE   },
+124 warn ERESOLVE   dep: {
+124 warn ERESOLVE     name: '@nivo/core',
+124 warn ERESOLVE     version: '0.80.0',
+124 warn ERESOLVE     whileInstalling: {
+124 warn ERESOLVE       name: '@nivo/pie',
+124 warn ERESOLVE       version: '0.80.0',
+124 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\pie'
+124 warn ERESOLVE     },
+124 warn ERESOLVE     location: 'node_modules/@nivo/core',
+124 warn ERESOLVE     isWorkspace: false,
+124 warn ERESOLVE     dependents: [ [Object] ]
+124 warn ERESOLVE   },
+124 warn ERESOLVE   force: true,
+124 warn ERESOLVE   isMine: false,
+124 warn ERESOLVE   strictPeerDeps: false,
+124 warn ERESOLVE   current: {
+124 warn ERESOLVE     name: '@nivo/core',
+124 warn ERESOLVE     version: '0.79.0',
+124 warn ERESOLVE     location: 'node_modules/@nivo/core',
+124 warn ERESOLVE     isWorkspace: false,
+124 warn ERESOLVE     dependents: [ [Object] ]
+124 warn ERESOLVE   },
+124 warn ERESOLVE   peerConflict: {
+124 warn ERESOLVE     name: '@nivo/core',
+124 warn ERESOLVE     version: '0.79.0',
+124 warn ERESOLVE     location: 'node_modules/@nivo/core',
+124 warn ERESOLVE     isWorkspace: false,
+124 warn ERESOLVE     dependents: [ [Object] ]
+124 warn ERESOLVE   }
+124 warn ERESOLVE }
+125 timing idealTree:node_modules/@nivo/pie Completed in 2407ms
+126 silly placeDep node_modules/@nivo/tooltip @react-spring/web@9.3.1 OK for: @nivo/tooltip@0.79.0 want: 9.3.1
+127 silly placeDep node_modules/@nivo/tooltip react@17.0.2 OK for: @react-spring/web@9.3.1 want: ^16.8.0  || ^17.0.0
+128 silly placeDep node_modules/@nivo/tooltip react-dom@17.0.2 OK for: @react-spring/web@9.3.1 want: ^16.8.0  || ^17.0.0
+129 timing idealTree:node_modules/@nivo/tooltip Completed in 15ms
+130 silly fetch manifest @testing-library/dom@>=7.21.4
+131 http fetch GET 200 https://registry.npmjs.org/@testing-library%2fdom 144ms (cache miss)
+132 silly placeDep ROOT @testing-library/dom@9.3.4 OK for: @testing-library/user-event@13.5.0 want: >=7.21.4
+133 timing idealTree:node_modules/@testing-library/user-event Completed in 165ms
+134 timing idealTree:node_modules/@testing-library/dom Completed in 0ms
+135 silly fetch manifest typescript@>= 2.7
+136 http fetch GET 200 https://registry.npmjs.org/typescript 533ms (cache miss)
+137 silly placeDep ROOT typescript@5.4.4 OK for: fork-ts-checker-webpack-plugin@6.5.3 want: >= 2.7
+138 timing idealTree:node_modules/fork-ts-checker-webpack-plugin Completed in 664ms
+139 silly fetch manifest typescript@^3.2.1 || ^4
+140 silly placeDep ROOT typescript@4.9.5 REPLACE for: react-scripts@5.0.1 want: ^3.2.1 || ^4
+141 timing idealTree:node_modules/react-scripts Completed in 20ms
+142 timing idealTree:node_modules/tsutils Completed in 0ms
+143 timing idealTree:node_modules/typescript Completed in 0ms
+144 timing idealTree:node_modules/@nivo/bar/node_modules/@nivo/annotations Completed in 0ms
+145 timing idealTree:node_modules/@nivo/bar/node_modules/@nivo/axes Completed in 0ms
+146 timing idealTree:node_modules/@nivo/bar/node_modules/@nivo/colors Completed in 0ms
+147 timing idealTree:node_modules/@nivo/bar/node_modules/@nivo/legends Completed in 0ms
+148 timing idealTree:node_modules/@nivo/bar/node_modules/@nivo/tooltip Completed in 0ms
+149 silly placeDep ROOT react-lifecycles-compat@3.0.4 OK for: @nivo/recompose@0.79.0 want: ^3.0.4
+150 timing idealTree:node_modules/@nivo/core/node_modules/@nivo/recompose Completed in 2ms
+151 timing idealTree:node_modules/react-lifecycles-compat Completed in 0ms
+152 silly placeDep node_modules/@nivo/core/node_modules/@react-spring/web @react-spring/animated@9.3.2 CONFLICT for: @react-spring/web@9.3.1 want: ~9.3.0
+153 warn ERESOLVE overriding peer dependency {
+153 warn ERESOLVE   code: 'ERESOLVE',
+153 warn ERESOLVE   edge: {
+153 warn ERESOLVE     type: 'peer',
+153 warn ERESOLVE     name: 'react',
+153 warn ERESOLVE     spec: '^16.8.0  || ^17.0.0',
+153 warn ERESOLVE     error: 'INVALID',
+153 warn ERESOLVE     from: {
+153 warn ERESOLVE       name: '@react-spring/animated',
+153 warn ERESOLVE       version: '9.3.2',
+153 warn ERESOLVE       location: 'node_modules/@nivo/core/node_modules/@react-spring/web/node_modules/@react-spring/animated',
+153 warn ERESOLVE       isWorkspace: false,
+153 warn ERESOLVE       dependents: [Array]
+153 warn ERESOLVE     }
+153 warn ERESOLVE   },
+153 warn ERESOLVE   dep: {
+153 warn ERESOLVE     name: 'react',
+153 warn ERESOLVE     version: '17.0.2',
+153 warn ERESOLVE     whileInstalling: {
+153 warn ERESOLVE       name: '@react-spring/web',
+153 warn ERESOLVE       version: '9.3.1',
+153 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\core\\node_modules\\@react-spring\\web'
+153 warn ERESOLVE     },
+153 warn ERESOLVE     location: 'node_modules/react',
+153 warn ERESOLVE     isWorkspace: false,
+153 warn ERESOLVE     dependents: [ [Object] ]
+153 warn ERESOLVE   },
+153 warn ERESOLVE   force: true,
+153 warn ERESOLVE   isMine: false,
+153 warn ERESOLVE   strictPeerDeps: false,
+153 warn ERESOLVE   current: {
+153 warn ERESOLVE     name: 'react',
+153 warn ERESOLVE     version: '18.2.0',
+153 warn ERESOLVE     location: 'node_modules/react',
+153 warn ERESOLVE     isWorkspace: false,
+153 warn ERESOLVE     dependents: [ [Object] ]
+153 warn ERESOLVE   },
+153 warn ERESOLVE   peerConflict: {
+153 warn ERESOLVE     name: 'react',
+153 warn ERESOLVE     version: '18.2.0',
+153 warn ERESOLVE     location: 'node_modules/react',
+153 warn ERESOLVE     isWorkspace: false,
+153 warn ERESOLVE     dependents: [ [Object] ]
+153 warn ERESOLVE   }
+153 warn ERESOLVE }
+154 silly placeDep node_modules/@nivo/core/node_modules/@react-spring/web @react-spring/core@9.3.2 CONFLICT for: @react-spring/web@9.3.1 want: ~9.3.0
+155 warn ERESOLVE overriding peer dependency {
+155 warn ERESOLVE   code: 'ERESOLVE',
+155 warn ERESOLVE   edge: {
+155 warn ERESOLVE     type: 'peer',
+155 warn ERESOLVE     name: 'react',
+155 warn ERESOLVE     spec: '^16.8.0  || ^17.0.0',
+155 warn ERESOLVE     error: 'INVALID',
+155 warn ERESOLVE     from: {
+155 warn ERESOLVE       name: '@react-spring/core',
+155 warn ERESOLVE       version: '9.3.2',
+155 warn ERESOLVE       location: 'node_modules/@nivo/core/node_modules/@react-spring/web/node_modules/@react-spring/core',
+155 warn ERESOLVE       isWorkspace: false,
+155 warn ERESOLVE       dependents: [Array]
+155 warn ERESOLVE     }
+155 warn ERESOLVE   },
+155 warn ERESOLVE   dep: {
+155 warn ERESOLVE     name: 'react',
+155 warn ERESOLVE     version: '17.0.2',
+155 warn ERESOLVE     whileInstalling: {
+155 warn ERESOLVE       name: '@react-spring/web',
+155 warn ERESOLVE       version: '9.3.1',
+155 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\core\\node_modules\\@react-spring\\web'
+155 warn ERESOLVE     },
+155 warn ERESOLVE     location: 'node_modules/react',
+155 warn ERESOLVE     isWorkspace: false,
+155 warn ERESOLVE     dependents: [ [Object] ]
+155 warn ERESOLVE   },
+155 warn ERESOLVE   force: true,
+155 warn ERESOLVE   isMine: false,
+155 warn ERESOLVE   strictPeerDeps: false,
+155 warn ERESOLVE   current: {
+155 warn ERESOLVE     name: 'react',
+155 warn ERESOLVE     version: '18.2.0',
+155 warn ERESOLVE     location: 'node_modules/react',
+155 warn ERESOLVE     isWorkspace: false,
+155 warn ERESOLVE     dependents: [ [Object] ]
+155 warn ERESOLVE   },
+155 warn ERESOLVE   peerConflict: {
+155 warn ERESOLVE     name: 'react',
+155 warn ERESOLVE     version: '18.2.0',
+155 warn ERESOLVE     location: 'node_modules/react',
+155 warn ERESOLVE     isWorkspace: false,
+155 warn ERESOLVE     dependents: [ [Object] ]
+155 warn ERESOLVE   }
+155 warn ERESOLVE }
+156 silly placeDep node_modules/@nivo/core/node_modules/@react-spring/web @react-spring/shared@9.3.2 CONFLICT for: @react-spring/web@9.3.1 want: ~9.3.0
+157 warn ERESOLVE overriding peer dependency {
+157 warn ERESOLVE   code: 'ERESOLVE',
+157 warn ERESOLVE   edge: {
+157 warn ERESOLVE     type: 'peer',
+157 warn ERESOLVE     name: 'react',
+157 warn ERESOLVE     spec: '^16.8.0  || ^17.0.0',
+157 warn ERESOLVE     error: 'INVALID',
+157 warn ERESOLVE     from: {
+157 warn ERESOLVE       name: '@react-spring/shared',
+157 warn ERESOLVE       version: '9.3.2',
+157 warn ERESOLVE       location: 'node_modules/@nivo/core/node_modules/@react-spring/web/node_modules/@react-spring/shared',
+157 warn ERESOLVE       isWorkspace: false,
+157 warn ERESOLVE       dependents: [Array]
+157 warn ERESOLVE     }
+157 warn ERESOLVE   },
+157 warn ERESOLVE   dep: {
+157 warn ERESOLVE     name: 'react',
+157 warn ERESOLVE     version: '17.0.2',
+157 warn ERESOLVE     whileInstalling: {
+157 warn ERESOLVE       name: '@react-spring/web',
+157 warn ERESOLVE       version: '9.3.1',
+157 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\core\\node_modules\\@react-spring\\web'
+157 warn ERESOLVE     },
+157 warn ERESOLVE     location: 'node_modules/react',
+157 warn ERESOLVE     isWorkspace: false,
+157 warn ERESOLVE     dependents: [ [Object] ]
+157 warn ERESOLVE   },
+157 warn ERESOLVE   force: true,
+157 warn ERESOLVE   isMine: false,
+157 warn ERESOLVE   strictPeerDeps: false,
+157 warn ERESOLVE   current: {
+157 warn ERESOLVE     name: 'react',
+157 warn ERESOLVE     version: '18.2.0',
+157 warn ERESOLVE     location: 'node_modules/react',
+157 warn ERESOLVE     isWorkspace: false,
+157 warn ERESOLVE     dependents: [ [Object] ]
+157 warn ERESOLVE   },
+157 warn ERESOLVE   peerConflict: {
+157 warn ERESOLVE     name: 'react',
+157 warn ERESOLVE     version: '18.2.0',
+157 warn ERESOLVE     location: 'node_modules/react',
+157 warn ERESOLVE     isWorkspace: false,
+157 warn ERESOLVE     dependents: [ [Object] ]
+157 warn ERESOLVE   }
+157 warn ERESOLVE }
+158 silly placeDep node_modules/@nivo/core @react-spring/types@9.3.2 OK for: @react-spring/web@9.3.1 want: ~9.3.0
+159 silly fetch manifest @react-spring/rafz@~9.3.0
+160 http fetch GET 200 https://registry.npmjs.org/@react-spring%2frafz 186ms (cache miss)
+161 timing idealTree:node_modules/@nivo/core/node_modules/@react-spring/web Completed in 248ms
+162 timing idealTree:node_modules/@nivo/core/node_modules/@react-spring/types Completed in 0ms
+163 silly placeDep node_modules/@nivo/core scheduler@0.20.2 OK for: react-dom@17.0.2 want: ^0.20.2
+164 timing idealTree:node_modules/@nivo/core/node_modules/react-dom Completed in 2ms
+165 timing idealTree:node_modules/@nivo/core/node_modules/scheduler Completed in 0ms
+166 timing idealTree:node_modules/@nivo/geo/node_modules/@nivo/colors Completed in 0ms
+167 timing idealTree:node_modules/@nivo/geo/node_modules/@nivo/legends Completed in 0ms
+168 timing idealTree:node_modules/@nivo/geo/node_modules/@nivo/tooltip Completed in 0ms
+169 warn ERESOLVE overriding peer dependency {
+169 warn ERESOLVE   code: 'ERESOLVE',
+169 warn ERESOLVE   edge: {
+169 warn ERESOLVE     type: 'peer',
+169 warn ERESOLVE     name: 'react',
+169 warn ERESOLVE     spec: '>= 16.14.0 < 18.0.0',
+169 warn ERESOLVE     error: 'INVALID',
+169 warn ERESOLVE     from: {
+169 warn ERESOLVE       name: '@nivo/annotations',
+169 warn ERESOLVE       version: '0.79.1',
+169 warn ERESOLVE       location: 'node_modules/@nivo/line/node_modules/@nivo/annotations',
+169 warn ERESOLVE       isWorkspace: false,
+169 warn ERESOLVE       dependents: [Array]
+169 warn ERESOLVE     }
+169 warn ERESOLVE   },
+169 warn ERESOLVE   dep: {
+169 warn ERESOLVE     name: 'react',
+169 warn ERESOLVE     version: '17.0.2',
+169 warn ERESOLVE     whileInstalling: {
+169 warn ERESOLVE       name: '@nivo/annotations',
+169 warn ERESOLVE       version: '0.79.1',
+169 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\line\\node_modules\\@nivo\\annotations'
+169 warn ERESOLVE     },
+169 warn ERESOLVE     location: 'node_modules/react',
+169 warn ERESOLVE     isWorkspace: false,
+169 warn ERESOLVE     dependents: [ [Object] ]
+169 warn ERESOLVE   },
+169 warn ERESOLVE   force: true,
+169 warn ERESOLVE   isMine: false,
+169 warn ERESOLVE   strictPeerDeps: false,
+169 warn ERESOLVE   current: {
+169 warn ERESOLVE     name: 'react',
+169 warn ERESOLVE     version: '18.2.0',
+169 warn ERESOLVE     location: 'node_modules/react',
+169 warn ERESOLVE     isWorkspace: false,
+169 warn ERESOLVE     dependents: [ [Object] ]
+169 warn ERESOLVE   },
+169 warn ERESOLVE   peerConflict: {
+169 warn ERESOLVE     current: {
+169 warn ERESOLVE       name: 'react',
+169 warn ERESOLVE       version: '18.2.0',
+169 warn ERESOLVE       location: 'node_modules/react',
+169 warn ERESOLVE       isWorkspace: false,
+169 warn ERESOLVE       dependents: [Array]
+169 warn ERESOLVE     },
+169 warn ERESOLVE     peer: {
+169 warn ERESOLVE       name: 'react',
+169 warn ERESOLVE       version: '17.0.2',
+169 warn ERESOLVE       whileInstalling: [Object],
+169 warn ERESOLVE       location: 'node_modules/react',
+169 warn ERESOLVE       isWorkspace: false,
+169 warn ERESOLVE       dependents: [Array]
+169 warn ERESOLVE     }
+169 warn ERESOLVE   }
+169 warn ERESOLVE }
+170 timing idealTree:node_modules/@nivo/line/node_modules/@nivo/annotations Completed in 32ms
+171 warn ERESOLVE overriding peer dependency {
+171 warn ERESOLVE   code: 'ERESOLVE',
+171 warn ERESOLVE   edge: {
+171 warn ERESOLVE     type: 'peer',
+171 warn ERESOLVE     name: 'react',
+171 warn ERESOLVE     spec: '>= 16.14.0 < 18.0.0',
+171 warn ERESOLVE     error: 'INVALID',
+171 warn ERESOLVE     from: {
+171 warn ERESOLVE       name: '@nivo/axes',
+171 warn ERESOLVE       version: '0.79.0',
+171 warn ERESOLVE       location: 'node_modules/@nivo/line/node_modules/@nivo/axes',
+171 warn ERESOLVE       isWorkspace: false,
+171 warn ERESOLVE       dependents: [Array]
+171 warn ERESOLVE     }
+171 warn ERESOLVE   },
+171 warn ERESOLVE   dep: {
+171 warn ERESOLVE     name: 'react',
+171 warn ERESOLVE     version: '17.0.2',
+171 warn ERESOLVE     whileInstalling: {
+171 warn ERESOLVE       name: '@nivo/axes',
+171 warn ERESOLVE       version: '0.79.0',
+171 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\line\\node_modules\\@nivo\\axes'
+171 warn ERESOLVE     },
+171 warn ERESOLVE     location: 'node_modules/react',
+171 warn ERESOLVE     isWorkspace: false,
+171 warn ERESOLVE     dependents: [ [Object] ]
+171 warn ERESOLVE   },
+171 warn ERESOLVE   force: true,
+171 warn ERESOLVE   isMine: false,
+171 warn ERESOLVE   strictPeerDeps: false,
+171 warn ERESOLVE   current: {
+171 warn ERESOLVE     name: 'react',
+171 warn ERESOLVE     version: '18.2.0',
+171 warn ERESOLVE     location: 'node_modules/react',
+171 warn ERESOLVE     isWorkspace: false,
+171 warn ERESOLVE     dependents: [ [Object] ]
+171 warn ERESOLVE   },
+171 warn ERESOLVE   peerConflict: {
+171 warn ERESOLVE     current: {
+171 warn ERESOLVE       name: 'react',
+171 warn ERESOLVE       version: '18.2.0',
+171 warn ERESOLVE       location: 'node_modules/react',
+171 warn ERESOLVE       isWorkspace: false,
+171 warn ERESOLVE       dependents: [Array]
+171 warn ERESOLVE     },
+171 warn ERESOLVE     peer: {
+171 warn ERESOLVE       name: 'react',
+171 warn ERESOLVE       version: '17.0.2',
+171 warn ERESOLVE       whileInstalling: [Object],
+171 warn ERESOLVE       location: 'node_modules/react',
+171 warn ERESOLVE       isWorkspace: false,
+171 warn ERESOLVE       dependents: [Array]
+171 warn ERESOLVE     }
+171 warn ERESOLVE   }
+171 warn ERESOLVE }
+172 timing idealTree:node_modules/@nivo/line/node_modules/@nivo/axes Completed in 38ms
+173 warn ERESOLVE overriding peer dependency {
+173 warn ERESOLVE   code: 'ERESOLVE',
+173 warn ERESOLVE   edge: {
+173 warn ERESOLVE     type: 'peer',
+173 warn ERESOLVE     name: 'react',
+173 warn ERESOLVE     spec: '>= 16.14.0 < 18.0.0',
+173 warn ERESOLVE     error: 'INVALID',
+173 warn ERESOLVE     from: {
+173 warn ERESOLVE       name: '@nivo/colors',
+173 warn ERESOLVE       version: '0.79.1',
+173 warn ERESOLVE       location: 'node_modules/@nivo/line/node_modules/@nivo/colors',
+173 warn ERESOLVE       isWorkspace: false,
+173 warn ERESOLVE       dependents: [Array]
+173 warn ERESOLVE     }
+173 warn ERESOLVE   },
+173 warn ERESOLVE   dep: {
+173 warn ERESOLVE     name: 'react',
+173 warn ERESOLVE     version: '17.0.2',
+173 warn ERESOLVE     whileInstalling: {
+173 warn ERESOLVE       name: '@nivo/colors',
+173 warn ERESOLVE       version: '0.79.1',
+173 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\line\\node_modules\\@nivo\\colors'
+173 warn ERESOLVE     },
+173 warn ERESOLVE     location: 'node_modules/react',
+173 warn ERESOLVE     isWorkspace: false,
+173 warn ERESOLVE     dependents: [ [Object] ]
+173 warn ERESOLVE   },
+173 warn ERESOLVE   force: true,
+173 warn ERESOLVE   isMine: false,
+173 warn ERESOLVE   strictPeerDeps: false,
+173 warn ERESOLVE   current: {
+173 warn ERESOLVE     name: 'react',
+173 warn ERESOLVE     version: '18.2.0',
+173 warn ERESOLVE     location: 'node_modules/react',
+173 warn ERESOLVE     isWorkspace: false,
+173 warn ERESOLVE     dependents: [ [Object] ]
+173 warn ERESOLVE   },
+173 warn ERESOLVE   peerConflict: {
+173 warn ERESOLVE     current: {
+173 warn ERESOLVE       name: 'react',
+173 warn ERESOLVE       version: '18.2.0',
+173 warn ERESOLVE       location: 'node_modules/react',
+173 warn ERESOLVE       isWorkspace: false,
+173 warn ERESOLVE       dependents: [Array]
+173 warn ERESOLVE     },
+173 warn ERESOLVE     peer: {
+173 warn ERESOLVE       name: 'react',
+173 warn ERESOLVE       version: '17.0.2',
+173 warn ERESOLVE       whileInstalling: [Object],
+173 warn ERESOLVE       location: 'node_modules/react',
+173 warn ERESOLVE       isWorkspace: false,
+173 warn ERESOLVE       dependents: [Array]
+173 warn ERESOLVE     }
+173 warn ERESOLVE   }
+173 warn ERESOLVE }
+174 timing idealTree:node_modules/@nivo/line/node_modules/@nivo/colors Completed in 34ms
+175 warn ERESOLVE overriding peer dependency {
+175 warn ERESOLVE   code: 'ERESOLVE',
+175 warn ERESOLVE   edge: {
+175 warn ERESOLVE     type: 'peer',
+175 warn ERESOLVE     name: 'react',
+175 warn ERESOLVE     spec: '>= 16.14.0 < 18.0.0',
+175 warn ERESOLVE     error: 'INVALID',
+175 warn ERESOLVE     from: {
+175 warn ERESOLVE       name: '@nivo/legends',
+175 warn ERESOLVE       version: '0.79.1',
+175 warn ERESOLVE       location: 'node_modules/@nivo/line/node_modules/@nivo/legends',
+175 warn ERESOLVE       isWorkspace: false,
+175 warn ERESOLVE       dependents: [Array]
+175 warn ERESOLVE     }
+175 warn ERESOLVE   },
+175 warn ERESOLVE   dep: {
+175 warn ERESOLVE     name: 'react',
+175 warn ERESOLVE     version: '17.0.2',
+175 warn ERESOLVE     whileInstalling: {
+175 warn ERESOLVE       name: '@nivo/legends',
+175 warn ERESOLVE       version: '0.79.1',
+175 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\line\\node_modules\\@nivo\\legends'
+175 warn ERESOLVE     },
+175 warn ERESOLVE     location: 'node_modules/react',
+175 warn ERESOLVE     isWorkspace: false,
+175 warn ERESOLVE     dependents: [ [Object] ]
+175 warn ERESOLVE   },
+175 warn ERESOLVE   force: true,
+175 warn ERESOLVE   isMine: false,
+175 warn ERESOLVE   strictPeerDeps: false,
+175 warn ERESOLVE   current: {
+175 warn ERESOLVE     name: 'react',
+175 warn ERESOLVE     version: '18.2.0',
+175 warn ERESOLVE     location: 'node_modules/react',
+175 warn ERESOLVE     isWorkspace: false,
+175 warn ERESOLVE     dependents: [ [Object] ]
+175 warn ERESOLVE   },
+175 warn ERESOLVE   peerConflict: {
+175 warn ERESOLVE     current: {
+175 warn ERESOLVE       name: 'react',
+175 warn ERESOLVE       version: '18.2.0',
+175 warn ERESOLVE       location: 'node_modules/react',
+175 warn ERESOLVE       isWorkspace: false,
+175 warn ERESOLVE       dependents: [Array]
+175 warn ERESOLVE     },
+175 warn ERESOLVE     peer: {
+175 warn ERESOLVE       name: 'react',
+175 warn ERESOLVE       version: '17.0.2',
+175 warn ERESOLVE       whileInstalling: [Object],
+175 warn ERESOLVE       location: 'node_modules/react',
+175 warn ERESOLVE       isWorkspace: false,
+175 warn ERESOLVE       dependents: [Array]
+175 warn ERESOLVE     }
+175 warn ERESOLVE   }
+175 warn ERESOLVE }
+176 timing idealTree:node_modules/@nivo/line/node_modules/@nivo/legends Completed in 25ms
+177 warn ERESOLVE overriding peer dependency {
+177 warn ERESOLVE   code: 'ERESOLVE',
+177 warn ERESOLVE   edge: {
+177 warn ERESOLVE     type: 'peer',
+177 warn ERESOLVE     name: 'react',
+177 warn ERESOLVE     spec: '>= 16.14.0 < 18.0.0',
+177 warn ERESOLVE     error: 'INVALID',
+177 warn ERESOLVE     from: {
+177 warn ERESOLVE       name: '@nivo/voronoi',
+177 warn ERESOLVE       version: '0.79.0',
+177 warn ERESOLVE       location: 'node_modules/@nivo/line/node_modules/@nivo/voronoi',
+177 warn ERESOLVE       isWorkspace: false,
+177 warn ERESOLVE       dependents: [Array]
+177 warn ERESOLVE     }
+177 warn ERESOLVE   },
+177 warn ERESOLVE   dep: {
+177 warn ERESOLVE     name: 'react',
+177 warn ERESOLVE     version: '17.0.2',
+177 warn ERESOLVE     whileInstalling: {
+177 warn ERESOLVE       name: '@nivo/voronoi',
+177 warn ERESOLVE       version: '0.79.0',
+177 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\line\\node_modules\\@nivo\\voronoi'
+177 warn ERESOLVE     },
+177 warn ERESOLVE     location: 'node_modules/react',
+177 warn ERESOLVE     isWorkspace: false,
+177 warn ERESOLVE     dependents: [ [Object] ]
+177 warn ERESOLVE   },
+177 warn ERESOLVE   force: true,
+177 warn ERESOLVE   isMine: false,
+177 warn ERESOLVE   strictPeerDeps: false,
+177 warn ERESOLVE   current: {
+177 warn ERESOLVE     name: 'react',
+177 warn ERESOLVE     version: '18.2.0',
+177 warn ERESOLVE     location: 'node_modules/react',
+177 warn ERESOLVE     isWorkspace: false,
+177 warn ERESOLVE     dependents: [ [Object] ]
+177 warn ERESOLVE   },
+177 warn ERESOLVE   peerConflict: {
+177 warn ERESOLVE     current: {
+177 warn ERESOLVE       name: 'react',
+177 warn ERESOLVE       version: '18.2.0',
+177 warn ERESOLVE       location: 'node_modules/react',
+177 warn ERESOLVE       isWorkspace: false,
+177 warn ERESOLVE       dependents: [Array]
+177 warn ERESOLVE     },
+177 warn ERESOLVE     peer: {
+177 warn ERESOLVE       name: 'react',
+177 warn ERESOLVE       version: '17.0.2',
+177 warn ERESOLVE       whileInstalling: [Object],
+177 warn ERESOLVE       location: 'node_modules/react',
+177 warn ERESOLVE       isWorkspace: false,
+177 warn ERESOLVE       dependents: [Array]
+177 warn ERESOLVE     }
+177 warn ERESOLVE   }
+177 warn ERESOLVE }
+178 timing idealTree:node_modules/@nivo/line/node_modules/@nivo/voronoi Completed in 24ms
+179 warn ERESOLVE overriding peer dependency {
+179 warn ERESOLVE   code: 'ERESOLVE',
+179 warn ERESOLVE   edge: {
+179 warn ERESOLVE     type: 'peer',
+179 warn ERESOLVE     name: 'react',
+179 warn ERESOLVE     spec: '^16.8.0  || ^17.0.0',
+179 warn ERESOLVE     error: 'INVALID',
+179 warn ERESOLVE     from: {
+179 warn ERESOLVE       name: '@react-spring/web',
+179 warn ERESOLVE       version: '9.3.1',
+179 warn ERESOLVE       location: 'node_modules/@nivo/line/node_modules/@react-spring/web',
+179 warn ERESOLVE       isWorkspace: false,
+179 warn ERESOLVE       dependents: [Array]
+179 warn ERESOLVE     }
+179 warn ERESOLVE   },
+179 warn ERESOLVE   dep: {
+179 warn ERESOLVE     name: 'react',
+179 warn ERESOLVE     version: '17.0.2',
+179 warn ERESOLVE     whileInstalling: {
+179 warn ERESOLVE       name: '@react-spring/web',
+179 warn ERESOLVE       version: '9.3.1',
+179 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\line\\node_modules\\@react-spring\\web'
+179 warn ERESOLVE     },
+179 warn ERESOLVE     location: 'node_modules/react',
+179 warn ERESOLVE     isWorkspace: false,
+179 warn ERESOLVE     dependents: [ [Object] ]
+179 warn ERESOLVE   },
+179 warn ERESOLVE   force: true,
+179 warn ERESOLVE   isMine: false,
+179 warn ERESOLVE   strictPeerDeps: false,
+179 warn ERESOLVE   current: {
+179 warn ERESOLVE     name: 'react',
+179 warn ERESOLVE     version: '18.2.0',
+179 warn ERESOLVE     location: 'node_modules/react',
+179 warn ERESOLVE     isWorkspace: false,
+179 warn ERESOLVE     dependents: [ [Object] ]
+179 warn ERESOLVE   },
+179 warn ERESOLVE   peerConflict: {
+179 warn ERESOLVE     current: {
+179 warn ERESOLVE       name: 'react',
+179 warn ERESOLVE       version: '18.2.0',
+179 warn ERESOLVE       location: 'node_modules/react',
+179 warn ERESOLVE       isWorkspace: false,
+179 warn ERESOLVE       dependents: [Array]
+179 warn ERESOLVE     },
+179 warn ERESOLVE     peer: {
+179 warn ERESOLVE       name: 'react',
+179 warn ERESOLVE       version: '17.0.2',
+179 warn ERESOLVE       whileInstalling: [Object],
+179 warn ERESOLVE       location: 'node_modules/react',
+179 warn ERESOLVE       isWorkspace: false,
+179 warn ERESOLVE       dependents: [Array]
+179 warn ERESOLVE     }
+179 warn ERESOLVE   }
+179 warn ERESOLVE }
+180 silly placeDep node_modules/@nivo/line react-dom@17.0.2 CONFLICT for: @react-spring/web@9.3.1 want: ^16.8.0  || ^17.0.0
+181 warn ERESOLVE overriding peer dependency {
+181 warn ERESOLVE   code: 'ERESOLVE',
+181 warn ERESOLVE   edge: {
+181 warn ERESOLVE     type: 'peer',
+181 warn ERESOLVE     name: 'react',
+181 warn ERESOLVE     spec: '17.0.2',
+181 warn ERESOLVE     error: 'INVALID',
+181 warn ERESOLVE     from: {
+181 warn ERESOLVE       name: 'react-dom',
+181 warn ERESOLVE       version: '17.0.2',
+181 warn ERESOLVE       location: 'node_modules/@nivo/line/node_modules/react-dom',
+181 warn ERESOLVE       isWorkspace: false,
+181 warn ERESOLVE       dependents: [Array]
+181 warn ERESOLVE     }
+181 warn ERESOLVE   },
+181 warn ERESOLVE   dep: {
+181 warn ERESOLVE     name: 'react',
+181 warn ERESOLVE     version: '17.0.2',
+181 warn ERESOLVE     whileInstalling: {
+181 warn ERESOLVE       name: '@react-spring/web',
+181 warn ERESOLVE       version: '9.3.1',
+181 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\line\\node_modules\\@react-spring\\web'
+181 warn ERESOLVE     },
+181 warn ERESOLVE     location: 'node_modules/react',
+181 warn ERESOLVE     isWorkspace: false,
+181 warn ERESOLVE     dependents: [ [Object] ]
+181 warn ERESOLVE   },
+181 warn ERESOLVE   force: true,
+181 warn ERESOLVE   isMine: false,
+181 warn ERESOLVE   strictPeerDeps: false,
+181 warn ERESOLVE   current: {
+181 warn ERESOLVE     name: 'react',
+181 warn ERESOLVE     version: '18.2.0',
+181 warn ERESOLVE     location: 'node_modules/react',
+181 warn ERESOLVE     isWorkspace: false,
+181 warn ERESOLVE     dependents: [ [Object] ]
+181 warn ERESOLVE   },
+181 warn ERESOLVE   peerConflict: {
+181 warn ERESOLVE     name: 'react',
+181 warn ERESOLVE     version: '18.2.0',
+181 warn ERESOLVE     location: 'node_modules/react',
+181 warn ERESOLVE     isWorkspace: false,
+181 warn ERESOLVE     dependents: [ [Object] ]
+181 warn ERESOLVE   }
+181 warn ERESOLVE }
+182 timing idealTree:node_modules/@nivo/line/node_modules/@react-spring/web Completed in 61ms
+183 silly placeDep node_modules/@nivo/line scheduler@0.20.2 OK for: react-dom@17.0.2 want: ^0.20.2
+184 timing idealTree:node_modules/@nivo/line/node_modules/react-dom Completed in 1ms
+185 timing idealTree:node_modules/@nivo/line/node_modules/scheduler Completed in 0ms
+186 timing idealTree:node_modules/@nivo/pie/node_modules/@nivo/arcs Completed in 0ms
+187 timing idealTree:node_modules/@nivo/pie/node_modules/@nivo/colors Completed in 0ms
+188 timing idealTree:node_modules/@nivo/pie/node_modules/@nivo/legends Completed in 0ms
+189 timing idealTree:node_modules/@nivo/pie/node_modules/@nivo/tooltip Completed in 0ms
+190 silly placeDep node_modules/@nivo/tooltip @react-spring/animated@9.3.2 OK for: @react-spring/web@9.3.1 want: ~9.3.0
+191 silly placeDep node_modules/@nivo/tooltip @react-spring/core@9.3.2 OK for: @react-spring/web@9.3.1 want: ~9.3.0
+192 silly placeDep node_modules/@nivo/tooltip @react-spring/shared@9.3.2 OK for: @react-spring/web@9.3.1 want: ~9.3.0
+193 silly placeDep node_modules/@nivo/tooltip @react-spring/types@9.3.2 OK for: @react-spring/web@9.3.1 want: ~9.3.0
+194 timing idealTree:node_modules/@nivo/tooltip/node_modules/@react-spring/web Completed in 18ms
+195 timing idealTree:node_modules/@nivo/tooltip/node_modules/@react-spring/animated Completed in 0ms
+196 timing idealTree:node_modules/@nivo/tooltip/node_modules/@react-spring/core Completed in 0ms
+197 silly placeDep node_modules/@nivo/tooltip @react-spring/rafz@9.3.2 OK for: @react-spring/shared@9.3.2 want: ~9.3.0
+198 timing idealTree:node_modules/@nivo/tooltip/node_modules/@react-spring/shared Completed in 3ms
+199 timing idealTree:node_modules/@nivo/tooltip/node_modules/@react-spring/rafz Completed in 0ms
+200 timing idealTree:node_modules/@nivo/tooltip/node_modules/@react-spring/types Completed in 0ms
+201 timing idealTree:node_modules/@nivo/tooltip/node_modules/react Completed in 2ms
+202 silly placeDep node_modules/@nivo/tooltip scheduler@0.20.2 OK for: react-dom@17.0.2 want: ^0.20.2
+203 timing idealTree:node_modules/@nivo/tooltip/node_modules/react-dom Completed in 2ms
+204 timing idealTree:node_modules/@nivo/tooltip/node_modules/scheduler Completed in 0ms
+205 silly fetch manifest react@^16.3.0 || 17
+206 silly fetch manifest react-dom@^16.3.0 || 17
+207 warn ERESOLVE overriding peer dependency {
+207 warn ERESOLVE   code: 'ERESOLVE',
+207 warn ERESOLVE   edge: {
+207 warn ERESOLVE     type: 'peer',
+207 warn ERESOLVE     name: 'react',
+207 warn ERESOLVE     spec: '^16.3.0 || 17',
+207 warn ERESOLVE     error: 'INVALID',
+207 warn ERESOLVE     from: {
+207 warn ERESOLVE       name: 'react-slidedown',
+207 warn ERESOLVE       version: '2.4.7',
+207 warn ERESOLVE       location: 'node_modules/react-pro-sidebar/node_modules/react-slidedown',
+207 warn ERESOLVE       isWorkspace: false,
+207 warn ERESOLVE       dependents: [Array]
+207 warn ERESOLVE     }
+207 warn ERESOLVE   },
+207 warn ERESOLVE   dep: {
+207 warn ERESOLVE     name: 'react',
+207 warn ERESOLVE     version: '17.0.2',
+207 warn ERESOLVE     whileInstalling: {
+207 warn ERESOLVE       name: 'react-slidedown',
+207 warn ERESOLVE       version: '2.4.7',
+207 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\react-pro-sidebar\\node_modules\\react-slidedown'
+207 warn ERESOLVE     },
+207 warn ERESOLVE     location: 'node_modules/react',
+207 warn ERESOLVE     isWorkspace: false,
+207 warn ERESOLVE     dependents: [ [Object] ]
+207 warn ERESOLVE   },
+207 warn ERESOLVE   force: true,
+207 warn ERESOLVE   isMine: false,
+207 warn ERESOLVE   strictPeerDeps: false,
+207 warn ERESOLVE   current: {
+207 warn ERESOLVE     name: 'react',
+207 warn ERESOLVE     version: '18.2.0',
+207 warn ERESOLVE     location: 'node_modules/react',
+207 warn ERESOLVE     isWorkspace: false,
+207 warn ERESOLVE     dependents: [ [Object] ]
+207 warn ERESOLVE   },
+207 warn ERESOLVE   peerConflict: {
+207 warn ERESOLVE     current: {
+207 warn ERESOLVE       name: 'react',
+207 warn ERESOLVE       version: '18.2.0',
+207 warn ERESOLVE       location: 'node_modules/react',
+207 warn ERESOLVE       isWorkspace: false,
+207 warn ERESOLVE       dependents: [Array]
+207 warn ERESOLVE     },
+207 warn ERESOLVE     peer: {
+207 warn ERESOLVE       name: 'react',
+207 warn ERESOLVE       version: '17.0.2',
+207 warn ERESOLVE       whileInstalling: [Object],
+207 warn ERESOLVE       location: 'node_modules/react',
+207 warn ERESOLVE       isWorkspace: false,
+207 warn ERESOLVE       dependents: [Array]
+207 warn ERESOLVE     }
+207 warn ERESOLVE   }
+207 warn ERESOLVE }
+208 warn ERESOLVE overriding peer dependency {
+208 warn ERESOLVE   code: 'ERESOLVE',
+208 warn ERESOLVE   edge: {
+208 warn ERESOLVE     type: 'peer',
+208 warn ERESOLVE     name: 'react-dom',
+208 warn ERESOLVE     spec: '^16.3.0 || 17',
+208 warn ERESOLVE     error: 'INVALID',
+208 warn ERESOLVE     from: {
+208 warn ERESOLVE       name: 'react-slidedown',
+208 warn ERESOLVE       version: '2.4.7',
+208 warn ERESOLVE       location: 'node_modules/react-pro-sidebar/node_modules/react-slidedown',
+208 warn ERESOLVE       isWorkspace: false,
+208 warn ERESOLVE       dependents: [Array]
+208 warn ERESOLVE     }
+208 warn ERESOLVE   },
+208 warn ERESOLVE   dep: {
+208 warn ERESOLVE     name: 'react-dom',
+208 warn ERESOLVE     version: '17.0.2',
+208 warn ERESOLVE     whileInstalling: {
+208 warn ERESOLVE       name: 'react-slidedown',
+208 warn ERESOLVE       version: '2.4.7',
+208 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\react-pro-sidebar\\node_modules\\react-slidedown'
+208 warn ERESOLVE     },
+208 warn ERESOLVE     location: 'node_modules/react-dom',
+208 warn ERESOLVE     isWorkspace: false,
+208 warn ERESOLVE     dependents: [ [Object] ]
+208 warn ERESOLVE   },
+208 warn ERESOLVE   force: true,
+208 warn ERESOLVE   isMine: false,
+208 warn ERESOLVE   strictPeerDeps: false,
+208 warn ERESOLVE   current: {
+208 warn ERESOLVE     name: 'react-dom',
+208 warn ERESOLVE     version: '18.2.0',
+208 warn ERESOLVE     location: 'node_modules/react-dom',
+208 warn ERESOLVE     isWorkspace: false,
+208 warn ERESOLVE     dependents: [
+208 warn ERESOLVE       [Object], [Object],
+208 warn ERESOLVE       [Object], [Object],
+208 warn ERESOLVE       [Object], [Object],
+208 warn ERESOLVE       [Object], [Object],
+208 warn ERESOLVE       [Object], [Object],
+208 warn ERESOLVE       [Object], [Object]
+208 warn ERESOLVE     ]
+208 warn ERESOLVE   },
+208 warn ERESOLVE   peerConflict: {
+208 warn ERESOLVE     current: {
+208 warn ERESOLVE       name: 'react-dom',
+208 warn ERESOLVE       version: '18.2.0',
+208 warn ERESOLVE       location: 'node_modules/react-dom',
+208 warn ERESOLVE       isWorkspace: false,
+208 warn ERESOLVE       dependents: [Array]
+208 warn ERESOLVE     },
+208 warn ERESOLVE     peer: {
+208 warn ERESOLVE       name: 'react-dom',
+208 warn ERESOLVE       version: '17.0.2',
+208 warn ERESOLVE       whileInstalling: [Object],
+208 warn ERESOLVE       location: 'node_modules/react-dom',
+208 warn ERESOLVE       isWorkspace: false,
+208 warn ERESOLVE       dependents: [Array]
+208 warn ERESOLVE     }
+208 warn ERESOLVE   }
+208 warn ERESOLVE }
+209 timing idealTree:node_modules/react-pro-sidebar/node_modules/react-slidedown Completed in 70ms
+210 timing idealTree:node_modules/@nivo/core/node_modules/@react-spring/web/node_modules/@react-spring/animated Completed in 0ms
+211 timing idealTree:node_modules/@nivo/core/node_modules/@react-spring/web/node_modules/@react-spring/core Completed in 0ms
+212 silly placeDep node_modules/@nivo/core @react-spring/rafz@9.3.2 OK for: @react-spring/shared@9.3.2 want: ~9.3.0
+213 timing idealTree:node_modules/@nivo/core/node_modules/@react-spring/web/node_modules/@react-spring/shared Completed in 2ms
+214 timing idealTree:node_modules/@nivo/core/node_modules/@react-spring/rafz Completed in 0ms
+215 warn ERESOLVE overriding peer dependency {
+215 warn ERESOLVE   code: 'ERESOLVE',
+215 warn ERESOLVE   edge: {
+215 warn ERESOLVE     type: 'peer',
+215 warn ERESOLVE     name: 'react',
+215 warn ERESOLVE     spec: '^16.8.0  || ^17.0.0',
+215 warn ERESOLVE     error: 'INVALID',
+215 warn ERESOLVE     from: {
+215 warn ERESOLVE       name: '@react-spring/animated',
+215 warn ERESOLVE       version: '9.3.2',
+215 warn ERESOLVE       location: 'node_modules/@nivo/line/node_modules/@react-spring/web/node_modules/@react-spring/animated',
+215 warn ERESOLVE       isWorkspace: false,
+215 warn ERESOLVE       dependents: [Array]
+215 warn ERESOLVE     }
+215 warn ERESOLVE   },
+215 warn ERESOLVE   dep: {
+215 warn ERESOLVE     name: 'react',
+215 warn ERESOLVE     version: '17.0.2',
+215 warn ERESOLVE     whileInstalling: {
+215 warn ERESOLVE       name: '@react-spring/animated',
+215 warn ERESOLVE       version: '9.3.2',
+215 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\line\\node_modules\\@react-spring\\web\\node_modules\\@react-spring\\animated'
+215 warn ERESOLVE     },
+215 warn ERESOLVE     location: 'node_modules/react',
+215 warn ERESOLVE     isWorkspace: false,
+215 warn ERESOLVE     dependents: [ [Object] ]
+215 warn ERESOLVE   },
+215 warn ERESOLVE   force: true,
+215 warn ERESOLVE   isMine: false,
+215 warn ERESOLVE   strictPeerDeps: false,
+215 warn ERESOLVE   current: {
+215 warn ERESOLVE     name: 'react',
+215 warn ERESOLVE     version: '18.2.0',
+215 warn ERESOLVE     location: 'node_modules/react',
+215 warn ERESOLVE     isWorkspace: false,
+215 warn ERESOLVE     dependents: [ [Object] ]
+215 warn ERESOLVE   },
+215 warn ERESOLVE   peerConflict: {
+215 warn ERESOLVE     current: {
+215 warn ERESOLVE       name: 'react',
+215 warn ERESOLVE       version: '18.2.0',
+215 warn ERESOLVE       location: 'node_modules/react',
+215 warn ERESOLVE       isWorkspace: false,
+215 warn ERESOLVE       dependents: [Array]
+215 warn ERESOLVE     },
+215 warn ERESOLVE     peer: {
+215 warn ERESOLVE       name: 'react',
+215 warn ERESOLVE       version: '17.0.2',
+215 warn ERESOLVE       whileInstalling: [Object],
+215 warn ERESOLVE       location: 'node_modules/react',
+215 warn ERESOLVE       isWorkspace: false,
+215 warn ERESOLVE       dependents: [Array]
+215 warn ERESOLVE     }
+215 warn ERESOLVE   }
+215 warn ERESOLVE }
+216 timing idealTree:node_modules/@nivo/line/node_modules/@react-spring/web/node_modules/@react-spring/animated Completed in 36ms
+217 warn ERESOLVE overriding peer dependency {
+217 warn ERESOLVE   code: 'ERESOLVE',
+217 warn ERESOLVE   edge: {
+217 warn ERESOLVE     type: 'peer',
+217 warn ERESOLVE     name: 'react',
+217 warn ERESOLVE     spec: '^16.8.0  || ^17.0.0',
+217 warn ERESOLVE     error: 'INVALID',
+217 warn ERESOLVE     from: {
+217 warn ERESOLVE       name: '@react-spring/core',
+217 warn ERESOLVE       version: '9.3.2',
+217 warn ERESOLVE       location: 'node_modules/@nivo/line/node_modules/@react-spring/web/node_modules/@react-spring/core',
+217 warn ERESOLVE       isWorkspace: false,
+217 warn ERESOLVE       dependents: [Array]
+217 warn ERESOLVE     }
+217 warn ERESOLVE   },
+217 warn ERESOLVE   dep: {
+217 warn ERESOLVE     name: 'react',
+217 warn ERESOLVE     version: '17.0.2',
+217 warn ERESOLVE     whileInstalling: {
+217 warn ERESOLVE       name: '@react-spring/core',
+217 warn ERESOLVE       version: '9.3.2',
+217 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\line\\node_modules\\@react-spring\\web\\node_modules\\@react-spring\\core'
+217 warn ERESOLVE     },
+217 warn ERESOLVE     location: 'node_modules/react',
+217 warn ERESOLVE     isWorkspace: false,
+217 warn ERESOLVE     dependents: [ [Object] ]
+217 warn ERESOLVE   },
+217 warn ERESOLVE   force: true,
+217 warn ERESOLVE   isMine: false,
+217 warn ERESOLVE   strictPeerDeps: false,
+217 warn ERESOLVE   current: {
+217 warn ERESOLVE     name: 'react',
+217 warn ERESOLVE     version: '18.2.0',
+217 warn ERESOLVE     location: 'node_modules/react',
+217 warn ERESOLVE     isWorkspace: false,
+217 warn ERESOLVE     dependents: [ [Object] ]
+217 warn ERESOLVE   },
+217 warn ERESOLVE   peerConflict: {
+217 warn ERESOLVE     current: {
+217 warn ERESOLVE       name: 'react',
+217 warn ERESOLVE       version: '18.2.0',
+217 warn ERESOLVE       location: 'node_modules/react',
+217 warn ERESOLVE       isWorkspace: false,
+217 warn ERESOLVE       dependents: [Array]
+217 warn ERESOLVE     },
+217 warn ERESOLVE     peer: {
+217 warn ERESOLVE       name: 'react',
+217 warn ERESOLVE       version: '17.0.2',
+217 warn ERESOLVE       whileInstalling: [Object],
+217 warn ERESOLVE       location: 'node_modules/react',
+217 warn ERESOLVE       isWorkspace: false,
+217 warn ERESOLVE       dependents: [Array]
+217 warn ERESOLVE     }
+217 warn ERESOLVE   }
+217 warn ERESOLVE }
+218 timing idealTree:node_modules/@nivo/line/node_modules/@react-spring/web/node_modules/@react-spring/core Completed in 30ms
+219 warn ERESOLVE overriding peer dependency {
+219 warn ERESOLVE   code: 'ERESOLVE',
+219 warn ERESOLVE   edge: {
+219 warn ERESOLVE     type: 'peer',
+219 warn ERESOLVE     name: 'react',
+219 warn ERESOLVE     spec: '^16.8.0  || ^17.0.0',
+219 warn ERESOLVE     error: 'INVALID',
+219 warn ERESOLVE     from: {
+219 warn ERESOLVE       name: '@react-spring/shared',
+219 warn ERESOLVE       version: '9.3.2',
+219 warn ERESOLVE       location: 'node_modules/@nivo/line/node_modules/@react-spring/web/node_modules/@react-spring/shared',
+219 warn ERESOLVE       isWorkspace: false,
+219 warn ERESOLVE       dependents: [Array]
+219 warn ERESOLVE     }
+219 warn ERESOLVE   },
+219 warn ERESOLVE   dep: {
+219 warn ERESOLVE     name: 'react',
+219 warn ERESOLVE     version: '17.0.2',
+219 warn ERESOLVE     whileInstalling: {
+219 warn ERESOLVE       name: '@react-spring/shared',
+219 warn ERESOLVE       version: '9.3.2',
+219 warn ERESOLVE       path: 'D:\\React\\react-admin-dashboard\\node_modules\\@nivo\\line\\node_modules\\@react-spring\\web\\node_modules\\@react-spring\\shared'
+219 warn ERESOLVE     },
+219 warn ERESOLVE     location: 'node_modules/react',
+219 warn ERESOLVE     isWorkspace: false,
+219 warn ERESOLVE     dependents: [ [Object] ]
+219 warn ERESOLVE   },
+219 warn ERESOLVE   force: true,
+219 warn ERESOLVE   isMine: false,
+219 warn ERESOLVE   strictPeerDeps: false,
+219 warn ERESOLVE   current: {
+219 warn ERESOLVE     name: 'react',
+219 warn ERESOLVE     version: '18.2.0',
+219 warn ERESOLVE     location: 'node_modules/react',
+219 warn ERESOLVE     isWorkspace: false,
+219 warn ERESOLVE     dependents: [ [Object] ]
+219 warn ERESOLVE   },
+219 warn ERESOLVE   peerConflict: {
+219 warn ERESOLVE     current: {
+219 warn ERESOLVE       name: 'react',
+219 warn ERESOLVE       version: '18.2.0',
+219 warn ERESOLVE       location: 'node_modules/react',
+219 warn ERESOLVE       isWorkspace: false,
+219 warn ERESOLVE       dependents: [Array]
+219 warn ERESOLVE     },
+219 warn ERESOLVE     peer: {
+219 warn ERESOLVE       name: 'react',
+219 warn ERESOLVE       version: '17.0.2',
+219 warn ERESOLVE       whileInstalling: [Object],
+219 warn ERESOLVE       location: 'node_modules/react',
+219 warn ERESOLVE       isWorkspace: false,
+219 warn ERESOLVE       dependents: [Array]
+219 warn ERESOLVE     }
+219 warn ERESOLVE   }
+219 warn ERESOLVE }
+220 timing idealTree:node_modules/@nivo/line/node_modules/@react-spring/web/node_modules/@react-spring/shared Completed in 34ms
+221 timing idealTree:buildDeps Completed in 22475ms
+222 timing idealTree:fixDepFlags Completed in 47ms
+223 timing idealTree Completed in 22945ms
+224 timing command:ci Completed in 23422ms
+225 notice
+225 notice New [32mpatch[39m version of npm available! [31m10.5.0[39m -> [32m10.5.1[39m
+225 notice Changelog: [36mhttps://github.com/npm/cli/releases/tag/v10.5.1[39m
+225 notice Run [32mnpm install -g npm@10.5.1[39m to update!
+225 notice
+226 verbose stack Error: 
+226 verbose stack `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
+226 verbose stack
+226 verbose stack Invalid: lock file's @nivo/core@0.80.0 does not satisfy @nivo/core@0.79.0
+226 verbose stack Invalid: lock file's @nivo/tooltip@0.80.0 does not satisfy @nivo/tooltip@0.79.0
+226 verbose stack Missing: @nivo/tooltip@0.80.0 from lock file
+226 verbose stack Missing: @nivo/recompose@0.79.0 from lock file
+226 verbose stack Missing: @react-spring/web@9.3.1 from lock file
+226 verbose stack Missing: react-dom@17.0.2 from lock file
+226 verbose stack Missing: @nivo/tooltip@0.80.0 from lock file
+226 verbose stack Missing: @nivo/tooltip@0.80.0 from lock file
+226 verbose stack Missing: @react-spring/web@9.3.1 from lock file
+226 verbose stack Missing: react@17.0.2 from lock file
+226 verbose stack Missing: react-dom@17.0.2 from lock file
+226 verbose stack Missing: @testing-library/dom@9.3.4 from lock file
+226 verbose stack Missing: typescript@4.9.5 from lock file
+226 verbose stack Missing: @react-spring/animated@9.3.2 from lock file
+226 verbose stack Missing: @react-spring/core@9.3.2 from lock file
+226 verbose stack Missing: @react-spring/shared@9.3.2 from lock file
+226 verbose stack Missing: @react-spring/types@9.3.2 from lock file
+226 verbose stack Missing: scheduler@0.20.2 from lock file
+226 verbose stack Missing: react-dom@17.0.2 from lock file
+226 verbose stack Missing: scheduler@0.20.2 from lock file
+226 verbose stack Missing: @react-spring/animated@9.3.2 from lock file
+226 verbose stack Missing: @react-spring/core@9.3.2 from lock file
+226 verbose stack Missing: @react-spring/shared@9.3.2 from lock file
+226 verbose stack Missing: @react-spring/types@9.3.2 from lock file
+226 verbose stack Missing: @react-spring/rafz@9.3.2 from lock file
+226 verbose stack Missing: scheduler@0.20.2 from lock file
+226 verbose stack Missing: @react-spring/rafz@9.3.2 from lock file
+226 verbose stack
+226 verbose stack Clean install a project
+226 verbose stack
+226 verbose stack Usage:
+226 verbose stack npm ci
+226 verbose stack
+226 verbose stack Options:
+226 verbose stack [--install-strategy <hoisted|nested|shallow|linked>] [--legacy-bundling]
+226 verbose stack [--global-style] [--omit <dev|optional|peer> [--omit <dev|optional|peer> ...]]
+226 verbose stack [--include <prod|dev|optional|peer> [--include <prod|dev|optional|peer> ...]]
+226 verbose stack [--strict-peer-deps] [--foreground-scripts] [--ignore-scripts] [--no-audit]
+226 verbose stack [--no-bin-links] [--no-fund] [--dry-run]
+226 verbose stack [-w|--workspace <workspace-name> [-w|--workspace <workspace-name> ...]]
+226 verbose stack [-ws|--workspaces] [--include-workspace-root] [--install-links]
+226 verbose stack
+226 verbose stack aliases: clean-install, ic, install-clean, isntall-clean
+226 verbose stack
+226 verbose stack Run "npm help ci" for more info
+226 verbose stack     at CI.usageError (C:\Program Files\nodejs\node_modules\npm\lib\base-command.js:114:26)
+226 verbose stack     at CI.exec (C:\Program Files\nodejs\node_modules\npm\lib\commands\ci.js:69:18)
+226 verbose stack     at async module.exports (C:\Program Files\nodejs\node_modules\npm\lib\cli-entry.js:61:5)
+227 verbose cwd D:\React\react-admin-dashboard
+228 verbose Windows_NT 10.0.22631
+229 verbose node v21.7.1
+230 verbose npm  v10.5.0
+231 error code EUSAGE
+232 error
+232 error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
+232 error
+232 error Invalid: lock file's @nivo/core@0.80.0 does not satisfy @nivo/core@0.79.0
+232 error Invalid: lock file's @nivo/tooltip@0.80.0 does not satisfy @nivo/tooltip@0.79.0
+232 error Missing: @nivo/tooltip@0.80.0 from lock file
+232 error Missing: @nivo/recompose@0.79.0 from lock file
+232 error Missing: @react-spring/web@9.3.1 from lock file
+232 error Missing: react-dom@17.0.2 from lock file
+232 error Missing: @nivo/tooltip@0.80.0 from lock file
+232 error Missing: @nivo/tooltip@0.80.0 from lock file
+232 error Missing: @react-spring/web@9.3.1 from lock file
+232 error Missing: react@17.0.2 from lock file
+232 error Missing: react-dom@17.0.2 from lock file
+232 error Missing: @testing-library/dom@9.3.4 from lock file
+232 error Missing: typescript@4.9.5 from lock file
+232 error Missing: @react-spring/animated@9.3.2 from lock file
+232 error Missing: @react-spring/core@9.3.2 from lock file
+232 error Missing: @react-spring/shared@9.3.2 from lock file
+232 error Missing: @react-spring/types@9.3.2 from lock file
+232 error Missing: scheduler@0.20.2 from lock file
+232 error Missing: react-dom@17.0.2 from lock file
+232 error Missing: scheduler@0.20.2 from lock file
+232 error Missing: @react-spring/animated@9.3.2 from lock file
+232 error Missing: @react-spring/core@9.3.2 from lock file
+232 error Missing: @react-spring/shared@9.3.2 from lock file
+232 error Missing: @react-spring/types@9.3.2 from lock file
+232 error Missing: @react-spring/rafz@9.3.2 from lock file
+232 error Missing: scheduler@0.20.2 from lock file
+232 error Missing: @react-spring/rafz@9.3.2 from lock file
+232 error
+232 error Clean install a project
+232 error
+232 error Usage:
+232 error npm ci
+232 error
+232 error Options:
+232 error [--install-strategy <hoisted|nested|shallow|linked>] [--legacy-bundling]
+232 error [--global-style] [--omit <dev|optional|peer> [--omit <dev|optional|peer> ...]]
+232 error [--include <prod|dev|optional|peer> [--include <prod|dev|optional|peer> ...]]
+232 error [--strict-peer-deps] [--foreground-scripts] [--ignore-scripts] [--no-audit]
+232 error [--no-bin-links] [--no-fund] [--dry-run]
+232 error [-w|--workspace <workspace-name> [-w|--workspace <workspace-name> ...]]
+232 error [-ws|--workspaces] [--include-workspace-root] [--install-links]
+232 error
+232 error aliases: clean-install, ic, install-clean, isntall-clean
+232 error
+232 error Run "npm help ci" for more info
+233 verbose exit 1
+234 timing npm Completed in 23979ms
+235 verbose code 1
+236 error A complete log of this run can be found in: D:\React\react-admin-dashboard\.npm\_logs\2024-04-08T06_13_40_531Z-debug-0.log
