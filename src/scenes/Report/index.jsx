@@ -1,601 +1,601 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  DialogActions,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Grid,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-} from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+// import React, { useState, useEffect } from 'react';
+// import axios from 'axios';
+// import {
+//   Button,
+//   Dialog,
+//   DialogTitle,
+//   DialogContent,
+//   TextField,
+//   DialogActions,
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableContainer,
+//   TableHead,
+//   TableRow,
+//   Paper,
+//   Typography,
+//   Grid,
+//   MenuItem,
+//   Select,
+//   FormControl,
+//   InputLabel,
+// } from '@mui/material';
+// import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 
-// Replace these URLs with your actual endpoints
-const API_CREATE_TEST = 'https://ewgjvadscl4otubtck4kp6vap40rjivf.lambda-url.us-east-1.on.aws/';
-const API_GET_TESTS = 'https://ewgjvadscl4otubtck4kp6vap40rjivf.lambda-url.us-east-1.on.aws/';
-const API_ADD_SAMPLE = 'https://pox6tnrgvttowvpdposwtyn2ly0ziuso.lambda-url.us-east-1.on.aws/';
-const API_GET_SAMPLES = 'https://pox6tnrgvttowvpdposwtyn2ly0ziuso.lambda-url.us-east-1.on.aws';
-const API_UPDATE_SAMPLE = 'https://pox6tnrgvttowvpdposwtyn2ly0ziuso.lambda-url.us-east-1.on.aws';
+// // Replace these URLs with your actual endpoints
+// const API_CREATE_TEST = 'https://ewgjvadscl4otubtck4kp6vap40rjivf.lambda-url.us-east-1.on.aws/';
+// const API_GET_TESTS = 'https://ewgjvadscl4otubtck4kp6vap40rjivf.lambda-url.us-east-1.on.aws/';
+// const API_ADD_SAMPLE = 'https://pox6tnrgvttowvpdposwtyn2ly0ziuso.lambda-url.us-east-1.on.aws/';
+// const API_GET_SAMPLES = 'https://pox6tnrgvttowvpdposwtyn2ly0ziuso.lambda-url.us-east-1.on.aws';
+// const API_UPDATE_SAMPLE = 'https://pox6tnrgvttowvpdposwtyn2ly0ziuso.lambda-url.us-east-1.on.aws';
 
-// List of testing machine options
-const testingMachineOptions = [
-  "Mark 1", "Mark 2", "Mark 3",
-  "Prabha 1", "Prabha 2", "Prabha 3",
-  "Pluto 1", "Pluto 2", "Pluto 3", 
-  "Helios 1", "Helios 2", "Helios 3",
-];
+// // List of testing machine options
+// const testingMachineOptions = [
+//   "Mark 1", "Mark 2", "Mark 3",
+//   "Prabha 1", "Prabha 2", "Prabha 3",
+//   "Pluto 1", "Pluto 2", "Pluto 3", 
+//   "Helios 1", "Helios 2", "Helios 3",
+// ];
 
-function TestManager() {
-  // ----- Global State for Testing Machine -----
-  const [selectedMachine, setSelectedMachine] = useState("");
+// function TestManager() {
+//   // ----- Global State for Testing Machine -----
+//   const [selectedMachine, setSelectedMachine] = useState("");
 
-  // ----- Test Header State -----
-  const [testHeaders, setTestHeaders] = useState([]);
-  const [selectedTest, setSelectedTest] = useState(null);
-  const [openCreateTest, setOpenCreateTest] = useState(false);
-  const [createTestForm, setCreateTestForm] = useState({
-    testId: '',
-    testTitle: '',
-    testDate: new Date(),
-    machine: '', // Will be filled from selectedMachine
-  });
+//   // ----- Test Header State -----
+//   const [testHeaders, setTestHeaders] = useState([]);
+//   const [selectedTest, setSelectedTest] = useState(null);
+//   const [openCreateTest, setOpenCreateTest] = useState(false);
+//   const [createTestForm, setCreateTestForm] = useState({
+//     testId: '',
+//     testTitle: '',
+//     testDate: new Date(),
+//     machine: '', // Will be filled from selectedMachine
+//   });
 
-  // ----- Sample Data State (for selected test) -----
-  const [samples, setSamples] = useState([]);
-  const [openAddSample, setOpenAddSample] = useState(false);
-  const [sampleForm, setSampleForm] = useState({
-    // pressureLevel: '',
-    // flowRateLevel: '',
-    sampleTime: new Date(),
-    current: '',
-    voltage: '',
-    temperature: '',
-    pressure: '',
-    flowRate: '',
-  });
+//   // ----- Sample Data State (for selected test) -----
+//   const [samples, setSamples] = useState([]);
+//   const [openAddSample, setOpenAddSample] = useState(false);
+//   const [sampleForm, setSampleForm] = useState({
+//     // pressureLevel: '',
+//     // flowRateLevel: '',
+//     sampleTime: new Date(),
+//     current: '',
+//     voltage: '',
+//     temperature: '',
+//     pressure: '',
+//     flowRate: '',
+//   });
 
-  // ----- Edit Sample State -----
-  const [openEditSample, setOpenEditSample] = useState(false);
-  const [editSampleForm, setEditSampleForm] = useState(null);
+//   // ----- Edit Sample State -----
+//   const [openEditSample, setOpenEditSample] = useState(false);
+//   const [editSampleForm, setEditSampleForm] = useState(null);
 
-// When a machine is selected, generate a new Test ID automatically:
-useEffect(() => {
-  if (selectedMachine) {
-    setCreateTestForm(prev => ({ 
-      ...prev, 
-      machine: selectedMachine, 
-      testId: uuidv4()  // generate a new unique id automatically
-    }));
-    fetchTestHeaders(selectedMachine);
-  }
-}, [selectedMachine]);
+// // When a machine is selected, generate a new Test ID automatically:
+// useEffect(() => {
+//   if (selectedMachine) {
+//     setCreateTestForm(prev => ({ 
+//       ...prev, 
+//       machine: selectedMachine, 
+//       testId: uuidv4()  // generate a new unique id automatically
+//     }));
+//     fetchTestHeaders(selectedMachine);
+//   }
+// }, [selectedMachine]);
 
-  // ----- When testing machine changes, reset tests and selected test -----
-  useEffect(() => {
-    setTestHeaders([]);
-    setSelectedTest(null);
-    if (selectedMachine) {
-      // Optionally, update the test header form's machine field
-      setCreateTestForm(prev => ({ ...prev, machine: selectedMachine }));
-      fetchTestHeaders(selectedMachine);
-    }
-  }, [selectedMachine]);
+//   // ----- When testing machine changes, reset tests and selected test -----
+//   useEffect(() => {
+//     setTestHeaders([]);
+//     setSelectedTest(null);
+//     if (selectedMachine) {
+//       // Optionally, update the test header form's machine field
+//       setCreateTestForm(prev => ({ ...prev, machine: selectedMachine }));
+//       fetchTestHeaders(selectedMachine);
+//     }
+//   }, [selectedMachine]);
 
-  // ----- Fetch Test Headers for selected machine -----
-  const fetchTestHeaders = async (machine) => {
-    try {
-      const res = await axios.get(API_GET_TESTS, {
+//   // ----- Fetch Test Headers for selected machine -----
+//   const fetchTestHeaders = async (machine) => {
+//     try {
+//       const res = await axios.get(API_GET_TESTS, {
 
-        headers: { 'Content-Type': 'application/json' },
-        params: { machine },
-      });
+//         headers: { 'Content-Type': 'application/json' },
+//         params: { machine },
+//       });
        
-      // Sort the test headers by `testDate` in descending order
-      const sortedTests = res.data.sort((a, b) => new Date(b.testDate) - new Date(a.testDate));
-      setTestHeaders(sortedTests);
-    } catch (error) {
-      console.error('Error fetching test headers', error);
-    }
-  };
+//       // Sort the test headers by `testDate` in descending order
+//       const sortedTests = res.data.sort((a, b) => new Date(b.testDate) - new Date(a.testDate));
+//       setTestHeaders(sortedTests);
+//     } catch (error) {
+//       console.error('Error fetching test headers', error);
+//     }
+//   };
   
-  // const fetchTestHeaders = async (machine) => {
-  //   try {
-  //     const res = await axios.get(API_GET_TESTS, {
-  //       headers: { 'Content-Type': 'application/json' },
-  //       params: { machine }, // backend must filter by machine
-  //     });
-  //     setTestHeaders(res.data);
-  //   } catch (error) {
-  //     console.error('Error fetching test headers', error);
-  //   }
-  // };
+//   // const fetchTestHeaders = async (machine) => {
+//   //   try {
+//   //     const res = await axios.get(API_GET_TESTS, {
+//   //       headers: { 'Content-Type': 'application/json' },
+//   //       params: { machine }, // backend must filter by machine
+//   //     });
+//   //     setTestHeaders(res.data);
+//   //   } catch (error) {
+//   //     console.error('Error fetching test headers', error);
+//   //   }
+//   // };
 
-  // ----- Create New Test Header -----
-  const handleCreateTestSubmit = async () => {
-    if (!createTestForm.testId || !createTestForm.testTitle) {
-      alert('Please enter both Test ID and Test Title.');
-      return;
-    }
-    try {
-      const payload = {
-        ...createTestForm,
-        testDate: createTestForm.testDate.toISOString(),
-      };
-      await axios.post(API_CREATE_TEST, payload, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-      setOpenCreateTest(false);
-      setCreateTestForm({ testId: '', testTitle: '', testDate: new Date(), machine: selectedMachine });
-      fetchTestHeaders(selectedMachine);
-    } catch (error) {
-      console.error('Error creating test header', error);
-    }
-  };
+//   // ----- Create New Test Header -----
+//   const handleCreateTestSubmit = async () => {
+//     if (!createTestForm.testId || !createTestForm.testTitle) {
+//       alert('Please enter both Test ID and Test Title.');
+//       return;
+//     }
+//     try {
+//       const payload = {
+//         ...createTestForm,
+//         testDate: createTestForm.testDate.toISOString(),
+//       };
+//       await axios.post(API_CREATE_TEST, payload, {
+//         headers: { 'Content-Type': 'application/json' },
+//       });
+//       setOpenCreateTest(false);
+//       setCreateTestForm({ testId: '', testTitle: '', testDate: new Date(), machine: selectedMachine });
+//       fetchTestHeaders(selectedMachine);
+//     } catch (error) {
+//       console.error('Error creating test header', error);
+//     }
+//   };
 
-  // ----- When a Test Header Row is Clicked -----
-  const handleTestHeaderClick = (test) => {
-    setSelectedTest(test);
-    fetchSamplesForTest(test.testId);
-  };
+//   // ----- When a Test Header Row is Clicked -----
+//   const handleTestHeaderClick = (test) => {
+//     setSelectedTest(test);
+//     fetchSamplesForTest(test.testId);
+//   };
 
-  // ----- Fetch Samples for Selected Test -----
-  const fetchSamplesForTest = async (testId) => {
-    try {
-      const res = await axios.get(API_GET_SAMPLES, {
-        headers: { 'Content-Type': 'application/json' },
-        params: { testId },
-      });
+//   // ----- Fetch Samples for Selected Test -----
+//   const fetchSamplesForTest = async (testId) => {
+//     try {
+//       const res = await axios.get(API_GET_SAMPLES, {
+//         headers: { 'Content-Type': 'application/json' },
+//         params: { testId },
+//       });
   
-      // Sort the samples by `sampleTime` in descending order
-      const sortedSamples = res.data.sort((a, b) => new Date(b.sampleTime) - new Date(a.sampleTime));
-      setSamples(sortedSamples);
-    } catch (error) {
-      console.error('Error fetching samples', error);
-    }
-  };
+//       // Sort the samples by `sampleTime` in descending order
+//       const sortedSamples = res.data.sort((a, b) => new Date(b.sampleTime) - new Date(a.sampleTime));
+//       setSamples(sortedSamples);
+//     } catch (error) {
+//       console.error('Error fetching samples', error);
+//     }
+//   };
   
-  // const fetchSamplesForTest = async (testId) => {
-  //   try {
-  //     const res = await axios.get(API_GET_SAMPLES, {
-  //       headers: { 'Content-Type': 'application/json' },
-  //       params: { testId },
-  //     });
-  //     setSamples(res.data);
-  //   } catch (error) {
-  //     console.error('Error fetching samples', error);
-  //   }
-  // };
+//   // const fetchSamplesForTest = async (testId) => {
+//   //   try {
+//   //     const res = await axios.get(API_GET_SAMPLES, {
+//   //       headers: { 'Content-Type': 'application/json' },
+//   //       params: { testId },
+//   //     });
+//   //     setSamples(res.data);
+//   //   } catch (error) {
+//   //     console.error('Error fetching samples', error);
+//   //   }
+//   // };
 
-  // ----- Add New Sample for Selected Test -----
-  const handleAddSampleSubmit = async () => {
-    if (!selectedTest) return;
-    try {
-      const payload = {
-        testId: selectedTest.testId,
-        sampleTime: sampleForm.sampleTime.toISOString(),
-        // pressureLevel: sampleForm.pressureLevel,
-        // flowRateLevel: sampleForm.flowRateLevel,
-        current: sampleForm.current,
-        voltage: sampleForm.voltage,
-        temperature: sampleForm.temperature,
-        pressure: sampleForm.pressure,
-        flowRate: sampleForm.flowRate,
-      };
-      await axios.post(API_ADD_SAMPLE, payload, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-      setOpenAddSample(false);
-      setSampleForm({
-        // pressureLevel: '',
-        // flowRateLevel: '',
-        sampleTime: new Date(),
-        current: '',
-        voltage: '',
-        temperature: '',
-        pressure: '',
-        flowRate: '',
-      });
-      fetchSamplesForTest(selectedTest.testId);
-    } catch (error) {
-      console.error('Error adding sample', error);
-    }
-  };
-  // ----- Edit Sample Handlers -----
-  const handleEditClick = (sample) => {
-    setEditSampleForm({ ...sample, sampleTime: new Date(sample.sampleTime) });
-    setOpenEditSample(true);
-  };
+//   // ----- Add New Sample for Selected Test -----
+//   const handleAddSampleSubmit = async () => {
+//     if (!selectedTest) return;
+//     try {
+//       const payload = {
+//         testId: selectedTest.testId,
+//         sampleTime: sampleForm.sampleTime.toISOString(),
+//         // pressureLevel: sampleForm.pressureLevel,
+//         // flowRateLevel: sampleForm.flowRateLevel,
+//         current: sampleForm.current,
+//         voltage: sampleForm.voltage,
+//         temperature: sampleForm.temperature,
+//         pressure: sampleForm.pressure,
+//         flowRate: sampleForm.flowRate,
+//       };
+//       await axios.post(API_ADD_SAMPLE, payload, {
+//         headers: { 'Content-Type': 'application/json' },
+//       });
+//       setOpenAddSample(false);
+//       setSampleForm({
+//         // pressureLevel: '',
+//         // flowRateLevel: '',
+//         sampleTime: new Date(),
+//         current: '',
+//         voltage: '',
+//         temperature: '',
+//         pressure: '',
+//         flowRate: '',
+//       });
+//       fetchSamplesForTest(selectedTest.testId);
+//     } catch (error) {
+//       console.error('Error adding sample', error);
+//     }
+//   };
+//   // ----- Edit Sample Handlers -----
+//   const handleEditClick = (sample) => {
+//     setEditSampleForm({ ...sample, sampleTime: new Date(sample.sampleTime) });
+//     setOpenEditSample(true);
+//   };
 
-  const handleEditSampleSubmit = async () => {
-    try {
-      const payload = {
-        ...editSampleForm,
-        sampleTime: editSampleForm.sampleTime.toISOString(),
-      };
-      await axios.put(API_UPDATE_SAMPLE, payload, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-      setOpenEditSample(false);
-      setEditSampleForm(null);
-      fetchSamplesForTest(selectedTest.testId);
-    } catch (error) {
-      console.error('Error updating sample', error);
-    }
-  };
+//   const handleEditSampleSubmit = async () => {
+//     try {
+//       const payload = {
+//         ...editSampleForm,
+//         sampleTime: editSampleForm.sampleTime.toISOString(),
+//       };
+//       await axios.put(API_UPDATE_SAMPLE, payload, {
+//         headers: { 'Content-Type': 'application/json' },
+//       });
+//       setOpenEditSample(false);
+//       setEditSampleForm(null);
+//       fetchSamplesForTest(selectedTest.testId);
+//     } catch (error) {
+//       console.error('Error updating sample', error);
+//     }
+//   };
 
-  // ----- Render Helpers -----
-  const renderTestHeaderRow = (test) => (
-    <TableRow key={test.testId} className="cursor-pointer hover:bg-gray-100" onClick={() => handleTestHeaderClick(test)}>
-      <TableCell>{test.testId}</TableCell>
-      <TableCell>{test.testTitle}</TableCell>
-      <TableCell>{new Date(test.testDate).toLocaleString()}</TableCell>
-      <TableCell>{test.machine}</TableCell>
-    </TableRow>
-  );
+//   // ----- Render Helpers -----
+//   const renderTestHeaderRow = (test) => (
+//     <TableRow key={test.testId} className="cursor-pointer hover:bg-gray-100" onClick={() => handleTestHeaderClick(test)}>
+//       <TableCell>{test.testId}</TableCell>
+//       <TableCell>{test.testTitle}</TableCell>
+//       <TableCell>{new Date(test.testDate).toLocaleString()}</TableCell>
+//       <TableCell>{test.machine}</TableCell>
+//     </TableRow>
+//   );
 
-  const renderSampleRow = (sample) => (
-    <TableRow key={`${sample.testId}-${sample.sampleTime}`} className="hover:bg-gray-100">
-{/*
-      <TableCell>{sample.pressureLevel}</TableCell>
-      <TableCell>{sample.flowRateLevel}</TableCell>
-*/}
-      <TableCell>{new Date(sample.sampleTime).toLocaleString()}</TableCell>
-      <TableCell>{sample.current}</TableCell>
-      <TableCell>{sample.voltage}</TableCell>
-      <TableCell>{sample.temperature}</TableCell>
-      <TableCell>{sample.pressure}</TableCell>
-      <TableCell>{sample.flowRate}</TableCell>
-      <TableCell>
-        <Button variant="outlined" size="small" onClick={() => handleEditClick(sample)}>
-          Edit
-        </Button>
-      </TableCell>
-    </TableRow>
-  );
-  // ----- Main Render -----
-  return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <div className="max-w-4xl mx-auto p-4">
-        {/* --- Testing Machine Dropdown --- */}
-        <div className="mb-4">
-          <FormControl fullWidth>
-            <InputLabel id="machine-select-label">Select BOP</InputLabel>
-            <Select
-              labelId="machine-select-label"
-              value={selectedMachine}
-              label="Select Testing Machine"
-              onChange={(e) => setSelectedMachine(e.target.value)}
-            >
-              {testingMachineOptions.map((machine) => (
-                <MenuItem key={machine} value={machine}>
-                  {machine}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
+//   const renderSampleRow = (sample) => (
+//     <TableRow key={`${sample.testId}-${sample.sampleTime}`} className="hover:bg-gray-100">
+// {/*
+//       <TableCell>{sample.pressureLevel}</TableCell>
+//       <TableCell>{sample.flowRateLevel}</TableCell>
+// */}
+//       <TableCell>{new Date(sample.sampleTime).toLocaleString()}</TableCell>
+//       <TableCell>{sample.current}</TableCell>
+//       <TableCell>{sample.voltage}</TableCell>
+//       <TableCell>{sample.temperature}</TableCell>
+//       <TableCell>{sample.pressure}</TableCell>
+//       <TableCell>{sample.flowRate}</TableCell>
+//       <TableCell>
+//         <Button variant="outlined" size="small" onClick={() => handleEditClick(sample)}>
+//           Edit
+//         </Button>
+//       </TableCell>
+//     </TableRow>
+//   );
+//   // ----- Main Render -----
+//   return (
+//     <LocalizationProvider dateAdapter={AdapterDateFns}>
+//       <div className="max-w-4xl mx-auto p-4">
+//         {/* --- Testing Machine Dropdown --- */}
+//         <div className="mb-4">
+//           <FormControl fullWidth>
+//             <InputLabel id="machine-select-label">Select BOP</InputLabel>
+//             <Select
+//               labelId="machine-select-label"
+//               value={selectedMachine}
+//               label="Select Testing Machine"
+//               onChange={(e) => setSelectedMachine(e.target.value)}
+//             >
+//               {testingMachineOptions.map((machine) => (
+//                 <MenuItem key={machine} value={machine}>
+//                   {machine}
+//                 </MenuItem>
+//               ))}
+//             </Select>
+//           </FormControl>
+//         </div>
 
-        {/* Only show header creation if a machine is selected */}
-        {selectedMachine && !selectedTest && (
-          <div>
-            <div className="mb-4">
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setOpenCreateTest(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                New Test Sample
-              </Button>
-            </div>
-            <Dialog open={openCreateTest} onClose={() => setOpenCreateTest(false)}>
-              <DialogTitle className="bg-blue-100">Create New Test</DialogTitle>
-              <DialogContent className="bg-white">
-              <TextField
-              margin="dense"
-              label="Test ID"
-              name="testId"
-              fullWidth
-              value={createTestForm.testId}
-              InputProps={{
-                readOnly: true,
-              }}
-              className="mb-3"
-            />
-                <TextField
-                  margin="dense"
-                  label="Test Title"
-                  name="testTitle"
-                  fullWidth
-                  value={createTestForm.testTitle}
-                  onChange={(e) => setCreateTestForm({ ...createTestForm, testTitle: e.target.value })}
-                  className="mb-3"
-                />
-                <DateTimePicker
-                  label="Test Date"
-                  value={createTestForm.testDate}
-                  onChange={(date) => setCreateTestForm({ ...createTestForm, testDate: date })}
-                  fullWidth
-                  margin="dense"
-                />
-              </DialogContent>
-              <DialogActions className="bg-blue-100">
-                <Button onClick={() => setOpenCreateTest(false)} color="secondary" className="text-red-600">
-                  Cancel
-                </Button>
-                <Button onClick={handleCreateTestSubmit} color="primary" className="bg-blue-600 hover:bg-blue-700 text-white">
-                  Submit
-                </Button>
-              </DialogActions>
-            </Dialog>
-            <Typography variant="h5" className="mt-6 mb-4">
-              Test Headers for {selectedMachine}
-            </Typography>
-            <TableContainer component={Paper} className="shadow rounded">
-              <Table>
-                <TableHead className="bg-gray-200">
-                  <TableRow>
+//         {/* Only show header creation if a machine is selected */}
+//         {selectedMachine && !selectedTest && (
+//           <div>
+//             <div className="mb-4">
+//               <Button
+//                 variant="contained"
+//                 color="primary"
+//                 onClick={() => setOpenCreateTest(true)}
+//                 className="bg-blue-600 hover:bg-blue-700 text-white"
+//               >
+//                 New Test Sample
+//               </Button>
+//             </div>
+//             <Dialog open={openCreateTest} onClose={() => setOpenCreateTest(false)}>
+//               <DialogTitle className="bg-blue-100">Create New Test</DialogTitle>
+//               <DialogContent className="bg-white">
+//               <TextField
+//               margin="dense"
+//               label="Test ID"
+//               name="testId"
+//               fullWidth
+//               value={createTestForm.testId}
+//               InputProps={{
+//                 readOnly: true,
+//               }}
+//               className="mb-3"
+//             />
+//                 <TextField
+//                   margin="dense"
+//                   label="Test Title"
+//                   name="testTitle"
+//                   fullWidth
+//                   value={createTestForm.testTitle}
+//                   onChange={(e) => setCreateTestForm({ ...createTestForm, testTitle: e.target.value })}
+//                   className="mb-3"
+//                 />
+//                 <DateTimePicker
+//                   label="Test Date"
+//                   value={createTestForm.testDate}
+//                   onChange={(date) => setCreateTestForm({ ...createTestForm, testDate: date })}
+//                   fullWidth
+//                   margin="dense"
+//                 />
+//               </DialogContent>
+//               <DialogActions className="bg-blue-100">
+//                 <Button onClick={() => setOpenCreateTest(false)} color="secondary" className="text-red-600">
+//                   Cancel
+//                 </Button>
+//                 <Button onClick={handleCreateTestSubmit} color="primary" className="bg-blue-600 hover:bg-blue-700 text-white">
+//                   Submit
+//                 </Button>
+//               </DialogActions>
+//             </Dialog>
+//             <Typography variant="h5" className="mt-6 mb-4">
+//               Test Headers for {selectedMachine}
+//             </Typography>
+//             <TableContainer component={Paper} className="shadow rounded">
+//               <Table>
+//                 <TableHead className="bg-gray-200">
+//                   <TableRow>
 
-                    <TableCell className="font-bold">Test ID</TableCell>
-                    <TableCell className="font-bold">Test Title</TableCell>
-                    <TableCell className="font-bold">Test Date</TableCell>
-                    <TableCell className="font-bold">Machine</TableCell>
+//                     <TableCell className="font-bold">Test ID</TableCell>
+//                     <TableCell className="font-bold">Test Title</TableCell>
+//                     <TableCell className="font-bold">Test Date</TableCell>
+//                     <TableCell className="font-bold">Machine</TableCell>
                     
-                  </TableRow>
-                </TableHead>
-                <TableBody>{testHeaders.map(renderTestHeaderRow)}</TableBody>
-              </Table>
-            </TableContainer>
-          </div>
-        )}
+//                   </TableRow>
+//                 </TableHead>
+//                 <TableBody>{testHeaders.map(renderTestHeaderRow)}</TableBody>
+//               </Table>
+//             </TableContainer>
+//           </div>
+//         )}
 
-        {selectedTest && (
-          // --- Test Details & Sample Management View ---
-          <div>
-            <Button variant="outlined" onClick={() => { setSelectedTest(null); setSamples([]); }} className="mb-4">
-              Back to Tests
-            </Button>
-            <div className="p-4 border rounded shadow mb-4">
-              <Typography variant="h6">
-                Test: {selectedTest.testTitle} (ID: {selectedTest.testId})
-              </Typography>
-              <Typography variant="body2">
-                Test Date: {new Date(selectedTest.testDate).toLocaleString()}
-              </Typography>
-              <Typography variant="body2">Machine: {selectedTest.machine}</Typography>
-            </div>
-            <div className="mb-4 mt-4">
-              <Button
-                variant="contained"
-                color="primary"
-                className="bg-green-600 hover:bg-green-700 text-white"
-                onClick={() => setOpenAddSample(true)}
-              >
-                Add Testing Sample
-              </Button>
-            </div>
-            <Dialog open={openAddSample} onClose={() => setOpenAddSample(false)}>
-              <DialogTitle className="bg-green-100">Add Testing Sample</DialogTitle>
-              <DialogContent className="bg-white">
-              {/*
-                <TextField
-                  margin="dense"
-                  label="Pressure Level"
-                  name="pressureLevel"
-                  fullWidth
-                  value={sampleForm.pressureLevel}
-                  onChange={(e) => setSampleForm({ ...sampleForm, pressureLevel: e.target.value })}
-                  className="mb-3"
-                />
-                <TextField
-                  margin="dense"
-                  label="Flow Rate Level"
-                  name="flowRateLevel"
-                  fullWidth
-                  value={sampleForm.flowRateLevel}
-                  onChange={(e) => setSampleForm({ ...sampleForm, flowRateLevel: e.target.value })}
-                  className="mb-3"
-                />
-                */}
+//         {selectedTest && (
+//           // --- Test Details & Sample Management View ---
+//           <div>
+//             <Button variant="outlined" onClick={() => { setSelectedTest(null); setSamples([]); }} className="mb-4">
+//               Back to Tests
+//             </Button>
+//             <div className="p-4 border rounded shadow mb-4">
+//               <Typography variant="h6">
+//                 Test: {selectedTest.testTitle} (ID: {selectedTest.testId})
+//               </Typography>
+//               <Typography variant="body2">
+//                 Test Date: {new Date(selectedTest.testDate).toLocaleString()}
+//               </Typography>
+//               <Typography variant="body2">Machine: {selectedTest.machine}</Typography>
+//             </div>
+//             <div className="mb-4 mt-4">
+//               <Button
+//                 variant="contained"
+//                 color="primary"
+//                 className="bg-green-600 hover:bg-green-700 text-white"
+//                 onClick={() => setOpenAddSample(true)}
+//               >
+//                 Add Testing Sample
+//               </Button>
+//             </div>
+//             <Dialog open={openAddSample} onClose={() => setOpenAddSample(false)}>
+//               <DialogTitle className="bg-green-100">Add Testing Sample</DialogTitle>
+//               <DialogContent className="bg-white">
+//               {/*
+//                 <TextField
+//                   margin="dense"
+//                   label="Pressure Level"
+//                   name="pressureLevel"
+//                   fullWidth
+//                   value={sampleForm.pressureLevel}
+//                   onChange={(e) => setSampleForm({ ...sampleForm, pressureLevel: e.target.value })}
+//                   className="mb-3"
+//                 />
+//                 <TextField
+//                   margin="dense"
+//                   label="Flow Rate Level"
+//                   name="flowRateLevel"
+//                   fullWidth
+//                   value={sampleForm.flowRateLevel}
+//                   onChange={(e) => setSampleForm({ ...sampleForm, flowRateLevel: e.target.value })}
+//                   className="mb-3"
+//                 />
+//                 */}
 
-                <DateTimePicker
-                  label="Select Sample Time"
-                  value={sampleForm.sampleTime}
-                  onChange={(date) => setSampleForm({ ...sampleForm, sampleTime: date })}
-                  fullWidth
-                  margin="dense"
-                />
-                <TextField
-                  margin="dense"
-                  label="Current"
-                  name="current"
-                  fullWidth
-                  value={sampleForm.current}
-                  onChange={(e) => setSampleForm({ ...sampleForm, current: e.target.value })}
-                  className="mb-3"
-                />
-                <TextField
-                  margin="dense"
-                  label="Voltage"
-                  name="voltage"
-                  fullWidth
-                  value={sampleForm.voltage}
-                  onChange={(e) => setSampleForm({ ...sampleForm, voltage: e.target.value })}
-                  className="mb-3"
-                />
-                <TextField
-                  margin="dense"
-                  label="Temperature"
-                  name="temperature"
-                  fullWidth
-                  value={sampleForm.temperature}
-                  onChange={(e) => setSampleForm({ ...sampleForm, temperature: e.target.value })}
-                  className="mb-3"
-                />
-                <TextField
-                  margin="dense"
-                  label="Pressure"
-                  name="pressure"
-                  fullWidth
-                  value={sampleForm.pressure}
-                  onChange={(e) => setSampleForm({ ...sampleForm, pressure: e.target.value })}
-                  className="mb-3"
-                />
-                <TextField
-                  margin="dense"
-                  label="Flow Rate"
-                  name="flowRate"
-                  fullWidth
-                  value={sampleForm.flowRate}
-                  onChange={(e) => setSampleForm({ ...sampleForm, flowRate: e.target.value })}
-                  className="mb-3"
-                />
-              </DialogContent>
-              <DialogActions className="bg-green-100">
-                <Button onClick={() => setOpenAddSample(false)} color="secondary" className="text-red-600">
-                  Cancel
-                </Button>
-                <Button onClick={handleAddSampleSubmit} color="primary" className="bg-green-600 hover:bg-green-700 text-white">
-                  Submit
-                </Button>
-              </DialogActions>
-            </Dialog>
-            <Typography variant="h5" className="mt-6 mb-4">
-              Samples for Test: {selectedTest.testTitle}
-            </Typography>
-            <TableContainer component={Paper} className="shadow rounded">
-              <Table>
-                <TableHead className="bg-gray-200">
-                  <TableRow>
-                    {/*
-                    // <TableCell className="font-bold">Pressure Level</TableCell>
-                    // <TableCell className="font-bold">Flow Rate Level</TableCell>
-                    */}
-                    <TableCell className="font-bold">Sample Time</TableCell>
-                    <TableCell className="font-bold">Current</TableCell>
-                    <TableCell className="font-bold">Voltage</TableCell>
-                    <TableCell className="font-bold">Temperature</TableCell>
-                    <TableCell className="font-bold">Pressure</TableCell>
-                    <TableCell className="font-bold">Flow Rate</TableCell>
-                    <TableCell className="font-bold">Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>{samples.map(renderSampleRow)}</TableBody>
-              </Table>
-            </TableContainer>
-          </div>
-        )}
+//                 <DateTimePicker
+//                   label="Select Sample Time"
+//                   value={sampleForm.sampleTime}
+//                   onChange={(date) => setSampleForm({ ...sampleForm, sampleTime: date })}
+//                   fullWidth
+//                   margin="dense"
+//                 />
+//                 <TextField
+//                   margin="dense"
+//                   label="Current"
+//                   name="current"
+//                   fullWidth
+//                   value={sampleForm.current}
+//                   onChange={(e) => setSampleForm({ ...sampleForm, current: e.target.value })}
+//                   className="mb-3"
+//                 />
+//                 <TextField
+//                   margin="dense"
+//                   label="Voltage"
+//                   name="voltage"
+//                   fullWidth
+//                   value={sampleForm.voltage}
+//                   onChange={(e) => setSampleForm({ ...sampleForm, voltage: e.target.value })}
+//                   className="mb-3"
+//                 />
+//                 <TextField
+//                   margin="dense"
+//                   label="Temperature"
+//                   name="temperature"
+//                   fullWidth
+//                   value={sampleForm.temperature}
+//                   onChange={(e) => setSampleForm({ ...sampleForm, temperature: e.target.value })}
+//                   className="mb-3"
+//                 />
+//                 <TextField
+//                   margin="dense"
+//                   label="Pressure"
+//                   name="pressure"
+//                   fullWidth
+//                   value={sampleForm.pressure}
+//                   onChange={(e) => setSampleForm({ ...sampleForm, pressure: e.target.value })}
+//                   className="mb-3"
+//                 />
+//                 <TextField
+//                   margin="dense"
+//                   label="Flow Rate"
+//                   name="flowRate"
+//                   fullWidth
+//                   value={sampleForm.flowRate}
+//                   onChange={(e) => setSampleForm({ ...sampleForm, flowRate: e.target.value })}
+//                   className="mb-3"
+//                 />
+//               </DialogContent>
+//               <DialogActions className="bg-green-100">
+//                 <Button onClick={() => setOpenAddSample(false)} color="secondary" className="text-red-600">
+//                   Cancel
+//                 </Button>
+//                 <Button onClick={handleAddSampleSubmit} color="primary" className="bg-green-600 hover:bg-green-700 text-white">
+//                   Submit
+//                 </Button>
+//               </DialogActions>
+//             </Dialog>
+//             <Typography variant="h5" className="mt-6 mb-4">
+//               Samples for Test: {selectedTest.testTitle}
+//             </Typography>
+//             <TableContainer component={Paper} className="shadow rounded">
+//               <Table>
+//                 <TableHead className="bg-gray-200">
+//                   <TableRow>
+//                     {/*
+//                     // <TableCell className="font-bold">Pressure Level</TableCell>
+//                     // <TableCell className="font-bold">Flow Rate Level</TableCell>
+//                     */}
+//                     <TableCell className="font-bold">Sample Time</TableCell>
+//                     <TableCell className="font-bold">Current</TableCell>
+//                     <TableCell className="font-bold">Voltage</TableCell>
+//                     <TableCell className="font-bold">Temperature</TableCell>
+//                     <TableCell className="font-bold">Pressure</TableCell>
+//                     <TableCell className="font-bold">Flow Rate</TableCell>
+//                     <TableCell className="font-bold">Actions</TableCell>
+//                   </TableRow>
+//                 </TableHead>
+//                 <TableBody>{samples.map(renderSampleRow)}</TableBody>
+//               </Table>
+//             </TableContainer>
+//           </div>
+//         )}
 
-        {openEditSample && editSampleForm && (
-          <Dialog open={openEditSample} onClose={() => setOpenEditSample(false)}>
-            <DialogTitle className="bg-blue-100">Edit Sample</DialogTitle>
-            <DialogContent className="bg-white">
-            {/*
-              <TextField
-                margin="dense"
-                label="Pressure Level"
-                name="pressureLevel"
-                fullWidth
-                value={editSampleForm.pressureLevel}
-                onChange={(e) => setEditSampleForm({ ...editSampleForm, pressureLevel: e.target.value })}
-                className="mb-3"
-              />
-              <TextField
-                margin="dense"
-                label="Flow Rate Level"
-                name="flowRateLevel"
-                fullWidth
-                value={editSampleForm.flowRateLevel}
-                onChange={(e) => setEditSampleForm({ ...editSampleForm, flowRateLevel: e.target.value })}
-                className="mb-3"
-              />
-              */}
-              <DateTimePicker
-                label="Sample Time"
-                value={editSampleForm.sampleTime}
-                onChange={(date) => setEditSampleForm({ ...editSampleForm, sampleTime: date })}
-                fullWidth
-                margin="dense"
-              />
-              <TextField
-                margin="dense"
-                label="Current"
-                name="current"
-                fullWidth
-                value={editSampleForm.current}
-                onChange={(e) => setEditSampleForm({ ...editSampleForm, current: e.target.value })}
-                className="mb-3"
-              />
-              <TextField
-                margin="dense"
-                label="Voltage"
-                name="voltage"
-                fullWidth
-                value={editSampleForm.voltage}
-                onChange={(e) => setEditSampleForm({ ...editSampleForm, voltage: e.target.value })}
-                className="mb-3"
-              />
-              <TextField
-                margin="dense"
-                label="Temperature"
-                name="temperature"
-                fullWidth
-                value={editSampleForm.temperature}
-                onChange={(e) => setEditSampleForm({ ...editSampleForm, temperature: e.target.value })}
-                className="mb-3"
-              />
-              <TextField
-                margin="dense"
-                label="Pressure"
-                name="pressure"
-                fullWidth
-                value={editSampleForm.pressure}
-                onChange={(e) => setEditSampleForm({ ...editSampleForm, pressure: e.target.value })}
-                className="mb-3"
-              />
-              <TextField
-                margin="dense"
-                label="Flow Rate"
-                name="flowRate"
-                fullWidth
-                value={editSampleForm.flowRate}
-                onChange={(e) => setEditSampleForm({ ...editSampleForm, flowRate: e.target.value })}
-                className="mb-3"
-              />
-            </DialogContent>
-            <DialogActions className="bg-blue-100">
-              <Button onClick={() => setOpenEditSample(false)} color="secondary" className="text-red-600">
-                Cancel
-              </Button>
-              <Button onClick={handleEditSampleSubmit} color="primary" className="bg-blue-600 hover:bg-blue-700 text-white">
-                Update Sample
-              </Button>
-            </DialogActions>
-          </Dialog>
-        )}
-      </div>
-    </LocalizationProvider>
-  );
-}
+//         {openEditSample && editSampleForm && (
+//           <Dialog open={openEditSample} onClose={() => setOpenEditSample(false)}>
+//             <DialogTitle className="bg-blue-100">Edit Sample</DialogTitle>
+//             <DialogContent className="bg-white">
+//             {/*
+//               <TextField
+//                 margin="dense"
+//                 label="Pressure Level"
+//                 name="pressureLevel"
+//                 fullWidth
+//                 value={editSampleForm.pressureLevel}
+//                 onChange={(e) => setEditSampleForm({ ...editSampleForm, pressureLevel: e.target.value })}
+//                 className="mb-3"
+//               />
+//               <TextField
+//                 margin="dense"
+//                 label="Flow Rate Level"
+//                 name="flowRateLevel"
+//                 fullWidth
+//                 value={editSampleForm.flowRateLevel}
+//                 onChange={(e) => setEditSampleForm({ ...editSampleForm, flowRateLevel: e.target.value })}
+//                 className="mb-3"
+//               />
+//               */}
+//               <DateTimePicker
+//                 label="Sample Time"
+//                 value={editSampleForm.sampleTime}
+//                 onChange={(date) => setEditSampleForm({ ...editSampleForm, sampleTime: date })}
+//                 fullWidth
+//                 margin="dense"
+//               />
+//               <TextField
+//                 margin="dense"
+//                 label="Current"
+//                 name="current"
+//                 fullWidth
+//                 value={editSampleForm.current}
+//                 onChange={(e) => setEditSampleForm({ ...editSampleForm, current: e.target.value })}
+//                 className="mb-3"
+//               />
+//               <TextField
+//                 margin="dense"
+//                 label="Voltage"
+//                 name="voltage"
+//                 fullWidth
+//                 value={editSampleForm.voltage}
+//                 onChange={(e) => setEditSampleForm({ ...editSampleForm, voltage: e.target.value })}
+//                 className="mb-3"
+//               />
+//               <TextField
+//                 margin="dense"
+//                 label="Temperature"
+//                 name="temperature"
+//                 fullWidth
+//                 value={editSampleForm.temperature}
+//                 onChange={(e) => setEditSampleForm({ ...editSampleForm, temperature: e.target.value })}
+//                 className="mb-3"
+//               />
+//               <TextField
+//                 margin="dense"
+//                 label="Pressure"
+//                 name="pressure"
+//                 fullWidth
+//                 value={editSampleForm.pressure}
+//                 onChange={(e) => setEditSampleForm({ ...editSampleForm, pressure: e.target.value })}
+//                 className="mb-3"
+//               />
+//               <TextField
+//                 margin="dense"
+//                 label="Flow Rate"
+//                 name="flowRate"
+//                 fullWidth
+//                 value={editSampleForm.flowRate}
+//                 onChange={(e) => setEditSampleForm({ ...editSampleForm, flowRate: e.target.value })}
+//                 className="mb-3"
+//               />
+//             </DialogContent>
+//             <DialogActions className="bg-blue-100">
+//               <Button onClick={() => setOpenEditSample(false)} color="secondary" className="text-red-600">
+//                 Cancel
+//               </Button>
+//               <Button onClick={handleEditSampleSubmit} color="primary" className="bg-blue-600 hover:bg-blue-700 text-white">
+//                 Update Sample
+//               </Button>
+//             </DialogActions>
+//           </Dialog>
+//         )}
+//       </div>
+//     </LocalizationProvider>
+//   );
+// }
 
-export default TestManager;
+// export default TestManager;
 
 
 
@@ -845,559 +845,559 @@ export default TestManager;
 
 
 
-// import React, { useState } from 'react';
-// import {
-//     Select,
-//     MenuItem,
-//     FormControl,
-//     InputLabel,
-//     Button,
-//     Box,
-//     TextField,
-//     Grid,
-//     Typography,
-// } from '@mui/material';
-// import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-// import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-// import Header from 'src/component/Header';
+import React, { useState } from 'react';
+import {
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Button,
+    Box,
+    TextField,
+    Grid,
+    Typography,
+} from '@mui/material';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import Header from 'src/component/Header';
 
-// function IoTDataViewer() {
-//     const [startTime, setStartTime] = useState(null);
-//     const [endTime, setEndTime] = useState(null);
-//     const [allData, setAllData] = useState([]);
-//     const [data, setData] = useState([]);
-//     const [error, setError] = useState('');
-//     const [selectedTestName, setSelectedTestName] = useState(null);
-//     const [isFetching, setIsFetching] = useState(false);
-//     const [totalizerFlow, setTotalizerFlow] = useState(null);
+function IoTDataViewer() {
+    const [startTime, setStartTime] = useState(null);
+    const [endTime, setEndTime] = useState(null);
+    const [allData, setAllData] = useState([]);
+    const [data, setData] = useState([]);
+    const [error, setError] = useState('');
+    const [selectedTestName, setSelectedTestName] = useState(null);
+    const [isFetching, setIsFetching] = useState(false);
+    const [totalizerFlow, setTotalizerFlow] = useState(null);
 
-//     const fetchData = async () => {
-//         setIsFetching(true);
-//         try {
-//             const convertToIST = (date) => {
-//                 const offsetInMilliseconds = 5.5 * 60 * 60 * 1000;
-//                 return new Date(date.getTime() + offsetInMilliseconds).toISOString().slice(0, 19);
-//             };
+    const fetchData = async () => {
+        setIsFetching(true);
+        try {
+            const convertToIST = (date) => {
+                const offsetInMilliseconds = 5.5 * 60 * 60 * 1000;
+                return new Date(date.getTime() + offsetInMilliseconds).toISOString().slice(0, 19);
+            };
 
-//             const startTimeIST = startTime ? convertToIST(startTime) : null;
-//             const endTimeIST = endTime ? convertToIST(endTime) : null;
+            const startTimeIST = startTime ? convertToIST(startTime) : null;
+            const endTimeIST = endTime ? convertToIST(endTime) : null;
 
-//             const response = await fetch('https://zxj8fcr2a7.execute-api.us-east-1.amazonaws.com/dev/iot-data', {
-//                 method: 'POST',
-//                 headers: {
-//                     'Content-Type': 'application/json',
-//                 },
-//                 body: JSON.stringify({
-//                     start_time: startTimeIST,
-//                     end_time: endTimeIST,
-//                 }),
-//             });
+            const response = await fetch('https://zxj8fcr2a7.execute-api.us-east-1.amazonaws.com/dev/iot-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    start_time: startTimeIST,
+                    end_time: endTimeIST,
+                }),
+            });
 
-//             const rawResult = await response.json();
-//             const result = rawResult.body ? JSON.parse(rawResult.body) : rawResult;
+            const rawResult = await response.json();
+            const result = rawResult.body ? JSON.parse(rawResult.body) : rawResult;
 
-//             if (response.ok) {
-//                 const processedData = (result.data || []).map((row, index) => ({
-//                     id: index,
-//                     timestamp: row.timestamp || row.time_bucket,
-//                     ist_timestamp: row.ist_timestamp || row.time_bucket,
-//                     Test_Name: row.device_data?.["Test-Name"] || row["test_name"],
+            if (response.ok) {
+                const processedData = (result.data || []).map((row, index) => ({
+                    id: index,
+                    timestamp: row.timestamp || row.time_bucket,
+                    ist_timestamp: row.ist_timestamp || row.time_bucket,
+                    Test_Name: row.device_data?.["Test-Name"] || row["test_name"],
                     
-//                     AX_LT_011: row.device_data?.["AX-LT-011"] !== undefined && row.device_data?.["AX-LT-011"] !== null
-//                     ? row.device_data?.["AX-LT-011"]
-//                     : row["avg_ax_lt_011"] || 0,
+                    AX_LT_011: row.device_data?.["AX-LT-011"] !== undefined && row.device_data?.["AX-LT-011"] !== null
+                    ? row.device_data?.["AX-LT-011"]
+                    : row["avg_ax_lt_011"] || 0,
 
-//                     AX_LT_021: row.device_data?.["AX-LT-021"] || row["avg_ax_lt_021"],
-//                     AX_VA_311: row.device_data?.["AX-VA-311"] !== undefined && row.device_data?.["AX-VA-311"] !== null
-//   ? row.device_data?.["AX-VA-311"]
-//   : row["ax_va_311"] || 0,
-//   AX_VA_312: row.device_data?.["AX-VA-312"] !== undefined && row.device_data?.["AX-VA-312"] !== null
-//   ? row.device_data?.["AX-VA-312"]
-//   : row["ax_va_312"] || 0,
-// CR_FT_001: row.device_data?.["CR-FT-001"] || row["cr_ft_001"],
-// CR_LT_011: row.device_data?.["CR-LT-011"] || row["cr_lt_011"],
-// CR_LT_021: row.device_data?.["CR-LT-021"] || row["cr_lt_021"],
-// CR_PT_001: row.device_data?.["CR-PT-001"] || row["cr_pt_001"],
-// CR_PT_011: row.device_data?.["CR-PT-011"] || row["cr_pt_011"],
-// CR_PT_021: row.device_data?.["CR-PT-021"] || row["cr_pt_021"],
-// CR_TT_001: row.device_data?.["CR-TT-001"] || row["cr_tt_001"],
-// CR_TT_002: row.device_data?.["CR-TT-002"] || row["cr_tt_002"],
-// CW_TT_011: row.device_data?.["CW-TT-011"] || row["cw_tt_011"],
-// CW_TT_021: row.device_data?.["CW-TT-021"] || row["cw_tt_021"],
-// GS_AT_011: row.device_data?.["GS-AT-011"] || row["gs_at_011"],
-// GS_AT_012: row.device_data?.["GS-AT-012"] || row["gs_at_012"],
-// GS_AT_022: row.device_data?.["GS-AT-022"] || row["gs_at_022"],
-// GS_PT_011: row.device_data?.["GS-PT-011"] || row["gs_pt_011"],
-// GS_PT_021: row.device_data?.["GS-PT-021"] || row["gs_pt_021"],
-// GS_TT_011: row.device_data?.["GS-TT-011"] || row["gs_tt_011"],
-// GS_TT_021: row.device_data?.["GS-TT-021"] || row["gs_tt_021"],
-// GS_VA_311: row.device_data?.["GS-VA-311"] || row["gs_va_311"],
-// GS_VA_312: row.device_data?.["GS-VA-312"] || row["gs_va_312"],
-// GS_VA_321: row.device_data?.["GS-VA-321"] || row["gs_va_321"],
-// GS_VA_322: row.device_data?.["GS-VA-322"] || row["gs_va_322"],
-// PR_AT_001: row.device_data?.["PR-AT-001"] || row["pr_at_001"],
-// PR_AT_003: row.device_data?.["PR-AT-003"] || row["pr_at_003"],
-// PR_AT_005: row.device_data?.["PR-AT-005"] || row["pr_at_005"],
-// PR_FT_001: row.device_data?.["PR-FT-001"] || row["pr_ft_001"],
-// PR_TT_001: row.device_data?.["PR-TT-001"] || row["pr_tt_001"],
-// PR_TT_061: row.device_data?.["PR-TT-061"] || row["pr_tt_061"],
-// PR_TT_072: row.device_data?.["PR-TT-072"] || row["pr_tt_072"],
-// PR_VA_352: row.device_data?.["PR-VA-352"] || row["pr_va_352"],
-// AX_VA_321: row.device_data?.["AX-VA-321"] !== undefined && row.device_data?.["AX-VA-321"] !== null
-// ? row.device_data?.["AX-VA-321"]
-// : row["ax_va_321"] || 0,
-// AX_VA_322: row.device_data?.["AX-VA-322"] !== undefined && row.device_data?.["AX-VA-322"] !== null
-// ? row.device_data?.["AX-VA-322"]
-// : row["ax_va_322"] || 0,
-// AX_VA_351: row.device_data?.["AX-VA-351"] !== undefined && row.device_data?.["AX-VA-351"] !== null
-// ? row.device_data?.["AX-VA-351"]
-// : row["ax_va_351"] || 0,
-// AX_VA_391: row.device_data?.["AX-VA-391"] !== undefined && row.device_data?.["AX-VA-391"] !== null
-// ? row.device_data?.["AX-VA-391"]
-// : row["ax_va_391"] || 0,
-// DM_VA_301: row.device_data?.["DM-VA-301"] !== undefined && row.device_data?.["DM-VA-301"] !== null
-// ? row.device_data?.["DM-VA-301"]
-// : row["dm_va_301"] || 0,
-// GS_VA_021: row.device_data?.["GS-VA-021"] !== undefined && row.device_data?.["GS-VA-021"] !== null
-// ? row.device_data?.["GS-VA-021"]
-// : row["gs_va_021"] || 0,
-// GS_VA_022: row.device_data?.["GS-VA-022"] !== undefined && row.device_data?.["GS-VA-022"] !== null
-// ? row.device_data?.["GS-VA-022"]
-// : row["gs_va_022"] || 0,
-// N2_VA_311: row.device_data?.["N2-VA-311"] !== undefined && row.device_data?.["N2-VA-311"] !== null
-// ? row.device_data?.["N2-VA-311"]
-// : row["n2_va_311"] || 0,
-// N2_VA_321: row.device_data?.["N2-VA-321"] !== undefined && row.device_data?.["N2-VA-321"] !== null
-// ? row.device_data?.["N2-VA-321"]
-// : row["n2_va_321"] || 0,
-// PR_VA_301: row.device_data?.["PR-VA-301"] !== undefined && row.device_data?.["PR-VA-301"] !== null
-// ? row.device_data?.["PR-VA-301"]
-// : row["pr_va_301"] || 0,
-// PR_VA_312: row.device_data?.["PR-VA-312"] !== undefined && row.device_data?.["PR-VA-312"] !== null
-// ? row.device_data?.["PR-VA-312"]
-// : row["pr_va_312"] || 0,
-// PR_VA_351: row.device_data?.["PR-VA-351"] !== undefined && row.device_data?.["PR-VA-351"] !== null
-// ? row.device_data?.["PR-VA-351"]
-// : row["pr_va_351"] || 0,
-// PR_VA_361Ain: row.device_data?.["PR-VA-361Ain"] !== undefined && row.device_data?.["PR-VA-361Ain"] !== null
-// ? row.device_data?.["PR-VA-361Ain"]
-// : row["pr_va_361ain"] || 0,
-// PR_VA_361Bin: row.device_data?.["PR-VA-361Bin"] !== undefined && row.device_data?.["PR-VA-361Bin"] !== null
-// ? row.device_data?.["PR-VA-361Bin"]
-// : row["pr_va_361bin"] || 0,
-// PR_VA_362Ain: row.device_data?.["PR-VA-362Ain"] !== undefined && row.device_data?.["PR-VA-362Ain"] !== null
-// ? row.device_data?.["PR-VA-362Ain"]
-// : row["pr_va_362ain"] || 0,
-// PR_VA_362Bin: row.device_data?.["PR-VA-362Bin"] !== undefined && row.device_data?.["PR-VA-362Bin"] !== null
-// ? row.device_data?.["PR-VA-362Bin"]
-// : row["pr_va_362bin"] || 0,
-// PR_VA_361Aout: row.device_data?.["PR-VA-361Aout"] !== undefined && row.device_data?.["PR-VA-361Aout"] !== null
-// ? row.device_data?.["PR-VA-361Aout"]
-// : row["pr_va_361aout"] || 0,
-// PR_VA_361Bout: row.device_data?.["PR-VA-361Bout"] !== undefined && row.device_data?.["PR-VA-361Bout"] !== null
-// ? row.device_data?.["PR-VA-361Bout"]
-// : row["pr_va_361bout"] || 0,
-// PR_VA_362Aout: row.device_data?.["PR-VA-362Aout"] !== undefined && row.device_data?.["PR-VA-362Aout"] !== null
-// ? row.device_data?.["PR-VA-362Aout"]
-// : row["pr_va_362aout"] || 0,
-// PR_VA_362Bout: row.device_data?.["PR-VA-362Bout"] !== undefined && row.device_data?.["PR-VA-362Bout"] !== null
-// ? row.device_data?.["PR-VA-362Bout"]
-// : row["pr_va_362bout"] || 0,
-// RECT_CT_001: row.device_data?.["RECT-CT-001"] !== undefined && row.device_data?.["RECT-CT-001"] !== null
-// ? row.device_data?.["RECT-CT-001"]
-// : row["rect_ct_001"] || 0,
-// RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.["RECT-VT-001"] !== null
-// ? row.device_data?.["RECT-VT-001"]
-// : row["rect_vt_001"] || 0,
-// DCDB0_CT_001: row.device_data?.["DCDB0-CT-001"] !== undefined && row.device_data?.["DCDB0-CT-001"] !== null
-// ? row.device_data?.["DCDB0-CT-001"]
-// : row["dcdb0_ct_001"] || 0,
-// DCDB0_VT_001: row.device_data?.["DCDB0-VT-001"] !== undefined && row.device_data?.["DCDB0-VT-001"] !== null
-// ? row.device_data?.["DCDB0-VT-001"]
-// : row["dcdb0_vt_001"] || 0,
-// DCDB1_CT_001: row.device_data?.["DCDB1-CT-001"] !== undefined && row.device_data?.["DCDB1-CT-001"] !== null
-// ? row.device_data?.["DCDB1-CT-001"]
-// : row["dcdb1_ct_001"] || 0,
-// DCDB1_VT_001: row.device_data?.["DCDB1-VT-001"] !== undefined && row.device_data?.["DCDB1-VT-001"] !== null
-// ? row.device_data?.["DCDB1-VT-001"]
-// : row["dcdb1_vt_001"] || 0,
-// DCDB2_CT_001: row.device_data?.["DCDB2-CT-001"] !== undefined && row.device_data?.["DCDB2-CT-001"] !== null
-// ? row.device_data?.["DCDB2-CT-001"]
-// : row["dcdb2_ct_001"] || 0,
-// DCDB2_VT_001: row.device_data?.["DCDB2-VT-001"] !== undefined && row.device_data?.["DCDB2-VT-001"] !== null
-// ? row.device_data?.["DCDB2-VT-001"]
-// : row["dcdb2_vt_001"] || 0,
-// DCDB3_CT_001: row.device_data?.["DCDB3-CT-001"] !== undefined && row.device_data?.["DCDB3-CT-001"] !== null
-// ? row.device_data?.["DCDB3-CT-001"]
-// : row["dcdb3_ct_001"] || 0,
-// DCDB3_VT_001: row.device_data?.["DCDB3-VT-001"] !== undefined && row.device_data?.["DCDB3-VT-001"] !== null
-// ? row.device_data?.["DCDB3-VT-001"]
-// : row["dcdb3_vt_001"] || 0,
-// DCDB4_CT_001: row.device_data?.["DCDB4-CT-001"] !== undefined && row.device_data?.["DCDB4-CT-001"] !== null
-// ? row.device_data?.["DCDB4-CT-001"]
-// : row["dcdb4_ct_001"] || 0,
-// DCDB4_VT_001: row.device_data?.["DCDB4-VT-001"] !== undefined && row.device_data?.["DCDB4-VT-001"] !== null
-// ? row.device_data?.["DCDB4-VT-001"]
-// : row["dcdb4_vt_001"] || 0,
-// PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] !== undefined && row.device_data?.["PLC-TIME-STAMP"] !== null
-// ? row.device_data?.["PLC-TIME-STAMP"]
-// : row["plc_time_stamp"] || 0,
-// Test_Description: row.device_data?.["Test-description"] !== undefined && row.device_data?.["Test-description"] !== null
-// ? row.device_data?.["Test-description"]
-// : row["test_description"] || 0,
-// Test_Remarks: row.device_data?.["Test-Remarks"] !== undefined && row.device_data?.["Test-Remarks"] !== null
-// ? row.device_data?.["Test-Remarks"]
-// : row["test_remarks"] || 0,
-// DM_LSH_001: row.device_data?.["DM-LSH-001"] !== undefined && row.device_data?.["DM-LSH-001"] !== null
-//   ? row.device_data?.["DM-LSH-001"]
-//   : row["dm_lsh_001"] !== undefined && row["dm_lsh_001"] !== null
-//   ? row["dm_lsh_001"]
-//   : false,
+                    AX_LT_021: row.device_data?.["AX-LT-021"] || row["avg_ax_lt_021"],
+                    AX_VA_311: row.device_data?.["AX-VA-311"] !== undefined && row.device_data?.["AX-VA-311"] !== null
+  ? row.device_data?.["AX-VA-311"]
+  : row["ax_va_311"] || 0,
+  AX_VA_312: row.device_data?.["AX-VA-312"] !== undefined && row.device_data?.["AX-VA-312"] !== null
+  ? row.device_data?.["AX-VA-312"]
+  : row["ax_va_312"] || 0,
+CR_FT_001: row.device_data?.["CR-FT-001"] || row["cr_ft_001"],
+CR_LT_011: row.device_data?.["CR-LT-011"] || row["cr_lt_011"],
+CR_LT_021: row.device_data?.["CR-LT-021"] || row["cr_lt_021"],
+CR_PT_001: row.device_data?.["CR-PT-001"] || row["cr_pt_001"],
+CR_PT_011: row.device_data?.["CR-PT-011"] || row["cr_pt_011"],
+CR_PT_021: row.device_data?.["CR-PT-021"] || row["cr_pt_021"],
+CR_TT_001: row.device_data?.["CR-TT-001"] || row["cr_tt_001"],
+CR_TT_002: row.device_data?.["CR-TT-002"] || row["cr_tt_002"],
+CW_TT_011: row.device_data?.["CW-TT-011"] || row["cw_tt_011"],
+CW_TT_021: row.device_data?.["CW-TT-021"] || row["cw_tt_021"],
+GS_AT_011: row.device_data?.["GS-AT-011"] || row["gs_at_011"],
+GS_AT_012: row.device_data?.["GS-AT-012"] || row["gs_at_012"],
+GS_AT_022: row.device_data?.["GS-AT-022"] || row["gs_at_022"],
+GS_PT_011: row.device_data?.["GS-PT-011"] || row["gs_pt_011"],
+GS_PT_021: row.device_data?.["GS-PT-021"] || row["gs_pt_021"],
+GS_TT_011: row.device_data?.["GS-TT-011"] || row["gs_tt_011"],
+GS_TT_021: row.device_data?.["GS-TT-021"] || row["gs_tt_021"],
+GS_VA_311: row.device_data?.["GS-VA-311"] || row["gs_va_311"],
+GS_VA_312: row.device_data?.["GS-VA-312"] || row["gs_va_312"],
+GS_VA_321: row.device_data?.["GS-VA-321"] || row["gs_va_321"],
+GS_VA_322: row.device_data?.["GS-VA-322"] || row["gs_va_322"],
+PR_AT_001: row.device_data?.["PR-AT-001"] || row["pr_at_001"],
+PR_AT_003: row.device_data?.["PR-AT-003"] || row["pr_at_003"],
+PR_AT_005: row.device_data?.["PR-AT-005"] || row["pr_at_005"],
+PR_FT_001: row.device_data?.["PR-FT-001"] || row["pr_ft_001"],
+PR_TT_001: row.device_data?.["PR-TT-001"] || row["pr_tt_001"],
+PR_TT_061: row.device_data?.["PR-TT-061"] || row["pr_tt_061"],
+PR_TT_072: row.device_data?.["PR-TT-072"] || row["pr_tt_072"],
+PR_VA_352: row.device_data?.["PR-VA-352"] || row["pr_va_352"],
+AX_VA_321: row.device_data?.["AX-VA-321"] !== undefined && row.device_data?.["AX-VA-321"] !== null
+? row.device_data?.["AX-VA-321"]
+: row["ax_va_321"] || 0,
+AX_VA_322: row.device_data?.["AX-VA-322"] !== undefined && row.device_data?.["AX-VA-322"] !== null
+? row.device_data?.["AX-VA-322"]
+: row["ax_va_322"] || 0,
+AX_VA_351: row.device_data?.["AX-VA-351"] !== undefined && row.device_data?.["AX-VA-351"] !== null
+? row.device_data?.["AX-VA-351"]
+: row["ax_va_351"] || 0,
+AX_VA_391: row.device_data?.["AX-VA-391"] !== undefined && row.device_data?.["AX-VA-391"] !== null
+? row.device_data?.["AX-VA-391"]
+: row["ax_va_391"] || 0,
+DM_VA_301: row.device_data?.["DM-VA-301"] !== undefined && row.device_data?.["DM-VA-301"] !== null
+? row.device_data?.["DM-VA-301"]
+: row["dm_va_301"] || 0,
+GS_VA_021: row.device_data?.["GS-VA-021"] !== undefined && row.device_data?.["GS-VA-021"] !== null
+? row.device_data?.["GS-VA-021"]
+: row["gs_va_021"] || 0,
+GS_VA_022: row.device_data?.["GS-VA-022"] !== undefined && row.device_data?.["GS-VA-022"] !== null
+? row.device_data?.["GS-VA-022"]
+: row["gs_va_022"] || 0,
+N2_VA_311: row.device_data?.["N2-VA-311"] !== undefined && row.device_data?.["N2-VA-311"] !== null
+? row.device_data?.["N2-VA-311"]
+: row["n2_va_311"] || 0,
+N2_VA_321: row.device_data?.["N2-VA-321"] !== undefined && row.device_data?.["N2-VA-321"] !== null
+? row.device_data?.["N2-VA-321"]
+: row["n2_va_321"] || 0,
+PR_VA_301: row.device_data?.["PR-VA-301"] !== undefined && row.device_data?.["PR-VA-301"] !== null
+? row.device_data?.["PR-VA-301"]
+: row["pr_va_301"] || 0,
+PR_VA_312: row.device_data?.["PR-VA-312"] !== undefined && row.device_data?.["PR-VA-312"] !== null
+? row.device_data?.["PR-VA-312"]
+: row["pr_va_312"] || 0,
+PR_VA_351: row.device_data?.["PR-VA-351"] !== undefined && row.device_data?.["PR-VA-351"] !== null
+? row.device_data?.["PR-VA-351"]
+: row["pr_va_351"] || 0,
+PR_VA_361Ain: row.device_data?.["PR-VA-361Ain"] !== undefined && row.device_data?.["PR-VA-361Ain"] !== null
+? row.device_data?.["PR-VA-361Ain"]
+: row["pr_va_361ain"] || 0,
+PR_VA_361Bin: row.device_data?.["PR-VA-361Bin"] !== undefined && row.device_data?.["PR-VA-361Bin"] !== null
+? row.device_data?.["PR-VA-361Bin"]
+: row["pr_va_361bin"] || 0,
+PR_VA_362Ain: row.device_data?.["PR-VA-362Ain"] !== undefined && row.device_data?.["PR-VA-362Ain"] !== null
+? row.device_data?.["PR-VA-362Ain"]
+: row["pr_va_362ain"] || 0,
+PR_VA_362Bin: row.device_data?.["PR-VA-362Bin"] !== undefined && row.device_data?.["PR-VA-362Bin"] !== null
+? row.device_data?.["PR-VA-362Bin"]
+: row["pr_va_362bin"] || 0,
+PR_VA_361Aout: row.device_data?.["PR-VA-361Aout"] !== undefined && row.device_data?.["PR-VA-361Aout"] !== null
+? row.device_data?.["PR-VA-361Aout"]
+: row["pr_va_361aout"] || 0,
+PR_VA_361Bout: row.device_data?.["PR-VA-361Bout"] !== undefined && row.device_data?.["PR-VA-361Bout"] !== null
+? row.device_data?.["PR-VA-361Bout"]
+: row["pr_va_361bout"] || 0,
+PR_VA_362Aout: row.device_data?.["PR-VA-362Aout"] !== undefined && row.device_data?.["PR-VA-362Aout"] !== null
+? row.device_data?.["PR-VA-362Aout"]
+: row["pr_va_362aout"] || 0,
+PR_VA_362Bout: row.device_data?.["PR-VA-362Bout"] !== undefined && row.device_data?.["PR-VA-362Bout"] !== null
+? row.device_data?.["PR-VA-362Bout"]
+: row["pr_va_362bout"] || 0,
+RECT_CT_001: row.device_data?.["RECT-CT-001"] !== undefined && row.device_data?.["RECT-CT-001"] !== null
+? row.device_data?.["RECT-CT-001"]
+: row["rect_ct_001"] || 0,
+RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.["RECT-VT-001"] !== null
+? row.device_data?.["RECT-VT-001"]
+: row["rect_vt_001"] || 0,
+DCDB0_CT_001: row.device_data?.["DCDB0-CT-001"] !== undefined && row.device_data?.["DCDB0-CT-001"] !== null
+? row.device_data?.["DCDB0-CT-001"]
+: row["dcdb0_ct_001"] || 0,
+DCDB0_VT_001: row.device_data?.["DCDB0-VT-001"] !== undefined && row.device_data?.["DCDB0-VT-001"] !== null
+? row.device_data?.["DCDB0-VT-001"]
+: row["dcdb0_vt_001"] || 0,
+DCDB1_CT_001: row.device_data?.["DCDB1-CT-001"] !== undefined && row.device_data?.["DCDB1-CT-001"] !== null
+? row.device_data?.["DCDB1-CT-001"]
+: row["dcdb1_ct_001"] || 0,
+DCDB1_VT_001: row.device_data?.["DCDB1-VT-001"] !== undefined && row.device_data?.["DCDB1-VT-001"] !== null
+? row.device_data?.["DCDB1-VT-001"]
+: row["dcdb1_vt_001"] || 0,
+DCDB2_CT_001: row.device_data?.["DCDB2-CT-001"] !== undefined && row.device_data?.["DCDB2-CT-001"] !== null
+? row.device_data?.["DCDB2-CT-001"]
+: row["dcdb2_ct_001"] || 0,
+DCDB2_VT_001: row.device_data?.["DCDB2-VT-001"] !== undefined && row.device_data?.["DCDB2-VT-001"] !== null
+? row.device_data?.["DCDB2-VT-001"]
+: row["dcdb2_vt_001"] || 0,
+DCDB3_CT_001: row.device_data?.["DCDB3-CT-001"] !== undefined && row.device_data?.["DCDB3-CT-001"] !== null
+? row.device_data?.["DCDB3-CT-001"]
+: row["dcdb3_ct_001"] || 0,
+DCDB3_VT_001: row.device_data?.["DCDB3-VT-001"] !== undefined && row.device_data?.["DCDB3-VT-001"] !== null
+? row.device_data?.["DCDB3-VT-001"]
+: row["dcdb3_vt_001"] || 0,
+DCDB4_CT_001: row.device_data?.["DCDB4-CT-001"] !== undefined && row.device_data?.["DCDB4-CT-001"] !== null
+? row.device_data?.["DCDB4-CT-001"]
+: row["dcdb4_ct_001"] || 0,
+DCDB4_VT_001: row.device_data?.["DCDB4-VT-001"] !== undefined && row.device_data?.["DCDB4-VT-001"] !== null
+? row.device_data?.["DCDB4-VT-001"]
+: row["dcdb4_vt_001"] || 0,
+PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] !== undefined && row.device_data?.["PLC-TIME-STAMP"] !== null
+? row.device_data?.["PLC-TIME-STAMP"]
+: row["plc_time_stamp"] || 0,
+Test_Description: row.device_data?.["Test-description"] !== undefined && row.device_data?.["Test-description"] !== null
+? row.device_data?.["Test-description"]
+: row["test_description"] || 0,
+Test_Remarks: row.device_data?.["Test-Remarks"] !== undefined && row.device_data?.["Test-Remarks"] !== null
+? row.device_data?.["Test-Remarks"]
+: row["test_remarks"] || 0,
+DM_LSH_001: row.device_data?.["DM-LSH-001"] !== undefined && row.device_data?.["DM-LSH-001"] !== null
+  ? row.device_data?.["DM-LSH-001"]
+  : row["dm_lsh_001"] !== undefined && row["dm_lsh_001"] !== null
+  ? row["dm_lsh_001"]
+  : false,
 
-// DM_LSL_001: row.device_data?.["DM-LSL-001"] !== undefined && row.device_data?.["DM-LSL-001"] !== null
-// ? row.device_data?.["DM-LSL-001"]
-// : row["dm_lsl_001"] || 0,
-// GS_LSL_011: row.device_data?.["GS-LSL-011"] !== undefined && row.device_data?.["GS-LSL-011"] !== null
-// ? row.device_data?.["GS-LSL-011"]
-// : row["gs_lsl_011"] || 0,
-// GS_LSL_021: row.device_data?.["GS-LSL-021"] !== undefined && row.device_data?.["GS-LSL-021"] !== null
-// ? row.device_data?.["GS-LSL-021"]
-// : row["gs_lsl_021"] || 0 ,
-//                 }));
+DM_LSL_001: row.device_data?.["DM-LSL-001"] !== undefined && row.device_data?.["DM-LSL-001"] !== null
+? row.device_data?.["DM-LSL-001"]
+: row["dm_lsl_001"] || 0,
+GS_LSL_011: row.device_data?.["GS-LSL-011"] !== undefined && row.device_data?.["GS-LSL-011"] !== null
+? row.device_data?.["GS-LSL-011"]
+: row["gs_lsl_011"] || 0,
+GS_LSL_021: row.device_data?.["GS-LSL-021"] !== undefined && row.device_data?.["GS-LSL-021"] !== null
+? row.device_data?.["GS-LSL-021"]
+: row["gs_lsl_021"] || 0 ,
+                }));
 
-//                 const uniqueTestNames = new Set();
-//                 const deduplicatedData = processedData.filter((row) => {
-//                     if (row.Test_Name && !uniqueTestNames.has(row.Test_Name)) {
-//                         uniqueTestNames.add(row.Test_Name);
-//                         return true;
-//                     }
-//                     return false;
-//                 });
+                const uniqueTestNames = new Set();
+                const deduplicatedData = processedData.filter((row) => {
+                    if (row.Test_Name && !uniqueTestNames.has(row.Test_Name)) {
+                        uniqueTestNames.add(row.Test_Name);
+                        return true;
+                    }
+                    return false;
+                });
 
-//                 setAllData(processedData);
-//                 setData(deduplicatedData);
-//                 setError('');
-//             } else {
-//                 setAllData([]);
-//                 setData([]);
-//                 setError(result.message || 'Failed to fetch data');
-//             }
-//         } catch (err) {
-//             console.error("Error in Fetch:", err);
-//             setAllData([]);
-//             setData([]);
-//             setError(err.message || 'An unexpected error occurred');
-//         } finally {
-//             setIsFetching(false);
-//         }
-//     };
-//     const filteredRows = selectedTestName
-//     ? allData.filter((row) => row.Test_Name === selectedTestName)
-//     : [];
+                setAllData(processedData);
+                setData(deduplicatedData);
+                setError('');
+            } else {
+                setAllData([]);
+                setData([]);
+                setError(result.message || 'Failed to fetch data');
+            }
+        } catch (err) {
+            console.error("Error in Fetch:", err);
+            setAllData([]);
+            setData([]);
+            setError(err.message || 'An unexpected error occurred');
+        } finally {
+            setIsFetching(false);
+        }
+    };
+    const filteredRows = selectedTestName
+    ? allData.filter((row) => row.Test_Name === selectedTestName)
+    : [];
 
-//     const handleTestNameChange = (event) => {
-//         setSelectedTestName(event.target.value);
-//         setTotalizerFlow(null); // Reset totalizer flow when test changes
-//     };
+    const handleTestNameChange = (event) => {
+        setSelectedTestName(event.target.value);
+        setTotalizerFlow(null); // Reset totalizer flow when test changes
+    };
 
-//     const calculateTotalizerFlow = () => {
-//         const filteredRows = allData.filter((row) => row.Test_Name === selectedTestName);
+    const calculateTotalizerFlow = () => {
+        const filteredRows = allData.filter((row) => row.Test_Name === selectedTestName);
 
-//         if (filteredRows.length === 0) {
-//             setTotalizerFlow(null);
-//             return;
-//         }
+        if (filteredRows.length === 0) {
+            setTotalizerFlow(null);
+            return;
+        }
 
-//         // Filter out invalid and negative values
-//         const validRows = filteredRows.filter((row) => row.CR_FT_001 && row.CR_FT_001 > 0);
+        // Filter out invalid and negative values
+        const validRows = filteredRows.filter((row) => row.CR_FT_001 && row.CR_FT_001 > 0);
 
-//         if (validRows.length < 2) {
-//             // If less than 2 valid rows, we cannot calculate a meaningful totalizer flow
-//             setTotalizerFlow(0);
-//             return;
-//         }
+        if (validRows.length < 2) {
+            // If less than 2 valid rows, we cannot calculate a meaningful totalizer flow
+            setTotalizerFlow(0);
+            return;
+        }
 
-//         // Calculate the totalizer flow dynamically
-//         let totalFlow = 0;
-//         for (let i = 0; i < validRows.length - 1; i++) {
-//             const currentRow = validRows[i];
-//             const nextRow = validRows[i + 1];
+        // Calculate the totalizer flow dynamically
+        let totalFlow = 0;
+        for (let i = 0; i < validRows.length - 1; i++) {
+            const currentRow = validRows[i];
+            const nextRow = validRows[i + 1];
 
-//             const currentTimestamp = new Date(currentRow.timestamp).getTime();
-//             const nextTimestamp = new Date(nextRow.timestamp).getTime();
+            const currentTimestamp = new Date(currentRow.timestamp).getTime();
+            const nextTimestamp = new Date(nextRow.timestamp).getTime();
 
-//             const durationInSeconds = (nextTimestamp - currentTimestamp) / 1000;
+            const durationInSeconds = (nextTimestamp - currentTimestamp) / 1000;
 
-//             // Add flow contribution for the time duration between two rows
-//             if (durationInSeconds > 0) {
-//                 totalFlow += currentRow.CR_FT_001 * durationInSeconds;
-//             }
-//         }
-//         // Calculate the total test duration in seconds
-//         const startTimestamp = new Date(validRows[0].timestamp).getTime();
-//         const endTimestamp = new Date(validRows[validRows.length - 1].timestamp).getTime();
-//         const totalDurationInSeconds = (endTimestamp - startTimestamp) / 1000;
+            // Add flow contribution for the time duration between two rows
+            if (durationInSeconds > 0) {
+                totalFlow += currentRow.CR_FT_001 * durationInSeconds;
+            }
+        }
+        // Calculate the total test duration in seconds
+        const startTimestamp = new Date(validRows[0].timestamp).getTime();
+        const endTimestamp = new Date(validRows[validRows.length - 1].timestamp).getTime();
+        const totalDurationInSeconds = (endTimestamp - startTimestamp) / 1000;
 
-//         // Avoid division by zero
-//         const totalizer = totalDurationInSeconds > 0 ? totalFlow / totalDurationInSeconds : 0;
+        // Avoid division by zero
+        const totalizer = totalDurationInSeconds > 0 ? totalFlow / totalDurationInSeconds : 0;
 
-//         setTotalizerFlow(totalizer); // Set the totalizer flow value
-//     };
+        setTotalizerFlow(totalizer); // Set the totalizer flow value
+    };
 
-//     const columns = [
-//         { field: 'ist_timestamp', headerName: 'IST Timestamp', width: 205 },
-//         { field: 'Test_Name', headerName: 'Test Name', width: 170 },
-//         {
-//             field: "AX_LT_011", headerName: "AX-LT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "AX_LT_021", headerName: "AX-LT-021", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4) },
+    const columns = [
+        { field: 'ist_timestamp', headerName: 'IST Timestamp', width: 205 },
+        { field: 'Test_Name', headerName: 'Test Name', width: 170 },
+        {
+            field: "AX_LT_011", headerName: "AX-LT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "AX_LT_021", headerName: "AX-LT-021", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4) },
           
-//           {
-//             field: "CW_TT_011", headerName: "CW-TT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "CW_TT_021", headerName: "CW-TT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "CR_LT_011", headerName: "CR-LT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "CR_PT_011", headerName: "CR-PT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "CR_LT_021", headerName: "CR-LT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "CR_PT_021", headerName: "CR-PT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "CR_PT_001", headerName: "CR-PT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "CR_TT_001", headerName: "CR-TT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "CR_FT_001", headerName: "CR-FT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "CR_TT_002", headerName: "CR-TT-002", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_AT_011", headerName: "GS-AT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_AT_012", headerName: "GS-AT-012", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_PT_011", headerName: "GS-PT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_TT_011", headerName: "GS-TT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_AT_022", headerName: "GS-AT-022", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_PT_021", headerName: "GS-PT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_TT_021", headerName: "GS-TT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_TT_001", headerName: "PR-TT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_TT_061", headerName: "PR-TT-061", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_TT_072", headerName: "PR-TT-072", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_FT_001", headerName: "PR-FT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_AT_001", headerName: "PR-AT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_AT_003", headerName: "PR-AT-003", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_AT_005", headerName: "PR-AT-005", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DM_LSH_001", headerName: "DM-LSH-001", width: 70, valueFormatter: (params) => String(params.value) },
-//           {
-//             field: "DM_LSL_001", headerName: "DM-LSL-001", width: 70, valueFormatter: (params) => String(params.value) },
-//           {
-//             field: "GS_LSL_021", headerName: "GS-LSL-021", width: 70, valueFormatter: (params) => String(params.value) },
-//           {
-//             field: "GS_LSL_011", headerName: "GS-LSL-011", width: 70, valueFormatter: (params) => String(params.value) },
-//           {
-//             field: "PR_VA_301", headerName: "PR-VA-301", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_VA_352", headerName: "PR-VA-352", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_VA_312", headerName: "PR-VA-312", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_VA_351", headerName: "PR-VA-351", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_VA_361Ain", headerName: "PR-VA-361Ain", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_VA_361Aout", headerName: "PR-VA-361Aout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_VA_361Bin", headerName: "PR-VA-361Bin", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_VA_361Bout", headerName: "PR-VA-361Bout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_VA_362Ain", headerName: "PR-VA-362Ain", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_VA_362Aout", headerName: "PR-VA-362Aout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_VA_362Bin", headerName: "PR-VA-362Bin", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "PR_VA_362Bout", headerName: "PR-VA-362Bout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "N2_VA_311", headerName: "N2-VA-311", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_VA_311", headerName: "GS-VA-311", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_VA_312", headerName: "GS-VA-312", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "N2_VA_321", headerName: "N2-VA-321", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_VA_321", headerName: "GS-VA-321", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_VA_322", headerName: "GS-VA-322", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_VA_022", headerName: "GS-VA-022", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "GS_VA_021", headerName: "GS-VA-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "AX_VA_351", headerName: "AX-VA-351", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "AX_VA_311", headerName: "AX-VA-311", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "AX_VA_312", headerName: "AX-VA-312", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "AX_VA_321", headerName: "AX-VA-321", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "AX_VA_322", headerName: "AX-VA-322", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "AX_VA_391", headerName: "AX-VA-391", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DM_VA_301", headerName: "DM-VA-301", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DCDB0_VT_001", headerName: "DCDB0-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DCDB0_CT_001", headerName: "DCDB0-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DCDB1_VT_001", headerName: "DCDB1-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DCDB1_CT_001", headerName: "DCDB1-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DCDB2_VT_001", headerName: "DCDB2-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DCDB2_CT_001", headerName: "DCDB2-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DCDB3_VT_001", headerName: "DCDB3-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DCDB3_CT_001", headerName: "DCDB3-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DCDB4_VT_001", headerName: "DCDB4-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "DCDB4_CT_001", headerName: "DCDB4-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "RECT_CT_001", headerName: "RECT-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           {
-//             field: "RECT_VT_001", headerName: "RECT-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-//           { 
-//             field: "PLC_TIME_STAMP", headerName: "PLC-TIME-STAMP", width: 180, valueFormatter: (params) => params.value },
-//           {
-//             field: "Test_Remarks", headerName: "Test-Remarks", width: 150, valueFormatter: (params) => params.value },
-//           {
-//             field: "Test_Description", headerName: "Test-description", width: 150, valueFormatter: (params) => params.value }
-//               ];
+          {
+            field: "CW_TT_011", headerName: "CW-TT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "CW_TT_021", headerName: "CW-TT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "CR_LT_011", headerName: "CR-LT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "CR_PT_011", headerName: "CR-PT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "CR_LT_021", headerName: "CR-LT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "CR_PT_021", headerName: "CR-PT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "CR_PT_001", headerName: "CR-PT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "CR_TT_001", headerName: "CR-TT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "CR_FT_001", headerName: "CR-FT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "CR_TT_002", headerName: "CR-TT-002", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_AT_011", headerName: "GS-AT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_AT_012", headerName: "GS-AT-012", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_PT_011", headerName: "GS-PT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_TT_011", headerName: "GS-TT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_AT_022", headerName: "GS-AT-022", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_PT_021", headerName: "GS-PT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_TT_021", headerName: "GS-TT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_TT_001", headerName: "PR-TT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_TT_061", headerName: "PR-TT-061", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_TT_072", headerName: "PR-TT-072", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_FT_001", headerName: "PR-FT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_AT_001", headerName: "PR-AT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_AT_003", headerName: "PR-AT-003", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_AT_005", headerName: "PR-AT-005", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DM_LSH_001", headerName: "DM-LSH-001", width: 70, valueFormatter: (params) => String(params.value) },
+          {
+            field: "DM_LSL_001", headerName: "DM-LSL-001", width: 70, valueFormatter: (params) => String(params.value) },
+          {
+            field: "GS_LSL_021", headerName: "GS-LSL-021", width: 70, valueFormatter: (params) => String(params.value) },
+          {
+            field: "GS_LSL_011", headerName: "GS-LSL-011", width: 70, valueFormatter: (params) => String(params.value) },
+          {
+            field: "PR_VA_301", headerName: "PR-VA-301", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_VA_352", headerName: "PR-VA-352", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_VA_312", headerName: "PR-VA-312", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_VA_351", headerName: "PR-VA-351", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_VA_361Ain", headerName: "PR-VA-361Ain", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_VA_361Aout", headerName: "PR-VA-361Aout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_VA_361Bin", headerName: "PR-VA-361Bin", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_VA_361Bout", headerName: "PR-VA-361Bout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_VA_362Ain", headerName: "PR-VA-362Ain", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_VA_362Aout", headerName: "PR-VA-362Aout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_VA_362Bin", headerName: "PR-VA-362Bin", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PR_VA_362Bout", headerName: "PR-VA-362Bout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "N2_VA_311", headerName: "N2-VA-311", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_VA_311", headerName: "GS-VA-311", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_VA_312", headerName: "GS-VA-312", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "N2_VA_321", headerName: "N2-VA-321", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_VA_321", headerName: "GS-VA-321", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_VA_322", headerName: "GS-VA-322", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_VA_022", headerName: "GS-VA-022", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "GS_VA_021", headerName: "GS-VA-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "AX_VA_351", headerName: "AX-VA-351", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "AX_VA_311", headerName: "AX-VA-311", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "AX_VA_312", headerName: "AX-VA-312", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "AX_VA_321", headerName: "AX-VA-321", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "AX_VA_322", headerName: "AX-VA-322", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "AX_VA_391", headerName: "AX-VA-391", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DM_VA_301", headerName: "DM-VA-301", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DCDB0_VT_001", headerName: "DCDB0-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DCDB0_CT_001", headerName: "DCDB0-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DCDB1_VT_001", headerName: "DCDB1-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DCDB1_CT_001", headerName: "DCDB1-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DCDB2_VT_001", headerName: "DCDB2-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DCDB2_CT_001", headerName: "DCDB2-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DCDB3_VT_001", headerName: "DCDB3-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DCDB3_CT_001", headerName: "DCDB3-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DCDB4_VT_001", headerName: "DCDB4-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "DCDB4_CT_001", headerName: "DCDB4-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "RECT_CT_001", headerName: "RECT-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "RECT_VT_001", headerName: "RECT-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          { 
+            field: "PLC_TIME_STAMP", headerName: "PLC-TIME-STAMP", width: 180, valueFormatter: (params) => params.value },
+          {
+            field: "Test_Remarks", headerName: "Test-Remarks", width: 150, valueFormatter: (params) => params.value },
+          {
+            field: "Test_Description", headerName: "Test-description", width: 150, valueFormatter: (params) => params.value }
+              ];
 
-//     return (
-//       <Box m="15px" mt="-60px">
-//             <Header
-//                 title="Report Analytics"
-//                 subtitle="Fetch Report using Start Date-time and End Date-time"
-//             />
-//             <div>
-//                 <LocalizationProvider dateAdapter={AdapterDateFns}>
-//                     <Grid container spacing={2} alignItems="center">
-//                         <Grid item xs={3}>
-//                             <DateTimePicker
-//                                 label="Start Date Time"
-//                                 value={startTime}
-//                                 onChange={(newValue) => setStartTime(newValue)}
-//                                 renderInput={(params) => <TextField {...params} fullWidth />}
-//                             />
-//                         </Grid>
-//                         <Grid item xs={3}>
-//                             <DateTimePicker
-//                                 label="End Date Time"
-//                                 value={endTime}
-//                                 onChange={(newValue) => setEndTime(newValue)}
-//                                 renderInput={(params) => <TextField {...params} fullWidth />}
-//                             />
-//                         </Grid>
-//                         <Grid item xs={2}>
-//                             <Button
-//                                 variant="contained"
-//                                 color="secondary"
-//                                 onClick={fetchData}
-//                                 disabled={!startTime || !endTime || isFetching}
-//                             >
-//                                 {isFetching ? "Fetching..." : "Fetch Data"}
-//                             </Button>
-//                         </Grid>
-//                     </Grid>
-//                 </LocalizationProvider>
-//                 {error && <p style={{ color: 'red' }}>{error}</p>}
-//                 {!isFetching && data.length > 0 && (
-//                     <Box sx={{ mt: 4, mb: 4, width: '300px' }}>
-//                         <FormControl fullWidth>
-//                             <InputLabel id="test-name-select-label">Select Test-Name</InputLabel>
-//                             <Select
-//                                 labelId="test-name-select-label"
-//                                 value={selectedTestName || ''}
-//                                 onChange={handleTestNameChange}
-//                             >
-//                                 {data.map((row) => (
-//                                     <MenuItem key={row.id} value={row.Test_Name}>
-//                                         {row.Test_Name}
-//                                     </MenuItem>
-//                                 ))}
-//                             </Select>
-//                         </FormControl>
-//                         <Button
-//                             variant="contained"
-//                             color="primary"
-//                             onClick={calculateTotalizerFlow}
-//                             sx={{ mt: 2 }}
-//                             disabled={!selectedTestName}
-//                         >
-//                             Calculate Totalizer Flow
-//                         </Button>
-//                     </Box>
-//                 )}
-//                 {isFetching ? (
-//                     <Typography variant="h5" color="secondary">Data fetching....</Typography>
-//                 ) : selectedTestName && filteredRows.length > 0 ? (
-//                     <Box sx={{ height: 600, width: '100%' }}>
-//                     {totalizerFlow !== null && (
-//                         <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
-//                             Totalizer Flow for "{selectedTestName}": {totalizerFlow.toFixed(2)} Liters/Second
-//                         </Typography>
-//                     )}
-//                         <h2>Details for Test-Name: {selectedTestName}</h2>
+    return (
+      <Box m="15px" mt="-60px">
+            <Header
+                title="Report Analytics"
+                subtitle="Fetch Report using Start Date-time and End Date-time"
+            />
+            <div>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={3}>
+                            <DateTimePicker
+                                label="Start Date Time"
+                                value={startTime}
+                                onChange={(newValue) => setStartTime(newValue)}
+                                renderInput={(params) => <TextField {...params} fullWidth />}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <DateTimePicker
+                                label="End Date Time"
+                                value={endTime}
+                                onChange={(newValue) => setEndTime(newValue)}
+                                renderInput={(params) => <TextField {...params} fullWidth />}
+                            />
+                        </Grid>
+                        <Grid item xs={2}>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={fetchData}
+                                disabled={!startTime || !endTime || isFetching}
+                            >
+                                {isFetching ? "Fetching..." : "Fetch Data"}
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </LocalizationProvider>
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {!isFetching && data.length > 0 && (
+                    <Box sx={{ mt: 4, mb: 4, width: '300px' }}>
+                        <FormControl fullWidth>
+                            <InputLabel id="test-name-select-label">Select Test-Name</InputLabel>
+                            <Select
+                                labelId="test-name-select-label"
+                                value={selectedTestName || ''}
+                                onChange={handleTestNameChange}
+                            >
+                                {data.map((row) => (
+                                    <MenuItem key={row.id} value={row.Test_Name}>
+                                        {row.Test_Name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={calculateTotalizerFlow}
+                            sx={{ mt: 2 }}
+                            disabled={!selectedTestName}
+                        >
+                            Calculate Totalizer Flow
+                        </Button>
+                    </Box>
+                )}
+                {isFetching ? (
+                    <Typography variant="h5" color="secondary">Data fetching....</Typography>
+                ) : selectedTestName && filteredRows.length > 0 ? (
+                    <Box sx={{ height: 600, width: '100%' }}>
+                    {totalizerFlow !== null && (
+                        <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
+                            Totalizer Flow for "{selectedTestName}": {totalizerFlow.toFixed(2)} Liters/Second
+                        </Typography>
+                    )}
+                        <h2>Details for Test-Name: {selectedTestName}</h2>
                         
-//                         <DataGrid
-//                             rows={filteredRows}
-//                             columns={columns}
-//                             components={{ Toolbar: GridToolbar }}
-//                             getRowId={(row) => row.id}
-//                             componentsProps={{
-//                               toolbar:{
-//                                 sx: {
-//                                   "& .MuiButton-root": {
-//                                     color: "rgb(34 197 94)",
-//                                   },
-//                                 },
-//                               },
-//                             }}
-//                         />
+                        <DataGrid
+                            rows={filteredRows}
+                            columns={columns}
+                            components={{ Toolbar: GridToolbar }}
+                            getRowId={(row) => row.id}
+                            componentsProps={{
+                              toolbar:{
+                                sx: {
+                                  "& .MuiButton-root": {
+                                    color: "rgb(34 197 94)",
+                                  },
+                                },
+                              },
+                            }}
+                        />
                        
-//                     </Box>
-//                 ) : (
-//                     <Typography variant="h6" color="textSecondary"></Typography>
-//                 )}
-//             </div>
-//         </Box>
-//     );
-// }
+                    </Box>
+                ) : (
+                    <Typography variant="h6" color="textSecondary"></Typography>
+                )}
+            </div>
+        </Box>
+    );
+}
 
-// export default IoTDataViewer;
+export default IoTDataViewer;
 
 
 

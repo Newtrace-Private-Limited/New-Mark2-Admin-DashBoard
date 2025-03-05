@@ -7,6 +7,7 @@ import Prediction from "./scenes/HistoricalScatterCharts";
 import Analytics from "./scenes/analytics";
 import Stackdata from "./scenes/stackdata";
 import Report from "./scenes/Report";
+import TestingData from "./scenes/testingdata";
 import CustomeChart from "./scenes/CustomeChart";
 import FAQ from "./scenes/faq";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -46,6 +47,7 @@ function App() {
                   <Route path="/HistoricalLineCharts" element={<TimeSeries />} />
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/report" element={<Report />} />
+                  <Route path="/testingdata" element={<TestingData />} />
                   <Route path="/bar" element={<Bar />} />
                   <Route path="/CustomeChart" element={<CustomeChart />} />
                   <Route path="/line" element={<Line />} />
