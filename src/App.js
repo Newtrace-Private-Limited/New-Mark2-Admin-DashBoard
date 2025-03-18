@@ -26,10 +26,8 @@ import store from "./redux/store";
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
-
   return (
-   
-    <WebSocketProvider store={store}>
+       <WebSocketProvider store={store}>
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline />

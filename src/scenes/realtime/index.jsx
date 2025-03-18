@@ -21,81 +21,134 @@ const RealTime = () => {
     { field: "id", headerName: "ID", hide: true },
     { field: "date", headerName: "Date", width: 80 },
     { field: "time", headerName: "Time", width: 70 },
-    // {
-    //   field: "differenceBetweenTime",
-    //   headerName: "Difference Between Time (ms)",
-    //   width: 70,
-    // },
-    { field: "AX-LT-011", headerName: "AX-LT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
-    { field: "AX-LT-021", headerName: "AX-LT-021", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "CW-TT-011", headerName: "CW-TT-011", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "CW-TT-021", headerName: "CW-TT-021", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "CR-LT-011", headerName: "CR-LT-011", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "CR-PT-011", headerName: "CR-PT-011", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "CR-LT-021", headerName: "CR-LT-021", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "CR-PT-021", headerName: "CR-PT-021", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "CR-PT-001", headerName: "CR-PT-001", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "CR-TT-001", headerName: "CR-TT-001", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "CR-FT-001", headerName: "CR-FT-001", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "CR-TT-002", headerName: "CR-TT-002", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-AT-011", headerName: "GS-AT-011", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-AT-012", headerName: "GS-AT-012", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-PT-011", headerName: "GS-PT-011", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-TT-011", headerName: "GS-TT-011", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-AT-022", headerName: "GS-AT-022", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-PT-021", headerName: "GS-PT-021", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-TT-021", headerName: "GS-TT-021", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-TT-001", headerName: "PR-TT-001", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-TT-061", headerName: "PR-TT-061", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-TT-072", headerName: "PR-TT-072", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-FT-001", headerName: "PR-FT-001", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-AT-001", headerName: "PR-AT-001", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-AT-003", headerName: "PR-AT-003", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-AT-005", headerName: "PR-AT-005", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DM-LSH-001", headerName: "DM-LSH-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DM-LSL-001", headerName: "DM-LSL-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-LSL-021", headerName: "GS-LSL-021", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-LSL-011", headerName: "GS-LSL-011", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-301", headerName: "PR-VA-301", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-352", headerName: "PR-VA-352", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-312", headerName: "PR-VA-312", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-351", headerName: "PR-VA-351", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-361Ain", headerName: "PR-VA-361Ain", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-361Aout", headerName: "PR-VA-361Aout", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-361Bin", headerName: "PR-VA-361Bin", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-361Bout", headerName: "PR-VA-361Bout", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-362Ain", headerName: "PR-VA-362Ain", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-362Aout", headerName: "PR-VA-362Aout", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-362Bin", headerName: "PR-VA-362Bin", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PR-VA-362Bout", headerName: "PR-VA-362Bout", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "N2-VA-311", headerName: "N2-VA-311", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-VA-311", headerName: "GS-VA-311", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-VA-312", headerName: "GS-VA-312", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "N2-VA-321", headerName: "N2-VA-321", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-VA-321", headerName: "GS-VA-321", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-VA-322", headerName: "GS-VA-322", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-VA-022", headerName: "GS-VA-022", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "GS-VA-021", headerName: "GS-VA-021", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "AX-VA-351", headerName: "AX-VA-351", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "AX-VA-311", headerName: "AX-VA-311", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "AX-VA-312", headerName: "AX-VA-312", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "AX-VA-321", headerName: "AX-VA-321", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "AX-VA-322", headerName: "AX-VA-322", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "AX-VA-391", headerName: "AX-VA-391", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DM-VA-301", headerName: "DM-VA-301", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DCDB0-VT-001", headerName: "DCDB0-VT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DCDB0-CT-001", headerName: "DCDB0-CT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DCDB1-VT-001", headerName: "DCDB1-VT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DCDB1-CT-001", headerName: "DCDB1-CT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DCDB2-VT-001", headerName: "DCDB2-VT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DCDB2-CT-001", headerName: "DCDB2-CT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DCDB3-VT-001", headerName: "DCDB3-VT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DCDB3-CT-001", headerName: "DCDB3-CT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DCDB4-VT-001", headerName: "DCDB4-VT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "DCDB4-CT-001", headerName: "DCDB4-CT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "RECT-CT-001", headerName: "RECT-CT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "RECT-VT-001", headerName: "RECT-VT-001", width: 90 ,valueFormatter: (params) => Number(params.value).toFixed(4), },
-    { field: "PLC-TIME-STAMP", headerName: "PLC-TIME-STAMP", width: 170, },
+
+    {
+      field: "Test-Name",
+      headerName: "Test-Name",
+      width: 100,
+      valueFormatter: (params) => params.value || "",
+    },
+    {
+      field: "Test-Remarks",
+      headerName: "Test-Remarks",
+      width: 150,
+      valueFormatter: (params) => params.value || "",
+    },
+    {
+      field: "Test-description",
+      headerName: "Test-description",
+      width: 150,
+      valueFormatter: (params) => params.value || "",
+    },
+    {
+      field: "LICR-0101-PV",
+      headerName: "LICR-0101-PV",
+      width: 120,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "LICR-0102-PV",
+      headerName: "LICR-0102-PV",
+      width: 120,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "LICR-0103-PV",
+      headerName: "LICR-0103-PV",
+      width: 120,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "PICR-0101-PV",
+      headerName: "PICR-0101-PV",
+      width: 120,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "PICR-0102-PV",
+      headerName: "PICR-0102-PV",
+      width: 120,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "PICR-0103-PV",
+      headerName: "PICR-0103-PV",
+      width: 120,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "TICR-0101-PV",
+      headerName: "TICR-0101-PV",
+      width: 120,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "ABB-Flow-Meter",
+      headerName: "ABB-Flow-Meter",
+      width: 120,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "H2-Flow",
+      headerName: "H2-Flow",
+      width: 70,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "O2-Flow",
+      headerName: "O2-Flow",
+      width: 70,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "Cell-back-pressure",
+      headerName: "Cell-back-pressure",
+      width: 150,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "H2-Pressure-outlet",
+      headerName: "H2-Pressure-outlet",
+      width: 150,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "O2-Pressure-outlet",
+      headerName: "O2-Pressure-outlet",
+      width: 150,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "H2-Stack-pressure-difference",
+      headerName: "H2-Stack-pressure-difference",
+      width: 170,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "O2-Stack-pressure-difference",
+      headerName: "O2-Stack-pressure-difference",
+      width: 170,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "Ly-Rectifier-current",
+      headerName: "Ly-Rectifier-current",
+      width: 150,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "Ly-Rectifier-voltage",
+      headerName: "Ly-Rectifier-voltage",
+      width: 150,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    {
+      field: "Cell-Voltage-Multispan",
+      headerName: "Cell-Voltage-Multispan",
+      width: 150,
+      valueFormatter: (params) => Number(params.value).toFixed(4),
+    },
+    { field: "PLC-TIME-STAMP", headerName: "PLC-TIME-STAMP", width: 170 },
   ]);
 
   useEffect(() => {
@@ -153,41 +206,40 @@ const RealTime = () => {
 
   return (
     <Box m="15px" mt="-60px">
-    <div
-      style={{
-        height: dimensions.height,
-        width: dimensions.width,
-        margin: "0 auto",
-      }}
-    >
-      <Header
-        title="Real Time Data Table"
-        subtitle="Welcome to your Real Time Data Table"
-      />
-      <DataGrid
-      rows={rows}
-        columns={columns}
-        components={{ Toolbar: GridToolbar }}
-        rowsPerPageOptions={[25, 50, 100]}
-        loading={rows.length === 0}
-        disableSelectionOnClick
-        getRowId={(row) => row.id}
-        componentsProps={{
-          toolbar:{
-            sx: {
-              "& .MuiButton-root": {
-                color: "rgb(34 197 94)",
+      <div
+        style={{
+          height: dimensions.height,
+          width: dimensions.width,
+          margin: "0 auto",
+        }}
+      >
+        <Header
+          title="Real Time Data Table"
+          subtitle="Welcome to your Real Time Data Table"
+        />
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          components={{ Toolbar: GridToolbar }}
+          rowsPerPageOptions={[25, 50, 100]}
+          loading={rows.length === 0}
+          disableSelectionOnClick
+          getRowId={(row) => row.id}
+          componentsProps={{
+            toolbar: {
+              sx: {
+                "& .MuiButton-root": {
+                  color: "rgb(34 197 94)",
+                },
               },
             },
-          },
-        }}
-      />
-    </div>
+          }}
+        />
+      </div>
     </Box>
   );
 };
 export default RealTime;
-
 
 // import React, { useState, useEffect } from "react";
 // import { DataGrid, GridToolbar } from "@mui/x-data-grid";
@@ -215,13 +267,13 @@ export default RealTime;
 //     const currentTime = new Date();
 //     const istDateObject = new Date(data["PLC-TIME-STAMP"]);
 //     const timeDifference = differenceInMilliseconds(currentTime, istDateObject);
-  
+
 //     setRows((prevRows) => {
 //       // Check if a row with the same timestamp already exists
 //       const isDuplicate = prevRows.some(
 //         (row) => row["PLC-TIME-STAMP"] === data["PLC-TIME-STAMP"]
 //       );
-  
+
 //       if (isDuplicate) {
 //         // If duplicate, replace the existing row data instead of adding a new row
 //         return prevRows.map((row) =>
@@ -284,7 +336,7 @@ export default RealTime;
 //           toolbar: {
 //             sx: {
 //               "& .MuiButton-root": {
-//                 color: "rgb(34 197 94);", 
+//                 color: "rgb(34 197 94);",
 //                 },
 //               }
 //             },
@@ -295,8 +347,6 @@ export default RealTime;
 // };
 
 // export default RealTime;
-
-
 
 // import React, { useState, useEffect } from "react";
 // import { DataGrid, GridToolbar } from "@mui/x-data-grid";
@@ -397,13 +447,13 @@ export default RealTime;
 //     const currentTime = new Date();
 //     const istDateObject = new Date(data["PLC-TIME-STAMP"]);
 //     const timeDifference = differenceInMilliseconds(currentTime, istDateObject);
-  
+
 //     setRows((prevRows) => {
 //       // Check if a row with the same timestamp already exists
 //       const isDuplicate = prevRows.some(
 //         (row) => row["PLC-TIME-STAMP"] === data["PLC-TIME-STAMP"]
 //       );
-  
+
 //       if (isDuplicate) {
 //         // If duplicate, replace the existing row data instead of adding a new row
 //         return prevRows.map((row) =>
@@ -432,28 +482,28 @@ export default RealTime;
 //       }
 //     });
 //   }, [data]);
-  
-  // useEffect(() => {
-  //   const currentTime = new Date();
-  //   const istDateObject = new Date(data["PLC-TIME-STAMP"]);
-  //   const timeDifference = differenceInMilliseconds(currentTime, istDateObject);
 
-  //   setRows((prevRows) => {
-  //     const newRows = [
-  //       ...prevRows,
-  //       {
-  //         ...data,
-  //         id: prevRows.length + 1,
-  //         date: format(istDateObject, "yyyy-MM-dd"),
-  //         time: format(istDateObject, "HH:mm:ss"),
-  //         differenceBetweenTime: timeDifference,
-  //       },
-  //     ];
-  //     return newRows.sort(
-  //       (a, b) => new Date(b["PLC-TIME-STAMP"]) - new Date(a["PLC-TIME-STAMP"])
-  //     );
-  //   });
-  // }, [data]);
+// useEffect(() => {
+//   const currentTime = new Date();
+//   const istDateObject = new Date(data["PLC-TIME-STAMP"]);
+//   const timeDifference = differenceInMilliseconds(currentTime, istDateObject);
+
+//   setRows((prevRows) => {
+//     const newRows = [
+//       ...prevRows,
+//       {
+//         ...data,
+//         id: prevRows.length + 1,
+//         date: format(istDateObject, "yyyy-MM-dd"),
+//         time: format(istDateObject, "HH:mm:ss"),
+//         differenceBetweenTime: timeDifference,
+//       },
+//     ];
+//     return newRows.sort(
+//       (a, b) => new Date(b["PLC-TIME-STAMP"]) - new Date(a["PLC-TIME-STAMP"])
+//     );
+//   });
+// }, [data]);
 
 //   const formatNumber = (value) => {
 //     if (typeof value === "number") {
@@ -558,7 +608,7 @@ export default RealTime;
 //           toolbar: {
 //             sx: {
 //               "& .MuiButton-root": {
-//                 color: "rgb(34 197 94);", 
+//                 color: "rgb(34 197 94);",
 //                 },
 //               }
 //             },

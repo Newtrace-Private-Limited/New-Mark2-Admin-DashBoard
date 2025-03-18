@@ -1,145 +1,159 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import GridLayout from "react-grid-layout";
-import { Box, Typography, IconButton, useTheme, Button } from "@mui/material";
-import DragHandleIcon from "@mui/icons-material/DragHandle";
-import { debounce } from "lodash";
-import RawGasImpurities from "src/component/separator/RawGasImpurities";
-import H2RawGas from "src/component/AuxSystem/H2RawGas";
-import H2ProcessGas from "src/component/AuxSystem/H2ProcessGas";
-import Separator from "src/component/separator/Separator";
-import Electrolyte from "src/component/Electrolyte/Electrolyte";
-import RectifierControl from "src/component/separator/RectifierControl";
-import { setLayout as setLayoutAction } from "../../redux/layoutActions";
-import { tokens } from "../../theme";
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
-import Header from "src/component/Header";
+import React from 'react'
 
-const Overview = () => {
-  const dispatch = useDispatch();
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-
-  const largeScreenKey = "overviewChartsLayoutLarge";
-  const smallScreenKey = "overviewChartsLayoutSmall";
-
-  // Default layouts for large and small screens
-  const largeScreenLayout = [
-    { i: "Seperator", x: 0, y: 1, w: 2.5, h: 10, minW: 2, maxW: 4, minH: 10, maxH: 10 },
-    { i: "Electrolyte", x: 2.5, y: 0, w: 2.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
-    { i: "RawGas", x: 5, y: 0, w: 5, h: 10, minW: 4.5, maxW: 7, minH: 9, maxH: 13 },
-    { i: "H2RAW", x: 0, y: 2, w: 6, h: 10.5, minW: 4.5, maxW: 7, minH: 9, maxH: 13 },
-    { i: "RECTIFIER", x: 10, y: 0, w: 2, h: 10, minW: 2, maxW: 4, minH: 2, maxH: 11 },
-    { i: "H2PROCESS", x: 6, y: 3, w: 6, h: 10.5, minW: 4.5, maxW: 7, minH: 9, maxH: 13 },
-  ];
-
-  const smallScreenLayout = [
-    { i: "Seperator", x: 0, y: 1, w: 3.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
-    { i: "Electrolyte", x: 3.5, y: 0, w: 3.2, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
-    { i: "RawGas", x: 0, y: 1, w: 4.8, h: 10.7, minW: 4.5, maxW: 7, minH: 9, maxH: 13 },
-    { i: "H2RAW", x: 4.8, y: 1, w: 5, h: 10.5, minW: 4, maxW: 8, minH: 10, maxH: 13 },
-    { i: "RECTIFIER", x: 6.7, y: 0, w: 3, h: 10, minW: 2, maxW: 12, minH: 2, maxH: 15 },
-    { i: "H2PROCESS", x: 0, y: 3, w: 9.8, h: 10.5, minW: 4, maxW: 8, minH: 10, maxH: 13 },
-  ];
-
-  // Responsive layout state
-  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth > 1280);
-  const [layoutState, setLayoutState] = useState(() => {
-    const storedLayout = JSON.parse(localStorage.getItem(isLargeScreen ? largeScreenKey : smallScreenKey));
-    return storedLayout || (isLargeScreen ? largeScreenLayout : smallScreenLayout);
-  });
-
-  // Handle screen size changes
-  useEffect(() => {
-    const handleResize = () => {
-      const isLarge = window.innerWidth > 1280;
-      setIsLargeScreen(isLarge);
-
-      // Load appropriate layout from localStorage
-      const storedLayout = JSON.parse(localStorage.getItem(isLarge ? largeScreenKey : smallScreenKey));
-      setLayoutState(storedLayout || (isLarge ? largeScreenLayout : smallScreenLayout));
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Save layout with debounce
-  const saveLayout = debounce((newLayout) => {
-    setLayoutState(newLayout);
-    const layoutKey = isLargeScreen ? largeScreenKey : smallScreenKey;
-
-    // Dispatch action to save layout in Redux store
-    dispatch(setLayoutAction({ layout: newLayout, isLargeScreen }));
-    localStorage.setItem(layoutKey, JSON.stringify(newLayout));
-  }, 500);
-
-  // Reset layout to default
-  const resetLayout = () => {
-    const layoutToReset = isLargeScreen ? largeScreenLayout : smallScreenLayout;
-    setLayoutState(layoutToReset);
-
-    const layoutKey = isLargeScreen ? largeScreenKey : smallScreenKey;
-    dispatch(setLayoutAction({ layout: layoutToReset, isLargeScreen }));
-    localStorage.setItem(layoutKey, JSON.stringify(layoutToReset));
-  };
-
-  // Calculate box dimensions dynamically
-  const calculateBoxDimensions = (item) => {
-    const baseWidth = isLargeScreen ? 160 : 120;
-    const baseHeight = 30;
-    return {
-      width: item.w * baseWidth,
-      height: item.h * baseHeight,
-    };
-  };
+const index = () => {
   return (
-    <Box m="15px" mt="-60px">
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="Overview" subtitle="Welcome to your Overview" />
-        <Button variant="contained" color="secondary" onClick={resetLayout} className="top-6">
-          Reset Layout
-        </Button>
-      </Box>
-      <GridLayout
-        className="layout"
-        layout={layoutState}
-        cols={12}
-        rowHeight={30}
-        width={isLargeScreen ? 1630 : 1200}
-        onLayoutChange={(newLayout) => saveLayout(newLayout)}
-        onResizeStop={(newLayout) => saveLayout(newLayout)}
-        isResizable
-        isDraggable
-        draggableHandle=".drag-handle"
-      >
-        {layoutState.map((item) => {
-          const dimensions = calculateBoxDimensions(item);
-          return (
-            <Box key={item.i} sx={{ backgroundColor: colors.primary[400] }}>
-              <Box display="flex" justifyContent="space-between" p="8px">
-                <IconButton className="drag-handle" style={{ cursor: "move" }}>
-                  <DragHandleIcon />
-                </IconButton>
-                <Typography variant="h6">{item.i.toUpperCase()}</Typography>
-              </Box>
-              <Box display="flex" alignItems="center" justifyContent="center" height="100%">
-                {item.i === "RawGas" && <RawGasImpurities width={dimensions.width} height={dimensions.height} />}
-                {item.i === "H2RAW" && <H2RawGas width={dimensions.width} height={dimensions.height} />}
-                {item.i === "H2PROCESS" && <H2ProcessGas width={dimensions.width} height={dimensions.height} />}
-                {item.i === "Seperator" && <Separator />}
-                {item.i === "Electrolyte" && <Electrolyte />}
-                {item.i === "RECTIFIER" && <RectifierControl />}
-              </Box>
-            </Box>
-          );
-        })}
-      </GridLayout>
-    </Box>
-  );
-};
-export default Overview;
+    <div>
+      Overview
+    </div>
+  )
+}
+
+export default index
+
+
+
+// import React, { useState, useEffect } from "react";
+// import { useDispatch } from "react-redux";
+// import GridLayout from "react-grid-layout";
+// import { Box, Typography, IconButton, useTheme, Button } from "@mui/material";
+// import DragHandleIcon from "@mui/icons-material/DragHandle";
+// import { debounce } from "lodash";
+// import RawGasImpurities from "src/component/separator/RawGasImpurities";
+// import H2RawGas from "src/component/AuxSystem/H2RawGas";
+// import H2ProcessGas from "src/component/AuxSystem/H2ProcessGas";
+// import Separator from "src/component/separator/Separator";
+// import Electrolyte from "src/component/Electrolyte/Electrolyte";
+// import RectifierControl from "src/component/separator/RectifierControl";
+// import { setLayout as setLayoutAction } from "../../redux/layoutActions";
+// import { tokens } from "../../theme";
+// import "react-grid-layout/css/styles.css";
+// import "react-resizable/css/styles.css";
+// import Header from "src/component/Header";
+
+// const Overview = () => {
+//   const dispatch = useDispatch();
+//   const theme = useTheme();
+//   const colors = tokens(theme.palette.mode);
+
+//   const largeScreenKey = "overviewChartsLayoutLarge";
+//   const smallScreenKey = "overviewChartsLayoutSmall";
+
+//   // Default layouts for large and small screens
+//   const largeScreenLayout = [
+//     { i: "Seperator", x: 0, y: 1, w: 2.5, h: 10, minW: 2, maxW: 4, minH: 10, maxH: 10 },
+//     { i: "Electrolyte", x: 2.5, y: 0, w: 2.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
+//     { i: "RawGas", x: 5, y: 0, w: 5, h: 10, minW: 4.5, maxW: 7, minH: 9, maxH: 13 },
+//     { i: "H2RAW", x: 0, y: 2, w: 6, h: 10.5, minW: 4.5, maxW: 7, minH: 9, maxH: 13 },
+//     { i: "RECTIFIER", x: 10, y: 0, w: 2, h: 10, minW: 2, maxW: 4, minH: 2, maxH: 11 },
+//     { i: "H2PROCESS", x: 6, y: 3, w: 6, h: 10.5, minW: 4.5, maxW: 7, minH: 9, maxH: 13 },
+//   ];
+
+//   const smallScreenLayout = [
+//     { i: "Seperator", x: 0, y: 1, w: 3.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
+//     { i: "Electrolyte", x: 3.5, y: 0, w: 3.2, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
+//     { i: "RawGas", x: 0, y: 1, w: 4.8, h: 10.7, minW: 4.5, maxW: 7, minH: 9, maxH: 13 },
+//     { i: "H2RAW", x: 4.8, y: 1, w: 5, h: 10.5, minW: 4, maxW: 8, minH: 10, maxH: 13 },
+//     { i: "RECTIFIER", x: 6.7, y: 0, w: 3, h: 10, minW: 2, maxW: 12, minH: 2, maxH: 15 },
+//     { i: "H2PROCESS", x: 0, y: 3, w: 9.8, h: 10.5, minW: 4, maxW: 8, minH: 10, maxH: 13 },
+//   ];
+
+//   // Responsive layout state
+//   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth > 1280);
+//   const [layoutState, setLayoutState] = useState(() => {
+//     const storedLayout = JSON.parse(localStorage.getItem(isLargeScreen ? largeScreenKey : smallScreenKey));
+//     return storedLayout || (isLargeScreen ? largeScreenLayout : smallScreenLayout);
+//   });
+
+//   // Handle screen size changes
+//   useEffect(() => {
+//     const handleResize = () => {
+//       const isLarge = window.innerWidth > 1280;
+//       setIsLargeScreen(isLarge);
+
+//       // Load appropriate layout from localStorage
+//       const storedLayout = JSON.parse(localStorage.getItem(isLarge ? largeScreenKey : smallScreenKey));
+//       setLayoutState(storedLayout || (isLarge ? largeScreenLayout : smallScreenLayout));
+//     };
+
+//     window.addEventListener("resize", handleResize);
+//     return () => window.removeEventListener("resize", handleResize);
+//   }, []);
+
+//   // Save layout with debounce
+//   const saveLayout = debounce((newLayout) => {
+//     setLayoutState(newLayout);
+//     const layoutKey = isLargeScreen ? largeScreenKey : smallScreenKey;
+
+//     // Dispatch action to save layout in Redux store
+//     dispatch(setLayoutAction({ layout: newLayout, isLargeScreen }));
+//     localStorage.setItem(layoutKey, JSON.stringify(newLayout));
+//   }, 500);
+
+//   // Reset layout to default
+//   const resetLayout = () => {
+//     const layoutToReset = isLargeScreen ? largeScreenLayout : smallScreenLayout;
+//     setLayoutState(layoutToReset);
+
+//     const layoutKey = isLargeScreen ? largeScreenKey : smallScreenKey;
+//     dispatch(setLayoutAction({ layout: layoutToReset, isLargeScreen }));
+//     localStorage.setItem(layoutKey, JSON.stringify(layoutToReset));
+//   };
+
+//   // Calculate box dimensions dynamically
+//   const calculateBoxDimensions = (item) => {
+//     const baseWidth = isLargeScreen ? 160 : 120;
+//     const baseHeight = 30;
+//     return {
+//       width: item.w * baseWidth,
+//       height: item.h * baseHeight,
+//     };
+//   };
+//   return (
+//     <Box m="15px" mt="-60px">
+//       <Box display="flex" justifyContent="space-between" alignItems="center">
+//         <Header title="Overview" subtitle="Welcome to your Overview" />
+//         <Button variant="contained" color="secondary" onClick={resetLayout} className="top-6">
+//           Reset Layout
+//         </Button>
+//       </Box>
+//       <GridLayout
+//         className="layout"
+//         layout={layoutState}
+//         cols={12}
+//         rowHeight={30}
+//         width={isLargeScreen ? 1630 : 1200}
+//         onLayoutChange={(newLayout) => saveLayout(newLayout)}
+//         onResizeStop={(newLayout) => saveLayout(newLayout)}
+//         isResizable
+//         isDraggable
+//         draggableHandle=".drag-handle"
+//       >
+//         {layoutState.map((item) => {
+//           const dimensions = calculateBoxDimensions(item);
+//           return (
+//             <Box key={item.i} sx={{ backgroundColor: colors.primary[400] }}>
+//               <Box display="flex" justifyContent="space-between" p="8px">
+//                 <IconButton className="drag-handle" style={{ cursor: "move" }}>
+//                   <DragHandleIcon />
+//                 </IconButton>
+//                 <Typography variant="h6">{item.i.toUpperCase()}</Typography>
+//               </Box>
+//               <Box display="flex" alignItems="center" justifyContent="center" height="100%">
+//                 {item.i === "RawGas" && <RawGasImpurities width={dimensions.width} height={dimensions.height} />}
+//                 {item.i === "H2RAW" && <H2RawGas width={dimensions.width} height={dimensions.height} />}
+//                 {item.i === "H2PROCESS" && <H2ProcessGas width={dimensions.width} height={dimensions.height} />}
+//                 {item.i === "Seperator" && <Separator />}
+//                 {item.i === "Electrolyte" && <Electrolyte />}
+//                 {item.i === "RECTIFIER" && <RectifierControl />}
+//               </Box>
+//             </Box>
+//           );
+//         })}
+//       </GridLayout>
+//     </Box>
+//   );
+// };
+// export default Overview;
 
 // import React, { useState, useEffect } from "react";
 // import { useDispatch } from "react-redux";
