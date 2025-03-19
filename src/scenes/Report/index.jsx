@@ -1,14 +1,899 @@
-import React from 'react'
+import React, { useState } from 'react';
+import {
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    Button,
+    Box,
+    TextField,
+    Grid,
+    Typography,
+} from '@mui/material';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import Header from 'src/component/Header';
 
-const index = () => {
-  return (
-    <div>
-      report
-    </div>
-  )
+function IoTDataViewer() {
+    const [startTime, setStartTime] = useState(null);
+    const [endTime, setEndTime] = useState(null);
+    const [allData, setAllData] = useState([]);
+    const [data, setData] = useState([]);
+    const [error, setError] = useState('');
+    const [selectedTestName, setSelectedTestName] = useState(null);
+    const [isFetching, setIsFetching] = useState(false);
+    const [totalizerFlow, setTotalizerFlow] = useState(null);
+
+    const fetchData = async () => {
+        setIsFetching(true);
+        try {
+            const convertToIST = (date) => {
+                const offsetInMilliseconds = 5.5 * 60 * 60 * 1000;
+                return new Date(date.getTime() + offsetInMilliseconds).toISOString().slice(0, 19);
+            };
+            const startTimeIST = startTime ? convertToIST(startTime) : null;
+            const endTimeIST = endTime ? convertToIST(endTime) : null;
+            const response = await fetch('https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                
+                body: JSON.stringify({
+                    start_time: startTimeIST,
+                    end_time: endTimeIST,
+                }),
+            });
+            const rawResult = await response.json();
+            const result = rawResult.body ? JSON.parse(rawResult.body) : rawResult;
+            if (response.ok) {
+                const processedData = (result.data || []).map((row, index) => ({
+                    id: index,
+                    timestamp: row.timestamp || row.time_bucket,
+                    ist_timestamp: row.ist_timestamp || row.time_bucket,
+                    MK_2_Test_Name: row.device_data?.["MK_2_Test_Name"] || row["MK_2_Test_Name"],
+                    
+                    LICR_0101_PV: row.device_data?.["LICR-0101-PV"] !== undefined && row.device_data?.["LICR-0101-PV"] !== null 
+                    ? row.device_data?.["LICR-0101-PV"]
+                    : row["LICR-0101-PV"] || 0,
+LICR_0102_PV: row.device_data?.["LICR-0102-PV"] || row["LICR-0102-PV"],
+LICR_0103_PV: row.device_data?.["LICR-0103-PV"] || row["LICR-0103-PV"],
+PICR_0101_PV1: row.device_data?.["PICR-0101-PV1"] !== undefined && row.device_data?.["PICR-0101-PV1"] !== null
+? row.device_data?.["PICR-0101-PV1"]
+: row["PICR-0101-PV1"] || 0,
+
+PICR_0102_PV: row.device_data?.["PICR-0102-PV"] || row["PICR-0102-PV"],
+PICR_0103_PV: row.device_data?.["PICR-0103-PV"] || row["PICR-0103-PV"],
+TICR_0101_PV: row.device_data?.["TICR-0101-PV"] || row["TICR-0101-PV"],
+ABB_Flow_Meter: row.device_data?.["ABB-Flow-Meter"] || row["ABB-Flow-Meter"],
+H2_Flow: row.device_data?.["H2-Flow"] !== undefined && row.device_data?.["H2-Flow"] !== null
+? row.device_data?.["H2-Flow"]
+: row["H2-Flow"] || 0,
+O2_Flow: row.device_data?.["O2-Flow"] !== undefined && row.device_data?.["O2-Flow"] !== null
+? row.device_data?.["O2-Flow"]
+: row["O2-Flow"] || 0,
+Cell_back_pressure: row.device_data?.["Cell-back-pressure"] !== undefined && row.device_data?.["Cell-back-pressurez"] !== null
+                    ? row.device_data?.["Cell-back-pressure"]
+                    : row["Cell-back-pressure"] || 0,
+H2_Pressure_outlet: row.device_data?.["H2-Pressure-outlet"] || row["H2-Pressure-outlet"],
+O2_Pressure_outlet: row.device_data?.["O2-Pressure-outlet"] || row["O2-Pressure-outlet"],
+H2_Stack_pressure_difference: row.device_data?.["H2-Stack-pressure-difference"] || row["H2-Stack-pressure-difference"],
+O2_Stack_pressure_difference: row.device_data?.["O2-Stack-pressure-difference"] || row["O2-Stack-pressure-difference"],
+Ly_Rectifier_current: row.device_data?.["Ly-Rectifier-current"] || row["Ly-Rectifier-current"],
+Ly_Rectifier_voltage: row.device_data?.["Ly-Rectifier-voltage"] || row["Ly-Rectifier-voltage"],
+Cell_Voltage_Multispan: row.device_data?.["Cell-Voltage-Multispan"] !== undefined && row.device_data?.["Cell-Voltage-Multispan"] !== null
+? row.device_data?.["Cell-Voltage-Multispan"]
+: row["Cell-Voltage-Multispan"] || 0,
+RECT_CT_001: row.device_data?.["RECT-CT-001"] !== undefined && row.device_data?.["RECT-CT-001"] !== null
+? row.device_data?.["RECT-CT-001"]
+: row["rect_ct_001"] || 0,
+RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.["RECT-VT-001"] !== null
+? row.device_data?.["RECT-VT-001"]
+: row["rect_vt_001"] || 0,
+
+
+PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] || row["PLC-TIME-STAMP"],
+
+                }));
+
+                const uniqueTestNames = new Set();
+                const deduplicatedData = processedData.filter((row) => {
+                    if (row.MK_2_Test_Name && !uniqueTestNames.has(row.MK_2_Test_Name)) {
+                        uniqueTestNames.add(row.MK_2_Test_Name);
+                        return true;
+                    }
+                    return false;
+                });
+                setAllData(processedData);
+                setData(deduplicatedData);
+                setError('');
+            } else {
+                setAllData([]);
+                setData([]);
+                setError(result.message || 'Failed to fetch data');
+            }
+        } catch (err) {
+            console.error("Error in Fetch:", err);
+            setAllData([]);
+            setData([]);
+            setError(err.message || 'An unexpected error occurred');
+        } finally {
+            setIsFetching(false);
+        }
+    };
+    const filteredRows = selectedTestName
+    ? allData.filter((row) => row.MK_2_Test_Name === selectedTestName)
+    : [];
+
+    const handleTestNameChange = (event) => {
+        setSelectedTestName(event.target.value);
+        setTotalizerFlow(null); // Reset totalizer flow when test changes
+    };
+
+    const calculateTotalizerFlow = () => {
+        const filteredRows = allData.filter((row) => row.MK_2_Test_Name === selectedTestName);
+
+        if (filteredRows.length === 0) {
+            setTotalizerFlow(null);
+            return;
+        }
+
+        // Filter out invalid and negative values
+        const validRows = filteredRows.filter((row) => row.CR_FT_001 && row.CR_FT_001 > 0);
+
+        if (validRows.length < 2) {
+            // If less than 2 valid rows, we cannot calculate a meaningful totalizer flow
+            setTotalizerFlow(0);
+            return;
+        }
+
+        // Calculate the totalizer flow dynamically
+        let totalFlow = 0;
+        for (let i = 0; i < validRows.length - 1; i++) {
+            const currentRow = validRows[i];
+            const nextRow = validRows[i + 1];
+
+            const currentTimestamp = new Date(currentRow.timestamp).getTime();
+            const nextTimestamp = new Date(nextRow.timestamp).getTime();
+
+            const durationInSeconds = (nextTimestamp - currentTimestamp) / 1000;
+
+            // Add flow contribution for the time duration between two rows
+            if (durationInSeconds > 0) {
+                totalFlow += currentRow.CR_FT_001 * durationInSeconds;
+            }
+        }
+        // Calculate the total test duration in seconds
+        const startTimestamp = new Date(validRows[0].timestamp).getTime();
+        const endTimestamp = new Date(validRows[validRows.length - 1].timestamp).getTime();
+        const totalDurationInSeconds = (endTimestamp - startTimestamp) / 1000;
+
+        // Avoid division by zero
+        const totalizer = totalDurationInSeconds > 0 ? totalFlow / totalDurationInSeconds : 0;
+
+        setTotalizerFlow(totalizer); // Set the totalizer flow value
+    };
+ 
+    const columns = [
+        { field: 'ist_timestamp', headerName: 'IST Timestamp', width: 205 },
+        { field: 'MK_2_Test_Name', headerName: 'mark2 Test Name', width: 170 },
+        {
+            field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
+              {
+            field: "LICR_0102_PV", headerName: "LICR-0102-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "LICR_0103_PV", headerName: "LICR-0103-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "PICR_0101_PV1", headerName: "PICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+            {
+              field: "PICR_0102_PV", headerName: "PICR-0102-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "PICR_0103_PV", headerName: "PICR-0103-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "ABB_Flow_Meter", headerName: "ABB-Flow-Meter", width: 100, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "H2_Flow", headerName: "H2-Flow", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "O2_Flow", headerName: "O2-Flow", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "Cell_back_pressure", headerName: "Cell-back-pressure", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "H2_Pressure_outlet", headerName: "H2-Pressure-outlet", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "O2_Pressure_outlet", headerName: "O2-Pressure-outlet", width:120, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "H2_Stack_pressure_difference", headerName: "H2-Stack-pressure-difference", width: 170, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "O2_Stack_pressure_difference", headerName: "O2-Stack-pressure-difference", width: 170, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "Ly_Rectifier_current", headerName: "Ly-Rectifier-current", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "Ly_Rectifier_voltage", headerName: "Ly-Rectifier-voltage", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            {
+              field: "Cell_Voltage_Multispan", headerName: "Cell-Voltage-Multispan", width: 130, valueFormatter: (params) => Number(params.value).toFixed(4)
+            },
+            
+                {
+            field: "RECT_CT_001", headerName: "RECT-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          {
+            field: "RECT_VT_001", headerName: "RECT-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+          { 
+            field: "PLC_TIME_STAMP", headerName: "PLC-TIME-STAMP", width: 180, valueFormatter: (params) => params.value },
+            ];
+    return (
+      <Box m="15px" mt="-60px">
+            <Header
+                title="Report Analytics"
+                subtitle="Fetch Report using Start Date-time and End Date-time"
+            />
+            <div>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={3}>
+                            <DateTimePicker
+                                label="Start Date Time"
+                                value={startTime}
+                                onChange={(newValue) => setStartTime(newValue)}
+                                renderInput={(params) => <TextField {...params} fullWidth />}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <DateTimePicker
+                                label="End Date Time"
+                                value={endTime}
+                                onChange={(newValue) => setEndTime(newValue)}
+                                renderInput={(params) => <TextField {...params} fullWidth />}
+                            />
+                        </Grid>
+                        <Grid item xs={2}>
+                            <Button                      
+                                variant="contained"
+                                color="secondary"
+                                onClick={fetchData}
+                                disabled={!startTime || !endTime || isFetching}
+                            >
+                                {isFetching ? "Fetching..." : "Fetch Data"}
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </LocalizationProvider>
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {!isFetching && data.length > 0 && (
+                    <Box sx={{ mt: 4, mb: 4, width: '300px' }}>
+                        <FormControl fullWidth>
+                            <InputLabel id="test-name-select-label">Select Test-Name</InputLabel>
+                            <Select
+                                labelId="test-name-select-label"
+                                value={selectedTestName || ''}
+                                onChange={handleTestNameChange}
+                            >
+                                {data.map((row) => (
+                                    <MenuItem key={row.id} value={row.MK_2_Test_Name}>
+                                        {row.MK_2_Test_Name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={calculateTotalizerFlow}
+                            sx={{ mt: 2 }}
+                            disabled={!selectedTestName}
+                        >
+                            Calculate Totalizer Flow
+                        </Button>
+                    </Box>
+                )}
+                {isFetching ? (
+                    <Typography variant="h5" color="secondary">Data fetching....</Typography>
+                ) : selectedTestName && filteredRows.length > 0 ? (
+                    <Box sx={{ height: 600, width: '100%' }}>
+                    {totalizerFlow !== null && (
+                        <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
+                            Totalizer Flow for "{selectedTestName}": {totalizerFlow.toFixed(2)} Liters/Second
+                        </Typography>
+                    )}
+                        <h2>Details for Test-Name: {selectedTestName}</h2>
+                          <DataGrid
+                            rows={filteredRows}
+                            columns={columns}
+                            components={{ Toolbar: GridToolbar }}
+                            getRowId={(row) => row.id}
+                            componentsProps={{
+                              toolbar:{
+                                sx: {
+                                  "& .MuiButton-root": {
+                                    color: "rgb(34 197 94)",
+                                  },
+                                },
+                              },
+                            }}
+                        />
+                       
+                    </Box>
+                ) : (
+                    <Typography variant="h6" color="textSecondary"></Typography>
+                )}
+            </div>
+        </Box>
+    );  
 }
+export default IoTDataViewer;
 
-export default index
+
+
+
+// import React, { useState } from 'react';
+// import {
+//     Select,
+//     MenuItem,
+//     FormControl,
+//     InputLabel,
+//     Button,
+//     Box,
+//     TextField,
+//     Grid,
+//     Typography,
+// } from '@mui/material';
+// import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+// import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+// import Header from 'src/component/Header';
+
+// function IoTDataViewer() {
+//     const [startTime, setStartTime] = useState(null);
+//     const [endTime, setEndTime] = useState(null);
+//     const [allData, setAllData] = useState([]);
+//     const [data, setData] = useState([]);
+//     const [error, setError] = useState('');
+//     const [selectedTestName, setSelectedTestName] = useState(null);
+//     const [isFetching, setIsFetching] = useState(false);
+//     const [totalizerFlow, setTotalizerFlow] = useState(null);
+
+//     const fetchData = async () => {
+//         setIsFetching(true);
+//         try {
+//             const convertToIST = (date) => {
+//                 const offsetInMilliseconds = 5.5 * 60 * 60 * 1000;
+//                 return new Date(date.getTime() + offsetInMilliseconds).toISOString().slice(0, 19);
+//             };
+
+//             const startTimeIST = startTime ? convertToIST(startTime) : null;
+//             const endTimeIST = endTime ? convertToIST(endTime) : null;
+
+//             const response = await fetch('https://zxj8fcr2a7.execute-api.us-east-1.amazonaws.com/dev/iot-data', {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                 },
+//                 body: JSON.stringify({
+//                     start_time: startTimeIST,
+//                     end_time: endTimeIST,
+//                 }),
+//             });
+
+//             const rawResult = await response.json();
+//             const result = rawResult.body ? JSON.parse(rawResult.body) : rawResult;
+
+//             if (response.ok) {
+//                 const processedData = (result.data || []).map((row, index) => ({
+//                     id: index,
+//                     timestamp: row.timestamp || row.time_bucket,
+//                     ist_timestamp: row.ist_timestamp || row.time_bucket,
+//                     Test_Name: row.device_data?.["Test-Name"] || row["test_name"],
+                    
+//                     AX_LT_011: row.device_data?.["AX-LT-011"] !== undefined && row.device_data?.["AX-LT-011"] !== null
+//                     ? row.device_data?.["AX-LT-011"]
+//                     : row["avg_ax_lt_011"] || 0,
+
+//                     AX_LT_021: row.device_data?.["AX-LT-021"] || row["avg_ax_lt_021"],
+//                     AX_VA_311: row.device_data?.["AX-VA-311"] !== undefined && row.device_data?.["AX-VA-311"] !== null
+//   ? row.device_data?.["AX-VA-311"]
+//   : row["ax_va_311"] || 0,
+//   AX_VA_312: row.device_data?.["AX-VA-312"] !== undefined && row.device_data?.["AX-VA-312"] !== null
+//   ? row.device_data?.["AX-VA-312"]
+//   : row["ax_va_312"] || 0,
+// CR_FT_001: row.device_data?.["CR-FT-001"] || row["cr_ft_001"],
+// CR_LT_011: row.device_data?.["CR-LT-011"] || row["cr_lt_011"],
+// CR_LT_021: row.device_data?.["CR-LT-021"] || row["cr_lt_021"],
+// CR_PT_001: row.device_data?.["CR-PT-001"] || row["cr_pt_001"],
+// CR_PT_011: row.device_data?.["CR-PT-011"] || row["cr_pt_011"],
+// CR_PT_021: row.device_data?.["CR-PT-021"] || row["cr_pt_021"],
+// CR_TT_001: row.device_data?.["CR-TT-001"] || row["cr_tt_001"],
+// CR_TT_002: row.device_data?.["CR-TT-002"] || row["cr_tt_002"],
+// CW_TT_011: row.device_data?.["CW-TT-011"] || row["cw_tt_011"],
+// CW_TT_021: row.device_data?.["CW-TT-021"] || row["cw_tt_021"],
+// GS_AT_011: row.device_data?.["GS-AT-011"] || row["gs_at_011"],
+// GS_AT_012: row.device_data?.["GS-AT-012"] || row["gs_at_012"],
+// GS_AT_022: row.device_data?.["GS-AT-022"] || row["gs_at_022"],
+// GS_PT_011: row.device_data?.["GS-PT-011"] || row["gs_pt_011"],
+// GS_PT_021: row.device_data?.["GS-PT-021"] || row["gs_pt_021"],
+// GS_TT_011: row.device_data?.["GS-TT-011"] || row["gs_tt_011"],
+// GS_TT_021: row.device_data?.["GS-TT-021"] || row["gs_tt_021"],
+// GS_VA_311: row.device_data?.["GS-VA-311"] || row["gs_va_311"],
+// GS_VA_312: row.device_data?.["GS-VA-312"] || row["gs_va_312"],
+// GS_VA_321: row.device_data?.["GS-VA-321"] || row["gs_va_321"],
+// GS_VA_322: row.device_data?.["GS-VA-322"] || row["gs_va_322"],
+// PR_AT_001: row.device_data?.["PR-AT-001"] || row["pr_at_001"],
+// PR_AT_003: row.device_data?.["PR-AT-003"] || row["pr_at_003"],
+// PR_AT_005: row.device_data?.["PR-AT-005"] || row["pr_at_005"],
+// PR_FT_001: row.device_data?.["PR-FT-001"] || row["pr_ft_001"],
+// PR_TT_001: row.device_data?.["PR-TT-001"] || row["pr_tt_001"],
+// PR_TT_061: row.device_data?.["PR-TT-061"] || row["pr_tt_061"],
+// PR_TT_072: row.device_data?.["PR-TT-072"] || row["pr_tt_072"],
+// PR_VA_352: row.device_data?.["PR-VA-352"] || row["pr_va_352"],
+// AX_VA_321: row.device_data?.["AX-VA-321"] !== undefined && row.device_data?.["AX-VA-321"] !== null
+// ? row.device_data?.["AX-VA-321"]
+// : row["ax_va_321"] || 0,
+// AX_VA_322: row.device_data?.["AX-VA-322"] !== undefined && row.device_data?.["AX-VA-322"] !== null
+// ? row.device_data?.["AX-VA-322"]
+// : row["ax_va_322"] || 0,
+// AX_VA_351: row.device_data?.["AX-VA-351"] !== undefined && row.device_data?.["AX-VA-351"] !== null
+// ? row.device_data?.["AX-VA-351"]
+// : row["ax_va_351"] || 0,
+// AX_VA_391: row.device_data?.["AX-VA-391"] !== undefined && row.device_data?.["AX-VA-391"] !== null
+// ? row.device_data?.["AX-VA-391"]
+// : row["ax_va_391"] || 0,
+// DM_VA_301: row.device_data?.["DM-VA-301"] !== undefined && row.device_data?.["DM-VA-301"] !== null
+// ? row.device_data?.["DM-VA-301"]
+// : row["dm_va_301"] || 0,
+// GS_VA_021: row.device_data?.["GS-VA-021"] !== undefined && row.device_data?.["GS-VA-021"] !== null
+// ? row.device_data?.["GS-VA-021"]
+// : row["gs_va_021"] || 0,
+// GS_VA_022: row.device_data?.["GS-VA-022"] !== undefined && row.device_data?.["GS-VA-022"] !== null
+// ? row.device_data?.["GS-VA-022"]
+// : row["gs_va_022"] || 0,
+// N2_VA_311: row.device_data?.["N2-VA-311"] !== undefined && row.device_data?.["N2-VA-311"] !== null
+// ? row.device_data?.["N2-VA-311"]
+// : row["n2_va_311"] || 0,
+// N2_VA_321: row.device_data?.["N2-VA-321"] !== undefined && row.device_data?.["N2-VA-321"] !== null
+// ? row.device_data?.["N2-VA-321"]
+// : row["n2_va_321"] || 0,
+// PR_VA_301: row.device_data?.["PR-VA-301"] !== undefined && row.device_data?.["PR-VA-301"] !== null
+// ? row.device_data?.["PR-VA-301"]
+// : row["pr_va_301"] || 0,
+// PR_VA_312: row.device_data?.["PR-VA-312"] !== undefined && row.device_data?.["PR-VA-312"] !== null
+// ? row.device_data?.["PR-VA-312"]
+// : row["pr_va_312"] || 0,
+// PR_VA_351: row.device_data?.["PR-VA-351"] !== undefined && row.device_data?.["PR-VA-351"] !== null
+// ? row.device_data?.["PR-VA-351"]
+// : row["pr_va_351"] || 0,
+// PR_VA_361Ain: row.device_data?.["PR-VA-361Ain"] !== undefined && row.device_data?.["PR-VA-361Ain"] !== null
+// ? row.device_data?.["PR-VA-361Ain"]
+// : row["pr_va_361ain"] || 0,
+// PR_VA_361Bin: row.device_data?.["PR-VA-361Bin"] !== undefined && row.device_data?.["PR-VA-361Bin"] !== null
+// ? row.device_data?.["PR-VA-361Bin"]
+// : row["pr_va_361bin"] || 0,
+// PR_VA_362Ain: row.device_data?.["PR-VA-362Ain"] !== undefined && row.device_data?.["PR-VA-362Ain"] !== null
+// ? row.device_data?.["PR-VA-362Ain"]
+// : row["pr_va_362ain"] || 0,
+// PR_VA_362Bin: row.device_data?.["PR-VA-362Bin"] !== undefined && row.device_data?.["PR-VA-362Bin"] !== null
+// ? row.device_data?.["PR-VA-362Bin"]
+// : row["pr_va_362bin"] || 0,
+// PR_VA_361Aout: row.device_data?.["PR-VA-361Aout"] !== undefined && row.device_data?.["PR-VA-361Aout"] !== null
+// ? row.device_data?.["PR-VA-361Aout"]
+// : row["pr_va_361aout"] || 0,
+// PR_VA_361Bout: row.device_data?.["PR-VA-361Bout"] !== undefined && row.device_data?.["PR-VA-361Bout"] !== null
+// ? row.device_data?.["PR-VA-361Bout"]
+// : row["pr_va_361bout"] || 0,
+// PR_VA_362Aout: row.device_data?.["PR-VA-362Aout"] !== undefined && row.device_data?.["PR-VA-362Aout"] !== null
+// ? row.device_data?.["PR-VA-362Aout"]
+// : row["pr_va_362aout"] || 0,
+// PR_VA_362Bout: row.device_data?.["PR-VA-362Bout"] !== undefined && row.device_data?.["PR-VA-362Bout"] !== null
+// ? row.device_data?.["PR-VA-362Bout"]
+// : row["pr_va_362bout"] || 0,
+// RECT_CT_001: row.device_data?.["RECT-CT-001"] !== undefined && row.device_data?.["RECT-CT-001"] !== null
+// ? row.device_data?.["RECT-CT-001"]
+// : row["rect_ct_001"] || 0,
+// RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.["RECT-VT-001"] !== null
+// ? row.device_data?.["RECT-VT-001"]
+// : row["rect_vt_001"] || 0,
+// DCDB0_CT_001: row.device_data?.["DCDB0-CT-001"] !== undefined && row.device_data?.["DCDB0-CT-001"] !== null
+// ? row.device_data?.["DCDB0-CT-001"]
+// : row["dcdb0_ct_001"] || 0,
+// DCDB0_VT_001: row.device_data?.["DCDB0-VT-001"] !== undefined && row.device_data?.["DCDB0-VT-001"] !== null
+// ? row.device_data?.["DCDB0-VT-001"]
+// : row["dcdb0_vt_001"] || 0,
+// DCDB1_CT_001: row.device_data?.["DCDB1-CT-001"] !== undefined && row.device_data?.["DCDB1-CT-001"] !== null
+// ? row.device_data?.["DCDB1-CT-001"]
+// : row["dcdb1_ct_001"] || 0,
+// DCDB1_VT_001: row.device_data?.["DCDB1-VT-001"] !== undefined && row.device_data?.["DCDB1-VT-001"] !== null
+// ? row.device_data?.["DCDB1-VT-001"]
+// : row["dcdb1_vt_001"] || 0,
+// DCDB2_CT_001: row.device_data?.["DCDB2-CT-001"] !== undefined && row.device_data?.["DCDB2-CT-001"] !== null
+// ? row.device_data?.["DCDB2-CT-001"]
+// : row["dcdb2_ct_001"] || 0,
+// DCDB2_VT_001: row.device_data?.["DCDB2-VT-001"] !== undefined && row.device_data?.["DCDB2-VT-001"] !== null
+// ? row.device_data?.["DCDB2-VT-001"]
+// : row["dcdb2_vt_001"] || 0,
+// DCDB3_CT_001: row.device_data?.["DCDB3-CT-001"] !== undefined && row.device_data?.["DCDB3-CT-001"] !== null
+// ? row.device_data?.["DCDB3-CT-001"]
+// : row["dcdb3_ct_001"] || 0,
+// DCDB3_VT_001: row.device_data?.["DCDB3-VT-001"] !== undefined && row.device_data?.["DCDB3-VT-001"] !== null
+// ? row.device_data?.["DCDB3-VT-001"]
+// : row["dcdb3_vt_001"] || 0,
+// DCDB4_CT_001: row.device_data?.["DCDB4-CT-001"] !== undefined && row.device_data?.["DCDB4-CT-001"] !== null
+// ? row.device_data?.["DCDB4-CT-001"]
+// : row["dcdb4_ct_001"] || 0,
+// DCDB4_VT_001: row.device_data?.["DCDB4-VT-001"] !== undefined && row.device_data?.["DCDB4-VT-001"] !== null
+// ? row.device_data?.["DCDB4-VT-001"]
+// : row["dcdb4_vt_001"] || 0,
+// PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] !== undefined && row.device_data?.["PLC-TIME-STAMP"] !== null
+// ? row.device_data?.["PLC-TIME-STAMP"]
+// : row["plc_time_stamp"] || 0,
+// Test_Description: row.device_data?.["Test-description"] !== undefined && row.device_data?.["Test-description"] !== null
+// ? row.device_data?.["Test-description"]
+// : row["test_description"] || 0,
+// Test_Remarks: row.device_data?.["Test-Remarks"] !== undefined && row.device_data?.["Test-Remarks"] !== null
+// ? row.device_data?.["Test-Remarks"]
+// : row["test_remarks"] || 0,
+// DM_LSH_001: row.device_data?.["DM-LSH-001"] !== undefined && row.device_data?.["DM-LSH-001"] !== null
+//   ? row.device_data?.["DM-LSH-001"]
+//   : row["dm_lsh_001"] !== undefined && row["dm_lsh_001"] !== null
+//   ? row["dm_lsh_001"]
+//   : false,
+
+// DM_LSL_001: row.device_data?.["DM-LSL-001"] !== undefined && row.device_data?.["DM-LSL-001"] !== null
+// ? row.device_data?.["DM-LSL-001"]
+// : row["dm_lsl_001"] || 0,
+// GS_LSL_011: row.device_data?.["GS-LSL-011"] !== undefined && row.device_data?.["GS-LSL-011"] !== null
+// ? row.device_data?.["GS-LSL-011"]
+// : row["gs_lsl_011"] || 0,
+// GS_LSL_021: row.device_data?.["GS-LSL-021"] !== undefined && row.device_data?.["GS-LSL-021"] !== null
+// ? row.device_data?.["GS-LSL-021"]
+// : row["gs_lsl_021"] || 0 ,
+//                 }));
+
+//                 const uniqueTestNames = new Set();
+//                 const deduplicatedData = processedData.filter((row) => {
+//                     if (row.Test_Name && !uniqueTestNames.has(row.Test_Name)) {
+//                         uniqueTestNames.add(row.Test_Name);
+//                         return true;
+//                     }
+//                     return false;
+//                 });
+
+//                 setAllData(processedData);
+//                 setData(deduplicatedData);
+//                 setError('');
+//             } else {
+//                 setAllData([]);
+//                 setData([]);
+//                 setError(result.message || 'Failed to fetch data');
+//             }
+//         } catch (err) {
+//             console.error("Error in Fetch:", err);
+//             setAllData([]);
+//             setData([]);
+//             setError(err.message || 'An unexpected error occurred');
+//         } finally {
+//             setIsFetching(false);
+//         }
+//     };
+//     const filteredRows = selectedTestName
+//     ? allData.filter((row) => row.Test_Name === selectedTestName)
+//     : [];
+
+//     const handleTestNameChange = (event) => {
+//         setSelectedTestName(event.target.value);
+//         setTotalizerFlow(null); // Reset totalizer flow when test changes
+//     };
+
+//     const calculateTotalizerFlow = () => {
+//         const filteredRows = allData.filter((row) => row.Test_Name === selectedTestName);
+
+//         if (filteredRows.length === 0) {
+//             setTotalizerFlow(null);
+//             return;
+//         }
+
+//         // Filter out invalid and negative values
+//         const validRows = filteredRows.filter((row) => row.CR_FT_001 && row.CR_FT_001 > 0);
+
+//         if (validRows.length < 2) {
+//             // If less than 2 valid rows, we cannot calculate a meaningful totalizer flow
+//             setTotalizerFlow(0);
+//             return;
+//         }
+
+//         // Calculate the totalizer flow dynamically
+//         let totalFlow = 0;
+//         for (let i = 0; i < validRows.length - 1; i++) {
+//             const currentRow = validRows[i];
+//             const nextRow = validRows[i + 1];
+
+//             const currentTimestamp = new Date(currentRow.timestamp).getTime();
+//             const nextTimestamp = new Date(nextRow.timestamp).getTime();
+
+//             const durationInSeconds = (nextTimestamp - currentTimestamp) / 1000;
+
+//             // Add flow contribution for the time duration between two rows
+//             if (durationInSeconds > 0) {
+//                 totalFlow += currentRow.CR_FT_001 * durationInSeconds;
+//             }
+//         }
+//         // Calculate the total test duration in seconds
+//         const startTimestamp = new Date(validRows[0].timestamp).getTime();
+//         const endTimestamp = new Date(validRows[validRows.length - 1].timestamp).getTime();
+//         const totalDurationInSeconds = (endTimestamp - startTimestamp) / 1000;
+
+//         // Avoid division by zero
+//         const totalizer = totalDurationInSeconds > 0 ? totalFlow / totalDurationInSeconds : 0;
+
+//         setTotalizerFlow(totalizer); // Set the totalizer flow value
+//     };
+
+//     const columns = [
+//         { field: 'ist_timestamp', headerName: 'IST Timestamp', width: 205 },
+//         { field: 'Test_Name', headerName: 'Test Name', width: 170 },
+//         {
+//             field: "AX_LT_011", headerName: "AX-LT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "AX_LT_021", headerName: "AX-LT-021", width: 70 ,valueFormatter: (params) => Number(params.value).toFixed(4) },
+          
+//           {
+//             field: "CW_TT_011", headerName: "CW-TT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "CW_TT_021", headerName: "CW-TT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "CR_LT_011", headerName: "CR-LT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "CR_PT_011", headerName: "CR-PT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "CR_LT_021", headerName: "CR-LT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "CR_PT_021", headerName: "CR-PT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "CR_PT_001", headerName: "CR-PT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "CR_TT_001", headerName: "CR-TT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "CR_FT_001", headerName: "CR-FT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "CR_TT_002", headerName: "CR-TT-002", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_AT_011", headerName: "GS-AT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_AT_012", headerName: "GS-AT-012", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_PT_011", headerName: "GS-PT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_TT_011", headerName: "GS-TT-011", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_AT_022", headerName: "GS-AT-022", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_PT_021", headerName: "GS-PT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_TT_021", headerName: "GS-TT-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_TT_001", headerName: "PR-TT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_TT_061", headerName: "PR-TT-061", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_TT_072", headerName: "PR-TT-072", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_FT_001", headerName: "PR-FT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_AT_001", headerName: "PR-AT-001", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_AT_003", headerName: "PR-AT-003", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_AT_005", headerName: "PR-AT-005", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DM_LSH_001", headerName: "DM-LSH-001", width: 70, valueFormatter: (params) => String(params.value) },
+//           {
+//             field: "DM_LSL_001", headerName: "DM-LSL-001", width: 70, valueFormatter: (params) => String(params.value) },
+//           {
+//             field: "GS_LSL_021", headerName: "GS-LSL-021", width: 70, valueFormatter: (params) => String(params.value) },
+//           {
+//             field: "GS_LSL_011", headerName: "GS-LSL-011", width: 70, valueFormatter: (params) => String(params.value) },
+//           {
+//             field: "PR_VA_301", headerName: "PR-VA-301", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_VA_352", headerName: "PR-VA-352", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_VA_312", headerName: "PR-VA-312", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_VA_351", headerName: "PR-VA-351", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_VA_361Ain", headerName: "PR-VA-361Ain", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_VA_361Aout", headerName: "PR-VA-361Aout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_VA_361Bin", headerName: "PR-VA-361Bin", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_VA_361Bout", headerName: "PR-VA-361Bout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_VA_362Ain", headerName: "PR-VA-362Ain", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_VA_362Aout", headerName: "PR-VA-362Aout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_VA_362Bin", headerName: "PR-VA-362Bin", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PR_VA_362Bout", headerName: "PR-VA-362Bout", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "N2_VA_311", headerName: "N2-VA-311", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_VA_311", headerName: "GS-VA-311", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_VA_312", headerName: "GS-VA-312", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "N2_VA_321", headerName: "N2-VA-321", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_VA_321", headerName: "GS-VA-321", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_VA_322", headerName: "GS-VA-322", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_VA_022", headerName: "GS-VA-022", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "GS_VA_021", headerName: "GS-VA-021", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "AX_VA_351", headerName: "AX-VA-351", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "AX_VA_311", headerName: "AX-VA-311", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "AX_VA_312", headerName: "AX-VA-312", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "AX_VA_321", headerName: "AX-VA-321", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "AX_VA_322", headerName: "AX-VA-322", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "AX_VA_391", headerName: "AX-VA-391", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DM_VA_301", headerName: "DM-VA-301", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DCDB0_VT_001", headerName: "DCDB0-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DCDB0_CT_001", headerName: "DCDB0-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DCDB1_VT_001", headerName: "DCDB1-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DCDB1_CT_001", headerName: "DCDB1-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DCDB2_VT_001", headerName: "DCDB2-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DCDB2_CT_001", headerName: "DCDB2-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DCDB3_VT_001", headerName: "DCDB3-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DCDB3_CT_001", headerName: "DCDB3-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DCDB4_VT_001", headerName: "DCDB4-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "DCDB4_CT_001", headerName: "DCDB4-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "RECT_CT_001", headerName: "RECT-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "RECT_VT_001", headerName: "RECT-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           { 
+//             field: "PLC_TIME_STAMP", headerName: "PLC-TIME-STAMP", width: 180, valueFormatter: (params) => params.value },
+//           {
+//             field: "Test_Remarks", headerName: "Test-Remarks", width: 150, valueFormatter: (params) => params.value },
+//           {
+//             field: "Test_Description", headerName: "Test-description", width: 150, valueFormatter: (params) => params.value }
+//               ];
+
+//     return (
+//       <Box m="15px" mt="-60px">
+//             <Header
+//                 title="Report Analytics"
+//                 subtitle="Fetch Report using Start Date-time and End Date-time"
+//             />
+//             <div>
+//                 <LocalizationProvider dateAdapter={AdapterDateFns}>
+//                     <Grid container spacing={2} alignItems="center">
+//                         <Grid item xs={3}>
+//                             <DateTimePicker
+//                                 label="Start Date Time"
+//                                 value={startTime}
+//                                 onChange={(newValue) => setStartTime(newValue)}
+//                                 renderInput={(params) => <TextField {...params} fullWidth />}
+//                             />
+//                         </Grid>
+//                         <Grid item xs={3}>
+//                             <DateTimePicker
+//                                 label="End Date Time"
+//                                 value={endTime}
+//                                 onChange={(newValue) => setEndTime(newValue)}
+//                                 renderInput={(params) => <TextField {...params} fullWidth />}
+//                             />
+//                         </Grid>
+//                         <Grid item xs={2}>
+//                             <Button
+//                                 variant="contained"
+//                                 color="secondary"
+//                                 onClick={fetchData}
+//                                 disabled={!startTime || !endTime || isFetching}
+//                             >
+//                                 {isFetching ? "Fetching..." : "Fetch Data"}
+//                             </Button>
+//                         </Grid>
+//                     </Grid>
+//                 </LocalizationProvider>
+//                 {error && <p style={{ color: 'red' }}>{error}</p>}
+//                 {!isFetching && data.length > 0 && (
+//                     <Box sx={{ mt: 4, mb: 4, width: '300px' }}>
+//                         <FormControl fullWidth>
+//                             <InputLabel id="test-name-select-label">Select Test-Name</InputLabel>
+//                             <Select
+//                                 labelId="test-name-select-label"
+//                                 value={selectedTestName || ''}
+//                                 onChange={handleTestNameChange}
+//                             >
+//                                 {data.map((row) => (
+//                                     <MenuItem key={row.id} value={row.Test_Name}>
+//                                         {row.Test_Name}
+//                                     </MenuItem>
+//                                 ))}
+//                             </Select>
+//                         </FormControl>
+//                         <Button
+//                             variant="contained"
+//                             color="primary"
+//                             onClick={calculateTotalizerFlow}
+//                             sx={{ mt: 2 }}
+//                             disabled={!selectedTestName}
+//                         >
+//                             Calculate Totalizer Flow
+//                         </Button>
+//                     </Box>
+//                 )}
+//                 {isFetching ? (
+//                     <Typography variant="h5" color="secondary">Data fetching....</Typography>
+//                 ) : selectedTestName && filteredRows.length > 0 ? (
+//                     <Box sx={{ height: 600, width: '100%' }}>
+//                     {totalizerFlow !== null && (
+//                         <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
+//                             Totalizer Flow for "{selectedTestName}": {totalizerFlow.toFixed(2)} Liters/Second
+//                         </Typography>
+//                     )}
+//                         <h2>Details for Test-Name: {selectedTestName}</h2>
+                        
+//                         <DataGrid
+//                             rows={filteredRows}
+//                             columns={columns}
+//                             components={{ Toolbar: GridToolbar }}
+//                             getRowId={(row) => row.id}
+//                             componentsProps={{
+//                               toolbar:{
+//                                 sx: {
+//                                   "& .MuiButton-root": {
+//                                     color: "rgb(34 197 94)",
+//                                   },
+//                                 },
+//                               },
+//                             }}
+//                         />
+                       
+//                     </Box>
+//                 ) : (
+//                     <Typography variant="h6" color="textSecondary"></Typography>
+//                 )}
+//             </div>
+//         </Box>
+//     );
+// }
+
+// export default IoTDataViewer;
 
 
 // import React, { useState } from 'react';
