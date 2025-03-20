@@ -16,6 +16,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import Header from 'src/component/Header';
 
+  
 function IoTDataViewer() {
     const [startTime, setStartTime] = useState(null);
     const [endTime, setEndTime] = useState(null);
@@ -35,7 +36,7 @@ function IoTDataViewer() {
             };
             const startTimeIST = startTime ? convertToIST(startTime) : null;
             const endTimeIST = endTime ? convertToIST(endTime) : null;
-            const response = await fetch('https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data', {
+            const response = await fetch('https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data/historical-data', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -54,6 +55,8 @@ function IoTDataViewer() {
                     timestamp: row.timestamp || row.time_bucket,
                     ist_timestamp: row.ist_timestamp || row.time_bucket,
                     MK_2_Test_Name: row.device_data?.["MK_2_Test_Name"] || row["MK_2_Test_Name"],
+                    MK_2_Test_Description: row.device_data?.["MK_2_Test_Description"] || row["MK_2_Test_Description"],
+                    MK_2_Test_Remarks: row.device_data?.["MK_2_Test_Remarks"] || row["MK_2_Test_Remarks"],
                     
                     LICR_0101_PV: row.device_data?.["LICR-0101-PV"] !== undefined && row.device_data?.["LICR-0101-PV"] !== null 
                     ? row.device_data?.["LICR-0101-PV"]
@@ -79,10 +82,22 @@ Cell_back_pressure: row.device_data?.["Cell-back-pressure"] !== undefined && row
                     : row["Cell-back-pressure"] || 0,
 H2_Pressure_outlet: row.device_data?.["H2-Pressure-outlet"] || row["H2-Pressure-outlet"],
 O2_Pressure_outlet: row.device_data?.["O2-Pressure-outlet"] || row["O2-Pressure-outlet"],
-H2_Stack_pressure_difference: row.device_data?.["H2-Stack-pressure-difference"] || row["H2-Stack-pressure-difference"],
-O2_Stack_pressure_difference: row.device_data?.["O2-Stack-pressure-difference"] || row["O2-Stack-pressure-difference"],
-Ly_Rectifier_current: row.device_data?.["Ly-Rectifier-current"] || row["Ly-Rectifier-current"],
-Ly_Rectifier_voltage: row.device_data?.["Ly-Rectifier-voltage"] || row["Ly-Rectifier-voltage"],
+H2_Stack_pressure_difference: row.device_data?.["H2-Stack-pressure-difference"] !== undefined && row.device_data?.["H2-Stack-pressure-difference"] !== null 
+                              ? row.device_data?.["H2-Stack-pressure-difference"]
+                              : row["H2-Stack-pressure-difference"] || 0,
+
+O2_Stack_pressure_difference: row.device_data?.["O2-Stack-pressure-difference"] !== undefined && row.device_data?.["O2-Stack-pressure-difference"] !== null 
+                              ? row.device_data?.["O2-Stack-pressure-difference"]
+                              : row["O2-Stack-pressure-difference"] || 0,
+
+Ly_Rectifier_current: row.device_data?.["Ly-Rectifier-current"] !== undefined && row.device_data?.["Ly-Rectifier-current"] !== null 
+                      ? row.device_data?.["Ly-Rectifier-current"]
+                      : row["Ly-Rectifier-current"] || 0,
+
+Ly_Rectifier_voltage: row.device_data?.["Ly-Rectifier-voltage"] !== undefined && row.device_data?.["Ly-Rectifier-voltage"] !== null 
+                       ? row.device_data?.["Ly-Rectifier-voltage"]
+                       : row["Ly-Rectifier-voltage"] || 0,
+
 Cell_Voltage_Multispan: row.device_data?.["Cell-Voltage-Multispan"] !== undefined && row.device_data?.["Cell-Voltage-Multispan"] !== null
 ? row.device_data?.["Cell-Voltage-Multispan"]
 : row["Cell-Voltage-Multispan"] || 0,
@@ -148,7 +163,6 @@ PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] || row["PLC-TIME-STAMP"],
             setTotalizerFlow(0);
             return;
         }
-
         // Calculate the totalizer flow dynamically
         let totalFlow = 0;
         for (let i = 0; i < validRows.length - 1; i++) {
@@ -179,6 +193,8 @@ PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] || row["PLC-TIME-STAMP"],
     const columns = [
         { field: 'ist_timestamp', headerName: 'IST Timestamp', width: 205 },
         { field: 'MK_2_Test_Name', headerName: 'mark2 Test Name', width: 170 },
+        { field: 'MK_2_Test_Description', headerName: 'mark2 Test Description', width: 170 },
+        { field: 'MK_2_Test_Remarks', headerName: 'mark2 Test Remarks', width: 170 },
         {
             field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
               {
@@ -301,7 +317,7 @@ PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] || row["PLC-TIME-STAMP"],
                             Calculate Totalizer Flow
                         </Button>
                     </Box>
-                )}
+                )}  
                 {isFetching ? (
                     <Typography variant="h5" color="secondary">Data fetching....</Typography>
                 ) : selectedTestName && filteredRows.length > 0 ? (

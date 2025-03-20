@@ -1,16 +1,111 @@
-import React from 'react'
+// /* RandomUserList.js */
+// import React,
+// {
+//     useState,
+//     useEffect
+// } from 'react';
 
-const index = () => {
+// function RandomUserList() {
+//     const [userList, setUserList] = useState([]);
+
+//     useEffect(() => {
+//         fetch('https://random-data-api.com/api/v2/users?size=5')
+//             .then(response => response.json())
+//             .then(data => setUserList(data));
+//     }, []);
+
+//     return (
+//         <div>
+//             <h2>Random User List</h2>
+//             <ul>
+//                 {userList.map(user => (
+//                     <li key={user.id}>
+//                         <p>
+//                             Name:
+//                             {user.first_name}
+//                             {user.last_name}
+//                         </p>
+//                         <p>
+//                             Email:
+//                             {user.email}
+//                         </p>
+//                         {/* Add more user data fields as needed */}
+//                     </li>
+//                 ))}
+//             </ul>
+//         </div>
+//     );
+// }
+
+// export default RandomUserList;
+
+import React, { useEffect, useState } from 'react'
+
+const Index = () => {
+  const [user, setUseer] = useState([])
+
+  useEffect(()=>{
+    fetch('https://random-data-api.com/api/v2/users?size=5')
+    .then(response => response.json())
+    .then(data => setUseer(data))
+  })
   return (
     <div>
-      overview
+      {
+        user.length > 0 ?
+        (
+          <ul>
+          {
+            user.map(users=> (
+              <h1>{users.first_name}</h1>
+            ))
+          }
+          </ul>
+        )
+         : 
+         (
+          <p>loading</p>
+         )
+      }
     </div>
   )
 }
+export default Index
 
-export default index
 
+// import React, { useEffect, useState } from 'react'
 
+// const Index = () => {
+
+//   const [userData, setUserData] = useState([])
+
+//   useEffect(() => {
+//     // Fetch the data only once when the component mounts
+//     fetch('https://random-data-api.com/api/v2/users?size=5')
+//       .then(response => response.json())
+//       .then(data => setUserData(data))
+//       .catch(error => console.error('Error fetching data:', error)) // Handle errors
+//   }, []) // Empty dependency array ensures this runs once on mount
+
+//   return (
+//     <div>
+//       {/* Check if userData exists and is an array */}
+//       {userData.length > 0 ? (
+//         <ul>
+//           {userData.map(users => (
+//             <li key={users.id}>
+//               <h1>{users.first_name}</h1>
+//             </li>
+//           ))}
+//         </ul>
+//       ) : (
+//         <p>Loading...</p> // Loading indicator while data is being fetched
+//       )}
+//     </div>
+//   )
+// }
+
+// export default Index
 
 // import React, { useState, useEffect } from "react";
 // import { useDispatch } from "react-redux";
@@ -293,9 +388,6 @@ export default index
 
 // export default Overview;
 
-
-
-
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
 // import GridLayout from 'react-grid-layout';
@@ -313,12 +405,12 @@ export default index
 // import 'react-grid-layout/css/styles.css';
 // import 'react-resizable/css/styles.css';
 // import Header from 'src/component/Header';
- 
+
 // const Overview = () => {
 //   const dispatch = useDispatch();
 //   const theme = useTheme();
 //   const colors = tokens(theme.palette.mode);
- 
+
 //   // Define layouts for small and large screens
 //   const largeScreenLayout = [
 //     { i: 'Seperator', x: 0, y: 1, w: 2.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 10 },
@@ -335,18 +427,17 @@ export default index
 //    { i: 'RawGas', x: 0, y: 1, w: 4.8, h: 10.7 , minW: 4.5, maxW: 7, minH: 9, maxH: 13},
 //    { i: 'H2RAW', x: 4.8, y: 1, w: 5, h: 10.5, minW: 4, maxW: 8, minH: 10, maxH: 13 },
 //    { i: 'RECTIFIER', x: 6.7, y: 0, w: 3, h: 10 , minW: 2, maxW: 12, minH: 2, maxH: 15},
-//    { i: 'H2PROCESS', x: 0, y: 3, w: 9.8, h: 10.5 , minW: 4, maxW: 8, minH: 10, maxH: 13}, 
+//    { i: 'H2PROCESS', x: 0, y: 3, w: 9.8, h: 10.5 , minW: 4, maxW: 8, minH: 10, maxH: 13},
 //  ];
 //   // Manage responsive layout state
 //   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth > 1280);
 //   useEffect(() => {
-//     const savedLayout = JSON.parse(localStorage.getItem("overviewChartsLayout")) || 
+//     const savedLayout = JSON.parse(localStorage.getItem("overviewChartsLayout")) ||
 //                         (isLargeScreen ? largeScreenLayout : smallScreenLayout);
 //     setLayoutState(savedLayout);
 //     dispatch(setLayoutAction(savedLayout, "overviewCharts"));
 //   }, [dispatch, isLargeScreen]);
 
-  
 //   const [layoutState, setLayoutState] = useState(
 //     () => JSON.parse(localStorage.getItem("overviewChartsLayout")) || (isLargeScreen ? largeScreenLayout : smallScreenLayout)
 //   );
@@ -445,9 +536,6 @@ export default index
 
 // export default Overview;
 
-
-
-
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
 // import GridLayout from 'react-grid-layout';
@@ -471,25 +559,25 @@ export default index
 //   const theme = useTheme();
 //   const colors = tokens(theme.palette.mode);
 
-  // // Define layouts for small and large screens
-  // const largeScreenLayout = [
-  //    { i: 'Seperator', x: 0, y: 1, w: 2.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
-  //   { i: 'Electrolyte', x: 2.5, y: 0, w: 2.5, h: 10 , minW: 2.5, maxW: 4, minH: 9, maxH: 13},
-  //   { i: 'RawGas', x: 5, y: 0, w: 5, h: 10 , minW: 4.5, maxW: 7, minH: 9, maxH: 13},
-  //   { i: 'H2RAW', x: 0, y: 2, w: 6, h: 10.5, minW: 4, maxW: 8, minH: 10, maxH: 13 },
-  //   { i: 'RECTIFIER', x: 10, y: 0, w: 2, h: 10 , minW: 2, maxW: 12, minH: 2, maxH: 15},
-  //   { i: 'H2PROCESS', x: 6, y: 3, w: 6, h: 10.5 , minW: 4, maxW: 8, minH: 10, maxH: 13},
-  // ];
+// // Define layouts for small and large screens
+// const largeScreenLayout = [
+//    { i: 'Seperator', x: 0, y: 1, w: 2.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
+//   { i: 'Electrolyte', x: 2.5, y: 0, w: 2.5, h: 10 , minW: 2.5, maxW: 4, minH: 9, maxH: 13},
+//   { i: 'RawGas', x: 5, y: 0, w: 5, h: 10 , minW: 4.5, maxW: 7, minH: 9, maxH: 13},
+//   { i: 'H2RAW', x: 0, y: 2, w: 6, h: 10.5, minW: 4, maxW: 8, minH: 10, maxH: 13 },
+//   { i: 'RECTIFIER', x: 10, y: 0, w: 2, h: 10 , minW: 2, maxW: 12, minH: 2, maxH: 15},
+//   { i: 'H2PROCESS', x: 6, y: 3, w: 6, h: 10.5 , minW: 4, maxW: 8, minH: 10, maxH: 13},
+// ];
 
-  // const smallScreenLayout = [
-  //   { i: 'Seperator', x: 0, y: 1, w: 3.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
-  //   { i: 'Electrolyte', x: 3.5, y: 0, w: 3.2, h: 10 , minW: 2.5, maxW: 4, minH: 9, maxH: 13},
-  //   { i: 'RawGas', x: 0, y: 1, w: 4.8, h: 10.7 , minW: 4.5, maxW: 7, minH: 9, maxH: 13},
-  //   { i: 'H2RAW', x: 4.8, y: 1, w: 5, h: 10.5, minW: 4, maxW: 8, minH: 10, maxH: 13 },
-  //   { i: 'RECTIFIER', x: 6.7, y: 0, w: 3, h: 10 , minW: 2, maxW: 12, minH: 2, maxH: 15},
-  //   { i: 'H2PROCESS', x: 0, y: 3, w: 9.8, h: 10.5 , minW: 4, maxW: 8, minH: 10, maxH: 13},
-    
-  // ];
+// const smallScreenLayout = [
+//   { i: 'Seperator', x: 0, y: 1, w: 3.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
+//   { i: 'Electrolyte', x: 3.5, y: 0, w: 3.2, h: 10 , minW: 2.5, maxW: 4, minH: 9, maxH: 13},
+//   { i: 'RawGas', x: 0, y: 1, w: 4.8, h: 10.7 , minW: 4.5, maxW: 7, minH: 9, maxH: 13},
+//   { i: 'H2RAW', x: 4.8, y: 1, w: 5, h: 10.5, minW: 4, maxW: 8, minH: 10, maxH: 13 },
+//   { i: 'RECTIFIER', x: 6.7, y: 0, w: 3, h: 10 , minW: 2, maxW: 12, minH: 2, maxH: 15},
+//   { i: 'H2PROCESS', x: 0, y: 3, w: 9.8, h: 10.5 , minW: 4, maxW: 8, minH: 10, maxH: 13},
+
+// ];
 
 //   // Manage responsive layout state
 //   const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth > 1280);
@@ -512,7 +600,6 @@ export default index
 //     localStorage.setItem("customChartsLayout", JSON.stringify(newLayout));
 //   }, 500);
 
-
 //   // Reset layout
 //   const resetLayout = () => {
 //     const layoutToReset = isLargeScreen ? largeScreenLayout : smallScreenLayout;
@@ -521,15 +608,15 @@ export default index
 //     localStorage.setItem("customChartsLayout", JSON.stringify(layoutToReset));
 //   };
 
-  // // Dynamic Dimensions for Each Component
-  // const calculateBoxDimensions = (item) => {
-  //   const baseWidth = isLargeScreen ? 160 : 120; // Width multiplier
-  //   const baseHeight = 30; // Height multiplier
-  //   return {
-  //     width: item.w * baseWidth,
-  //     height: item.h * baseHeight,
-  //   };
-  // };
+// // Dynamic Dimensions for Each Component
+// const calculateBoxDimensions = (item) => {
+//   const baseWidth = isLargeScreen ? 160 : 120; // Width multiplier
+//   const baseHeight = 30; // Height multiplier
+//   return {
+//     width: item.w * baseWidth,
+//     height: item.h * baseHeight,
+//   };
+// };
 //   return (
 //     <Box m="20px">
 //       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -552,42 +639,40 @@ export default index
 //         isResizable
 //         isDraggable
 //         draggableHandle=".drag-handle"
-      // >
-        // {layoutState.map((item) => {
-        //   const dimensions = calculateBoxDimensions(item);
-        //   return (
-        //     <Box key={item.i} sx={{ backgroundColor: colors.primary[400] }}>
-        //       <Box display="flex" justifyContent="space-between" p="8px">
-        //         <IconButton className="drag-handle" style={{ cursor: 'move' }}>
-        //           <DragHandleIcon />
-        //         </IconButton>
-        //         <Typography variant="h6">{item.i.toUpperCase()}</Typography>
-        //       </Box>
-        //       <Box display="flex" alignItems="center" justifyContent="center" height="100%">
-        //         {item.i === "RawGas" && (
-        //           <RawGasImpurities width={dimensions.width} height={dimensions.height} />
-        //         )}
-        //         {item.i === "H2RAW" && (
-        //           <H2RawGas width={dimensions.width} height={dimensions.height} />
-        //         )}
-        //         {item.i === "H2PROCESS" && (
-        //           <H2ProcessGas width={dimensions.width} height={dimensions.height} />
-        //         )}
-        //         {item.i === "Seperator" && <Separator />}
-        //         {item.i === "Electrolyte" && <Electrolyte />}
-        //         {item.i === "RECTIFIER" && <RectifierControl />}
-        //       </Box>
-        //     </Box>
-        //   );
-        // })}
+// >
+// {layoutState.map((item) => {
+//   const dimensions = calculateBoxDimensions(item);
+//   return (
+//     <Box key={item.i} sx={{ backgroundColor: colors.primary[400] }}>
+//       <Box display="flex" justifyContent="space-between" p="8px">
+//         <IconButton className="drag-handle" style={{ cursor: 'move' }}>
+//           <DragHandleIcon />
+//         </IconButton>
+//         <Typography variant="h6">{item.i.toUpperCase()}</Typography>
+//       </Box>
+//       <Box display="flex" alignItems="center" justifyContent="center" height="100%">
+//         {item.i === "RawGas" && (
+//           <RawGasImpurities width={dimensions.width} height={dimensions.height} />
+//         )}
+//         {item.i === "H2RAW" && (
+//           <H2RawGas width={dimensions.width} height={dimensions.height} />
+//         )}
+//         {item.i === "H2PROCESS" && (
+//           <H2ProcessGas width={dimensions.width} height={dimensions.height} />
+//         )}
+//         {item.i === "Seperator" && <Separator />}
+//         {item.i === "Electrolyte" && <Electrolyte />}
+//         {item.i === "RECTIFIER" && <RectifierControl />}
+//       </Box>
+//     </Box>
+//   );
+// })}
 //       </GridLayout>
 //     </Box>
 //   );
 // };
 
 // export default Overview;
-
-
 
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
@@ -760,8 +845,6 @@ export default index
 // };
 
 // export default Overview;
-
-
 
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
@@ -951,8 +1034,6 @@ export default index
 
 // export default Overview;
 
-
-
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
 // import GridLayout from 'react-grid-layout';
@@ -987,8 +1068,8 @@ export default index
 //   ];
 
 //   // Load saved layout or fallback to initial layout
-//   const storedLayout = useSelector((state) => state.layout.customChartsLayout) 
-//     || JSON.parse(localStorage.getItem("customChartsLayout")) 
+//   const storedLayout = useSelector((state) => state.layout.customChartsLayout)
+//     || JSON.parse(localStorage.getItem("customChartsLayout"))
 //     || initialLayout;
 
 //   const [layoutState, setLayoutState] = useState(storedLayout); // Rename state updater
@@ -1142,9 +1223,6 @@ export default index
 
 // export default Overview;
 
-
-
-
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
 // import GridLayout from 'react-grid-layout';
@@ -1181,8 +1259,8 @@ export default index
 //   ];
 
 //   // Load saved layout or fallback to initial layout
-//   const storedLayout = useSelector((state) => state.layout.customChartsLayout) 
-//     || JSON.parse(localStorage.getItem("customChartsLayout")) 
+//   const storedLayout = useSelector((state) => state.layout.customChartsLayout)
+//     || JSON.parse(localStorage.getItem("customChartsLayout"))
 //     || initialLayout;
 
 //   const [layout, setLayout] = useState(storedLayout);
@@ -1208,7 +1286,6 @@ export default index
 //     dispatch(action); // Dispatch the valid action
 //     localStorage.setItem("customChartsLayout", JSON.stringify(newLayout));
 //   }, 500);
-  
 
 //   // Persist dimensions on resize
 //   const persistDimensions = (key, dimensions) => {
@@ -1338,7 +1415,6 @@ export default index
 
 // export default Overview;
 
-
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
 // import GridLayout from 'react-grid-layout';
@@ -1394,7 +1470,7 @@ export default index
 //     <Box m="20px">
 //       <Box display="flex" justifyContent="space-between" alignItems="center">
 //         <Typography variant="h4">Overview</Typography>
-  
+
 //       </Box>
 
 //       <GridLayout
@@ -1503,7 +1579,6 @@ export default index
 
 // export default Overview;
 
-
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
 // import GridLayout from 'react-grid-layout';
@@ -1523,7 +1598,6 @@ export default index
 //   const dispatch = useDispatch();
 //   const theme = useTheme();
 //   const colors = tokens(theme.palette.mode);
-
 
 //   // Load dimensions from localStorage or set defaults
 //   const getPersistedDimensions = (key, defaultDimensions) =>
@@ -1557,7 +1631,7 @@ export default index
 //     <Box m="20px">
 //       <Box display="flex" justifyContent="space-between" alignItems="center">
 //         <Typography variant="h4">Overview</Typography>
-  
+
 //       </Box>
 
 //       <GridLayout
@@ -1629,8 +1703,6 @@ export default index
 
 // export default Overview;
 
-
-
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
 // import GridLayout from 'react-grid-layout';
@@ -1734,8 +1806,6 @@ export default index
 
 // export default Overview;
 
-
-
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
 // import GridLayout from 'react-grid-layout';
@@ -1788,7 +1858,7 @@ export default index
 //       <GridLayout
 //         className="layout"
 //         layout={layout}
-//         cols={12} 
+//         cols={12}
 //         rowHeight={30}
 //         width={1600}
 //         onLayoutChange={(newLayout) => dispatch(setLayout(newLayout, "custom"))}
@@ -1837,8 +1907,6 @@ export default index
 // };
 
 // export default Overview;
-
-
 
 // import React, { useState, useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
@@ -1926,10 +1994,6 @@ export default index
 
 // export default Overview;
 
-
-
-
-
 // Raw gas code only
 
 // import React, { useState, useEffect } from 'react';
@@ -2003,8 +2067,6 @@ export default index
 
 // export default Overview;
 
-
-
 // import React, { useEffect } from 'react';
 // import { useDispatch, useSelector } from 'react-redux';
 // import GridLayout from 'react-grid-layout';
@@ -2026,7 +2088,7 @@ export default index
 
 // const Overview = () => {
 
-//   const initialLayout = [ 
+//   const initialLayout = [
 //     { i: 'Seperator', x: 0, y: 1, w: 2.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
 //     { i: 'Electrolyte', x: 2.5, y: 0, w: 2.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
 //     { i: 'RawGas', x: 0, y: 3, w: 5, h: 10, minW: 4.5, maxW: 7, minH: 9, maxH: 13 },
@@ -2161,9 +2223,6 @@ export default index
 
 // export default Overview;
 
-
-
-
 // import React, { useState, useEffect } from 'react';
 // import GridLayout from 'react-grid-layout';
 // import { Box, Typography, useTheme, IconButton, Button } from "@mui/material";
@@ -2184,7 +2243,7 @@ export default index
 //   const theme = useTheme();
 //   const colors = tokens(theme.palette.mode);
 
-//   const initialLayout = [ 
+//   const initialLayout = [
 //     { i: 'Seperator', x: 0, y: 1, w: 2.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
 //     { i: 'Electrolyte', x: 2.5, y: 0, w: 2.5, h: 10, minW: 2.5, maxW: 4, minH: 9, maxH: 13 },
 //     { i: 'RawGas', x: 0, y: 3, w: 5, h: 10, minW: 4.5, maxW: 7, minH: 9, maxH: 13 },
@@ -2310,8 +2369,6 @@ export default index
 
 // export default Overview;
 
-
-
 // import React from 'react';
 // import GridLayout from 'react-grid-layout';
 // import { Box, Typography, useTheme, IconButton } from "@mui/material";
@@ -2326,7 +2383,6 @@ export default index
 // import DragHandleIcon from '@mui/icons-material/DragHandle';
 // import 'react-grid-layout/css/styles.css';
 // import 'react-resizable/css/styles.css';
-   
 
 // const Overview = () => {
 //   const theme = useTheme();
@@ -2339,7 +2395,7 @@ export default index
 //     { i: 'H2RAW', x: 0, y: 2, w: 6, h: 10.5, minW: 4, maxW: 8, minH: 10, maxH: 13 },
 //     { i: 'RECTIFIER', x: 10, y: 0, w: 2, h: 10 , minW: 2, maxW: 12, minH: 2, maxH: 15},
 //     { i: 'H2PROCESS', x: 6, y: 3, w: 6, h: 10.5 , minW: 4, maxW: 8, minH: 10, maxH: 13},
-    
+
 //   ];
 
 //   return (
@@ -2353,7 +2409,7 @@ export default index
 //         layout={layout}
 //         cols={12}
 //         rowHeight={30}
-//         width={1600} 
+//         width={1600}
 //         draggableHandle=".drag-handle"
 //       >
 //         <Box key="Seperator" backgroundColor={colors.primary[400]}>
@@ -2394,7 +2450,7 @@ export default index
 //           <Box display="flex" justifyContent="space-between" p="10px">
 //             <IconButton className="drag-handle" style={{ cursor: 'move' }}>
 //               <DragHandleIcon />
-//             </IconButton> 
+//             </IconButton>
 //             <Typography variant="h6">H2 RAW GAS</Typography>
 //           </Box>
 //           <Box height="200px" >
@@ -2424,7 +2480,7 @@ export default index
 //           <RectifierControl />
 //         </Box>
 //       </Box>
-        
+
 //       </GridLayout>
 //     </Box>
 //   );
