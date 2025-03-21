@@ -1,176 +1,3 @@
-// import React, { useState } from "react";
-// import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-// import axios from "axios";
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-// import { Box, Button, Grid, TextField, useTheme } from "@mui/material";
-// import Header from "src/component/Header";
-// import { tokens } from "../../theme";
-// import { format } from "date-fns";
-
-// const DataTable = () => {
-//   const theme = useTheme();
-//   const colors = tokens(theme.palette.mode);
-
-//   const [rows, setRows] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [startDate, setStartDate] = useState(null);
-//   const [endDate, setEndDate] = useState(null);
-//   const [pageSize, setPageSize] = useState(100);
-//   const [error, setError] = useState("");
-
-//   const fetchData = async (start, end, page, pageSize) => {
-//     setLoading(true);
-//     setError("");
-//     try {
-//       // Format the start and end date to 'yyyy-MM-dd HH:mm' format
-//       const formattedStartTime = format(start, "yyyy-MM-dd HH:mm");
-//       const formattedEndTime = format(end, "yyyy-MM-dd HH:mm");
-
-//       // Ensure both start and end date are selected 
-//       if (!start || !end) {
-//         throw new Error("Start Date and End Date are required.");
-//       }
-
-//       const response = await axios.post(
-//         "https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data/historical-data",
-//         {
-//           start_time: formattedStartTime,
-//           end_time: formattedEndTime,
-//           page,
-//           page_size: pageSize,
-//         },
-//         {
-//           headers: { "Content-Type": "application/json" },
-//         }
-//       );
-
-//       if (response.status === 200) {
-//         const result = response.data;
-//         const processedData = (result.data || []).map((row, index) => ({
-//           id: index + (page - 1) * pageSize, // Ensure unique ID for pagination
-//           timestamp: row.timestamp || row.time_bucket,
-//           ist_timestamp: row.ist_timestamp || row.time_bucket,
-//           Test_Name: row.device_data?.["Test-Name"] || row["test_name"],
-//           MK_2_Test_Name:
-//             row.device_data?.["MK_2_Test_Name"] || row["MK_2_Test_Name"],
-
-//           LICR_0101_PV:
-//             row.device_data?.["LICR-0101-PV"] !== undefined &&
-//             row.device_data?.["LICR-0101-PV"] !== null
-//               ? row.device_data?.["LICR-0101-PV"]
-//               : row["LICR-0101-PV"] || 0,
-//         }));
-//         setRows(processedData);
-//       } else {
-//         throw new Error("Failed to fetch data");
-//       }
-//     } catch (error) {
-//       console.error("Error fetching data:", error);
-//       setRows([]);
-//       setError(error.message || "An unexpected error occurred.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-//   const handleFetchData = () => {
-//     if (startDate && endDate) {
-//       fetchData(startDate, endDate, 1, pageSize); // Pass selected dates and pagination params
-//     }
-//   };
-//   const columns = [
-//     { field: "ist_timestamp", headerName: "IST Timestamp", width: 200 },
-//     { field: "MK_2_Test_Name", headerName: "Mark2 Test Name", width: 170 },
-//     {
-//       field: "LICR_0101_PV",
-//       headerName: "LICR-0101-PV",
-//       width: 80,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "LICR_0102_PV",
-//       headerName: "LICR-0102-PV",
-//       width: 90,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "LICR_0103_PV",
-//       headerName: "LICR-0103-PV",
-//       width: 90,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "PICR_0101_PV1",
-//       headerName: "PICR-0101-PV",
-//       width: 90,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//   ];
-//   return (
-//     <Box m="15px" mt="-60px">
-//       <LocalizationProvider dateAdapter={AdapterDateFns}>
-//         <Header
-//           title="Historical Data Table"
-//           subtitle="Fetch data using start_time and end_time"
-//         />
-//         <Grid container spacing={2} alignItems="center">
-//           <Grid item xs={3}>
-//             <DateTimePicker
-//               label="Start Date and Time"
-//               value={startDate}
-//               onChange={setStartDate}
-//               renderInput={(params) => <TextField {...params} />}
-//             />
-//           </Grid>
-//           <Grid item xs={3}>
-//             <DateTimePicker
-//               label="End Date and Time"
-//               value={endDate}
-//               onChange={setEndDate}
-//               renderInput={(params) => <TextField {...params} />}
-//             />
-//           </Grid>
-//           <Grid item xs={3}>
-//             <Button
-//               variant="contained"
-//               color="secondary"
-//               onClick={handleFetchData}
-//               disabled={!startDate || !endDate}
-//             >
-//               Fetch Data
-//             </Button>
-//           </Grid>
-//         </Grid>
-//         {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
-//         <div style={{ height: 730, width: "100%", marginTop: 20 }}>
-//           <DataGrid
-//             rows={rows}
-//             columns={columns}
-//             pageSize={pageSize}
-//             onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-//             rowsPerPageOptions={[25, 50, 100]}
-//             loading={loading}
-//             components={{
-//               Toolbar: GridToolbar,
-//             }}
-//             componentsProps={{
-//               toolbar: {
-//                 sx: {
-//                   "& .MuiButton-root": {
-//                     color: "rgb(34 197 94)",
-//                   },
-//                 },
-//               },
-//             }}
-//           />
-//         </div>
-//       </LocalizationProvider>
-//     </Box>
-//   );
-// };
-// export default DataTable;
-
 import React, { useState } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import axios from "axios";
@@ -220,7 +47,6 @@ const DataTable = () => {
           headers: { "Content-Type": "application/json" },
         }
       );
-
       if (response.status === 200) {
         const result = response.data;
         const processedData = (result.data || []).map((row, index) => ({
@@ -320,13 +146,12 @@ RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.
       setPage(page - 1);
       fetchData(startDate, endDate, page - 1, pageSize);  // Load previous set of records
     }
-  };
-
+  }; 
   const columns = [
     { field: 'ist_timestamp', headerName: 'IST Timestamp', width: 205 },
-    { field: 'MK_2_Test_Name', headerName: 'mark2 Test Name', width: 170 },
-    { field: 'MK_2_Test_Description', headerName: 'mark2 Test Description', width: 170 },
-    { field: 'MK_2_Test_Remarks', headerName: 'mark2 Test Remarks', width: 170 },
+    { field: 'MK_2_Test_Name', headerName: 'mark2 Test Name', width: 250 },
+    // { field: 'MK_2_Test_Description', headerName: 'mark2 Test Description', width: 170 },
+    // { field: 'MK_2_Test_Remarks', headerName: 'mark2 Test Remarks', width: 170 },
     {
         field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
           {
@@ -383,6 +208,10 @@ RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.
       {
         field: "RECT_VT_001", headerName: "RECT-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
         ];
+         // You can display MK_2_Test_Name from the first row or any other logic you prefer
+  const mk2TestName = rows.length > 0 ? rows[0].MK_2_Test_Name : "No Data"; // Default if no data
+  const mk2TestDescription = rows.length > 0 ? rows[0].MK_2_Test_Description : "No Data"; // Default if no data
+  const mk2TestRemarks = rows.length > 0 ? rows[0].MK_2_Test_Remarks : "No Data"; // Default if no data
   return (
     <Box m="20px">
       <Header title="IOT Data" subtitle="Real-time IOT Data" />
@@ -418,10 +247,19 @@ RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.
           </Button>
         </Grid>
       </Grid>
-
+      {/* Display the MK_2_Test_Name in an H2 tag */}
+      <Box m="20px 0">
+        <h2>MK 2 Test Name: {mk2TestName}</h2>
+      </Box>
+      <Box m="20px 0">
+        <h2>MK 2 Test Description: {mk2TestDescription}</h2>
+      </Box>
+      <Box m="20px 0">
+        <h2>MK 2 Test Remarks: {mk2TestRemarks}</h2>
+      </Box>
       <Box m="20px 0">
         {error && <p style={{ color: "red" }}>{error}</p>}
-        <div style={{ height: 400, width: "100%" }}>
+        <div style={{ height: 550, width: "100%" }}>
           <DataGrid
             rows={rows} 
             columns={columns}

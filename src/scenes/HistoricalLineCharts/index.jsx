@@ -4,6 +4,7 @@ const index = () => {
   return (
     <div>
       Historical Line Analytics
+      
     </div>
   )
 }

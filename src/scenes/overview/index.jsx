@@ -1,3 +1,291 @@
+import { useState } from "react";
+
+function TodoList() {
+  const [tasks, setTasks] = useState([]);
+  const [task, setTask] = useState("");
+
+  const addTask = () => {
+    if (task.trim()) {
+      setTasks([...tasks, task]);
+      setTask("");
+    }
+  };
+
+  const removeTask = (index) => {
+    setTasks(tasks.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div>
+      <h2>To-Do List</h2>
+      <input
+        type="text"
+        value={task}
+        onChange={(e) => setTask(e.target.value)}
+        placeholder="Enter task"
+      />
+      <button onClick={addTask}>Add Task</button>
+      <ul>
+        {tasks.map((t, index) => (
+          <li key={index}>
+            {t} <button onClick={() => removeTask(index)}>Remove</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default TodoList;
+
+
+// import { useState } from "react";
+
+// function DisableButton() {
+//   const [isDisabled, setIsDisabled] = useState(false);
+
+//   return (
+//     <button onClick={() => setIsDisabled(true)} disabled={isDisabled}>
+//       {isDisabled ? "Clicked!" : "Click Me"}
+//     </button>
+//   );
+// }
+
+// export default DisableButton;
+
+// import React, { useState } from 'react'
+
+// const Index = () => {
+
+// const [number, setNumber] = useState('')
+//   return (
+//     <div>
+//       <button onClick={()=> setNumber(Math.floor(Math.random() * 10) +1)}>generatr random number : {number}</button>
+//     </div>
+//   )
+// }
+
+// export default Index
+
+
+
+// function FruitList() {
+//   const fruits = ["Apple", "Banana", "Orange"];
+
+//   return (
+//     <div>
+//       <h2>Fruit List</h2>
+//       <ul>
+//         {fruits.map((fruit, index) => (
+//           <li key={index}>{fruit}</li>
+//         ))}
+//       </ul>
+//     </div>
+//   );
+// }
+
+// export default FruitList;
+
+
+
+// import { useState } from "react";
+
+// function LivePreview() {
+//   const [text, setText] = useState("");
+
+//   return (
+//     <div>
+//       <input
+//         type="text"
+//         placeholder="Type something..."
+//         value={text}
+//         // onChange={(e) => setText(e.target.value)}
+//         onChange={(e)=> setText(e.target.value)}
+//       />
+//       <p>You typed: {text}</p>
+//     </div>
+//   );
+// }
+
+// export default LivePreview;
+
+
+// import { useState } from "react";
+
+// function ToggleMessage() {
+//   const [isVisible, setIsVisible] = useState(false);
+
+//   return (
+//     <div>
+//       <button onClick={() => setIsVisible(!isVisible)}>
+//         {isVisible ? "Hide" : "Show"} Message
+//       </button>
+//       {isVisible && <p>Hello, World!</p>}
+//     </div>
+//   );
+// }
+
+// export default ToggleMessage;
+
+
+// import { useState } from "react";
+
+// function DarkModeToggle() {
+//   const [darkMode, setDarkMode] = useState(false);
+
+//   return (
+//     <div style={{
+//       background: darkMode ? "#333" : "#fff",
+//       color: darkMode ? "#fff" : "#000",
+//       padding: "20px",
+//       textAlign: "center"
+//     }}>
+//       <h2>{darkMode ? "Dark Mode" : "Light Mode"}</h2>
+//       <button onClick={() => setDarkMode(!darkMode)}>
+//         Toggle Mode
+//       </button>
+
+//       <button onClick={()=> alert("do n ot click")}>alert</button>
+//     </div>
+//   );
+// }
+
+// export default DarkModeToggle;
+
+
+// import { useState, useEffect } from "react";
+
+// function DebouncedSearch() {
+//   const [query, setQuery] = useState("");
+//   const [results, setResults] = useState([]);
+
+//   useEffect(() => {
+//     const timer = setTimeout(() => {
+//       if (query) {
+//         fetch(`https://jsonplaceholder.typicode.com/users?name_like=${query}`)
+//           .then((res) => res.json())
+//           .then((data) => setResults(data));
+//       }
+//     }, 500);
+
+//     return () => clearTimeout(timer);
+//   }, [query]);
+
+//   return (
+//     <div>
+//       <h2>Search Users</h2>
+//       <input
+//         type="text"
+//         value={query}
+//         onChange={(e) => setQuery(e.target.value)}
+//         placeholder="Type to search..."
+//       />
+//       <ul>
+//         {results.map((user) => (
+//           <li key={user.id}>{user.name}</li>
+//         ))}
+//       </ul>
+//     </div>
+//   );
+// }
+
+// export default DebouncedSearch;
+
+
+// import { useState } from "react";
+
+// function TodoList() {
+//   const [tasks, setTasks] = useState([]);
+//   const [task, setTask] = useState("");
+
+//   const addTask = () => {
+//     if (task.trim() !== "") {
+//       setTasks([...tasks, task]);
+//       setTask(""); // Clear input after adding
+//     }
+//   };
+
+//   const removeTask = (index) => {
+//     setTasks(tasks.filter((_, i) => i !== index));
+//   };
+
+//   return (
+//     <div>
+//       <h2>To-Do List</h2>
+//       <input
+//         type="text"
+//         value={task}
+//         onChange={(e) => setTask(e.target.value)}
+//         placeholder="Enter a task"
+//       />
+//       <button onClick={addTask}>Add Task</button>
+//       <ul>
+//         {tasks.map((t, index) => (
+//           <li key={index}>
+//             {t} <button onClick={() => removeTask(index)}>Remove</button>
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   );
+// }
+// export default TodoList;
+
+
+// import React, { useEffect, useState } from 'react'
+
+// const Index = () => {
+
+//   const [users , setUsers] = useState([])
+
+//   useEffect(()=>{
+
+
+
+//     fetch('https://jsonplaceholder.typicode.com/users')
+//     .then(response => response.json())
+//     .then(data => setUsers(data))
+//   }, [])
+//   return (
+//     <div>
+//       {
+//         users.map((user)=>(
+//           <li key={user.id}>{user.name}</li>
+//         ))
+//       }
+
+//       <h1>this is h1</h1>
+
+//       {users && (
+//         <li>{users.name}</li>
+//       )}
+//     </div>
+//   )
+// }
+
+// export default Index
+
+
+// import React, { useState } from 'react'
+
+// const Index = () => {
+  
+//   const [count, setCount] = useState(0)
+//   return (
+//     <div>
+//       <h1>Click to Count :{count} </h1>
+//       <button onClick={()=> setCount(count+1)}>+ Add</button>
+//       <button onClick={()=> setCount(count-1)} disabled={count === 0}>- Negative</button>
+//       <button onClick={()=> setCount(0)}>Reset</button>
+
+//     </div>  
+//   )
+// }
+
+// export default Index
+
+
+
 // /* RandomUserList.js */
 // import React,
 // {
@@ -39,38 +327,38 @@
 
 // export default RandomUserList;
 
-import React, { useEffect, useState } from 'react'
+// import React, { useEffect, useState } from 'react'
 
-const Index = () => {
-  const [user, setUseer] = useState([])
+// const Index = () => {
+//   const [user, setUseer] = useState([])
 
-  useEffect(()=>{
-    fetch('https://random-data-api.com/api/v2/users?size=5')
-    .then(response => response.json())
-    .then(data => setUseer(data))
-  })
-  return (
-    <div>
-      {
-        user.length > 0 ?
-        (
-          <ul>
-          {
-            user.map(users=> (
-              <h1>{users.first_name}</h1>
-            ))
-          }
-          </ul>
-        )
-         : 
-         (
-          <p>loading</p>
-         )
-      }
-    </div>
-  )
-}
-export default Index
+//   useEffect(()=>{
+//     fetch('https://random-data-api.com/api/v2/users?size=5')
+//     .then(response => response.json())
+//     .then(data => setUseer(data))
+//   })
+//   return (
+//     <div>
+//       {
+//         user.length > 0 ?
+//         (
+//           <ul>
+//           {
+//             user.map(users=> (
+//               <h1>{users.first_name}</h1>
+//             ))
+//           }
+//           </ul>
+//         )
+//          : 
+//          (
+//           <p>loading</p>
+//          )
+//       }
+//     </div>
+//   )
+// }
+// export default Index
 
 
 // import React, { useEffect, useState } from 'react'

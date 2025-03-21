@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { Box, useTheme } from "@mui/material";
+import { Box, useTheme, Typography } from "@mui/material";
 import { format, differenceInMilliseconds } from "date-fns";
 import { tokens } from "../../theme";
 import Header from "src/component/Header";
@@ -10,7 +10,7 @@ const RealTime = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [rows, setRows] = useState([]);
-  const data = useWebSocket();
+  const data = useWebSocket(); // WebSocket data
 
   const [dimensions, setDimensions] = useState({
     height: window.innerWidth > 1280 ? 820 : 560,
@@ -23,23 +23,23 @@ const RealTime = () => {
     { field: "time", headerName: "Time", width: 70 },
 
     {
-      field: "Test-Name",
-      headerName: "Test-Name",
-      width: 100,
+      field: "MK_2_Test_Name",
+      headerName: "MK 2 Test Name",
+      width: 250,
       valueFormatter: (params) => params.value || "",
     },
-    {
-      field: "Test-Remarks",
-      headerName: "Test-Remarks",
-      width: 150,
-      valueFormatter: (params) => params.value || "",
-    },
-    {
-      field: "Test-description",
-      headerName: "Test-description",
-      width: 150,
-      valueFormatter: (params) => params.value || "",
-    },
+    // {
+    //   field: "MK_2_Test_Description",
+    //   headerName: "MK_2_Test_Description",
+    //   width: 200,
+    //   valueFormatter: (params) => params.value || "",
+    // },
+    // {
+    //   field: "MK_2_Test_Remarks", 
+    //   headerName: "MK_2_Test_Remarks",
+    //   width: 200,
+    //   valueFormatter: (params) => params.value || "",
+    // },
     {
       field: "LICR-0101-PV",
       headerName: "LICR-0101-PV",
@@ -217,6 +217,22 @@ const RealTime = () => {
           title="Real Time Data Table"
           subtitle="Welcome to your Real Time Data Table"
         />
+        {/* Display MK_2_Test_Name dynamically */}
+        {data?.MK_2_Test_Name && (
+          <Typography variant="h5" color="primary" sx={{ marginTop: 2 }}>
+            Current Test Name: {data.MK_2_Test_Name}
+          </Typography>          
+        )}
+        {data?.MK_2_Test_Description && (
+          <Typography variant="h5" color="primary" sx={{ marginTop: 2 }}>
+            Current Test Description: {data.MK_2_Test_Description}
+          </Typography>      
+        )}
+        {data?.MK_2_Test_Remarks && (
+          <Typography variant="h5v" color="primary" sx={{ marginTop: 2 }}>
+            Current Test Remarks: {data.MK_2_Test_Remarks}
+          </Typography>          
+        )}
         <DataGrid
           rows={rows}
           columns={columns}
@@ -239,7 +255,251 @@ const RealTime = () => {
     </Box>
   );
 };
+
 export default RealTime;
+
+
+// import React, { useState, useEffect } from "react";
+// import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+// import { Box, useTheme } from "@mui/material";
+// import { format, differenceInMilliseconds } from "date-fns";
+// import { tokens } from "../../theme";
+// import Header from "src/component/Header";
+// import { useWebSocket } from "src/WebSocketProvider";
+
+// const RealTime = () => {
+//   const theme = useTheme();
+//   const colors = tokens(theme.palette.mode);
+//   const [rows, setRows] = useState([]);
+//   const data = useWebSocket();
+
+//   const [dimensions, setDimensions] = useState({
+//     height: window.innerWidth > 1280 ? 820 : 560,
+//     width: window.innerWidth > 1280 ? "100%" : "100%",
+//   });
+  // const [columns] = useState([
+  //   { field: "id", headerName: "ID", hide: true },
+  //   { field: "date", headerName: "Date", width: 80 },
+  //   { field: "time", headerName: "Time", width: 70 },
+
+  //   {
+  //     field: "MK_2_Test_Name",
+  //     headerName: "MK 2 Test Name",
+  //     width: 250,
+  //     valueFormatter: (params) => params.value || "",
+  //   },
+  //   {
+  //     field: "MK_2_Test_Description",
+  //     headerName: "MK_2_Test_Description",
+  //     width: 200,
+  //     valueFormatter: (params) => params.value || "",
+  //   },
+  //   {
+  //     field: "MK_2_Test_Remarks", 
+  //     headerName: "MK_2_Test_Remarks",
+  //     width: 200,
+  //     valueFormatter: (params) => params.value || "",
+  //   },
+  //   {
+  //     field: "LICR-0101-PV",
+  //     headerName: "LICR-0101-PV",
+  //     width: 120,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "LICR-0102-PV",
+  //     headerName: "LICR-0102-PV",
+  //     width: 120,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "LICR-0103-PV",
+  //     headerName: "LICR-0103-PV",
+  //     width: 120,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "PICR-0101-PV",
+  //     headerName: "PICR-0101-PV",
+  //     width: 120,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "PICR-0102-PV",
+  //     headerName: "PICR-0102-PV",
+  //     width: 120,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "PICR-0103-PV",
+  //     headerName: "PICR-0103-PV",
+  //     width: 120,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "TICR-0101-PV",
+  //     headerName: "TICR-0101-PV",
+  //     width: 120,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "ABB-Flow-Meter",
+  //     headerName: "ABB-Flow-Meter",
+  //     width: 120,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "H2-Flow",
+  //     headerName: "H2-Flow",
+  //     width: 70,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "O2-Flow",
+  //     headerName: "O2-Flow",
+  //     width: 70,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "Cell-back-pressure",
+  //     headerName: "Cell-back-pressure",
+  //     width: 150,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "H2-Pressure-outlet",
+  //     headerName: "H2-Pressure-outlet",
+  //     width: 150,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "O2-Pressure-outlet",
+  //     headerName: "O2-Pressure-outlet",
+  //     width: 150,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "H2-Stack-pressure-difference",
+  //     headerName: "H2-Stack-pressure-difference",
+  //     width: 170,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "O2-Stack-pressure-difference",
+  //     headerName: "O2-Stack-pressure-difference",
+  //     width: 170,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "Ly-Rectifier-current",
+  //     headerName: "Ly-Rectifier-current",
+  //     width: 150,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "Ly-Rectifier-voltage",
+  //     headerName: "Ly-Rectifier-voltage",
+  //     width: 150,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   {
+  //     field: "Cell-Voltage-Multispan",
+  //     headerName: "Cell-Voltage-Multispan",
+  //     width: 150,
+  //     valueFormatter: (params) => Number(params.value).toFixed(4),
+  //   },
+  //   { field: "PLC-TIME-STAMP", headerName: "PLC-TIME-STAMP", width: 170 },
+  // ]);
+
+//   useEffect(() => {
+//     const handleResize = () => {
+//       setDimensions({
+//         height: window.innerWidth > 1280 ? 750 : 500,
+//         width: window.innerWidth > 1280 ? "100%" : "90%",
+//       });
+//     };
+
+//     window.addEventListener("resize", handleResize);
+//     return () => window.removeEventListener("resize", handleResize);
+//   }, []);
+
+//   useEffect(() => {
+//     const currentTime = new Date();
+//     const istDateObject = new Date(data["PLC-TIME-STAMP"]);
+//     const timeDifference = differenceInMilliseconds(currentTime, istDateObject);
+
+//     setRows((prevRows) => {
+//       // Check if a row with the same timestamp already exists
+//       const isDuplicate = prevRows.some(
+//         (row) => row["PLC-TIME-STAMP"] === data["PLC-TIME-STAMP"]
+//       );
+
+//       if (isDuplicate) {
+//         // Replace the existing row data
+//         return prevRows.map((row) =>
+//           row["PLC-TIME-STAMP"] === data["PLC-TIME-STAMP"]
+//             ? {
+//                 ...data,
+//                 id: row.id,
+//                 date: format(istDateObject, "yyyy-MM-dd"),
+//                 time: format(istDateObject, "HH:mm:ss"),
+//                 differenceBetweenTime: timeDifference,
+//               }
+//             : row
+//         );
+//       } else {
+//         // Add a new row
+//         const newRow = {
+//           ...data,
+//           id: prevRows.length + 1,
+//           date: format(istDateObject, "yyyy-MM-dd"),
+//           time: format(istDateObject, "HH:mm:ss"),
+//           differenceBetweenTime: timeDifference,
+//         };
+//         return [...prevRows, newRow].sort(
+//           (a, b) =>
+//             new Date(b["PLC-TIME-STAMP"]) - new Date(a["PLC-TIME-STAMP"])
+//         );
+//       }
+//     });
+//   }, [data]);
+
+//   return (
+//     <Box m="15px" mt="-60px">
+//       <div
+//         style={{
+//           height: dimensions.height,
+//           width: dimensions.width,
+//           margin: "0 auto",
+//         }}
+//       >
+//         <Header
+//           title="Real Time Data Table"
+//           subtitle="Welcome to your Real Time Data Table"
+//         />
+//         <DataGrid
+//           rows={rows}
+//           columns={columns}
+//           components={{ Toolbar: GridToolbar }}
+//           rowsPerPageOptions={[25, 50, 100]}
+//           loading={rows.length === 0}
+//           disableSelectionOnClick
+//           getRowId={(row) => row.id}
+//           componentsProps={{
+//             toolbar: {
+//               sx: {
+//                 "& .MuiButton-root": {
+//                   color: "rgb(34 197 94)",
+//                 },
+//               },
+//             },
+//           }}
+//         />
+//       </div>
+//     </Box>
+//   );
+// };
+// export default RealTime;
 
 // import React, { useState, useEffect } from "react";
 // import { DataGrid, GridToolbar } from "@mui/x-data-grid";
