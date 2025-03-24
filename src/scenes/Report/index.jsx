@@ -60,53 +60,7 @@ function IoTDataViewer() {
                     LICR_0101_PV: row.device_data?.["LICR-0101-PV"] !== undefined && row.device_data?.["LICR-0101-PV"] !== null 
                     ? row.device_data?.["LICR-0101-PV"]
                     : row["LICR-0101-PV"] || 0,
-LICR_0102_PV: row.device_data?.["LICR-0102-PV"] || row["LICR-0102-PV"],
-LICR_0103_PV: row.device_data?.["LICR-0103-PV"] || row["LICR-0103-PV"],
-PICR_0101_PV1: row.device_data?.["PICR-0101-PV1"] !== undefined && row.device_data?.["PICR-0101-PV1"] !== null
-? row.device_data?.["PICR-0101-PV1"]
-: row["PICR-0101-PV1"] || 0,
-
-PICR_0102_PV: row.device_data?.["PICR-0102-PV"] || row["PICR-0102-PV"],
-PICR_0103_PV: row.device_data?.["PICR-0103-PV"] || row["PICR-0103-PV"],
-TICR_0101_PV: row.device_data?.["TICR-0101-PV"] || row["TICR-0101-PV"],
-ABB_Flow_Meter: row.device_data?.["ABB-Flow-Meter"] || row["ABB-Flow-Meter"],
-H2_Flow: row.device_data?.["H2-Flow"] !== undefined && row.device_data?.["H2-Flow"] !== null
-? row.device_data?.["H2-Flow"]
-: row["H2-Flow"] || 0,
-O2_Flow: row.device_data?.["O2-Flow"] !== undefined && row.device_data?.["O2-Flow"] !== null
-? row.device_data?.["O2-Flow"]
-: row["O2-Flow"] || 0,
-Cell_back_pressure: row.device_data?.["Cell-back-pressure"] !== undefined && row.device_data?.["Cell-back-pressurez"] !== null
-                    ? row.device_data?.["Cell-back-pressure"]
-                    : row["Cell-back-pressure"] || 0,
-H2_Pressure_outlet: row.device_data?.["H2-Pressure-outlet"] || row["H2-Pressure-outlet"],
-O2_Pressure_outlet: row.device_data?.["O2-Pressure-outlet"] || row["O2-Pressure-outlet"],
-H2_Stack_pressure_difference: row.device_data?.["H2-Stack-pressure-difference"] !== undefined && row.device_data?.["H2-Stack-pressure-difference"] !== null 
-                              ? row.device_data?.["H2-Stack-pressure-difference"]
-                              : row["H2-Stack-pressure-difference"] || 0,
-
-O2_Stack_pressure_difference: row.device_data?.["O2-Stack-pressure-difference"] !== undefined && row.device_data?.["O2-Stack-pressure-difference"] !== null 
-                              ? row.device_data?.["O2-Stack-pressure-difference"]
-                              : row["O2-Stack-pressure-difference"] || 0,
-
-Ly_Rectifier_current: row.device_data?.["Ly-Rectifier-current"] !== undefined && row.device_data?.["Ly-Rectifier-current"] !== null 
-                      ? row.device_data?.["Ly-Rectifier-current"]
-                      : row["Ly-Rectifier-current"] || 0,
-
-Ly_Rectifier_voltage: row.device_data?.["Ly-Rectifier-voltage"] !== undefined && row.device_data?.["Ly-Rectifier-voltage"] !== null 
-                       ? row.device_data?.["Ly-Rectifier-voltage"]
-                       : row["Ly-Rectifier-voltage"] || 0,
-
-Cell_Voltage_Multispan: row.device_data?.["Cell-Voltage-Multispan"] !== undefined && row.device_data?.["Cell-Voltage-Multispan"] !== null
-? row.device_data?.["Cell-Voltage-Multispan"]
-: row["Cell-Voltage-Multispan"] || 0,
-RECT_CT_001: row.device_data?.["RECT-CT-001"] !== undefined && row.device_data?.["RECT-CT-001"] !== null
-? row.device_data?.["RECT-CT-001"]
-: row["rect_ct_001"] || 0,
-RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.["RECT-VT-001"] !== null
-? row.device_data?.["RECT-VT-001"]
-: row["rect_vt_001"] || 0,
-PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] || row["PLC-TIME-STAMP"],
+                    LICR_0102_PV: row.device_data?.["LICR-0102-PV"] || row["LICR-0102-PV"],
                 }));
 
                 const uniqueTestNames = new Set();
@@ -140,118 +94,39 @@ PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] || row["PLC-TIME-STAMP"],
     : [];
 
     const handleTestNameChange = (event) => {
-        setSelectedTestName(event.target.value);
-        setTotalizerFlow(null); // Reset totalizer flow when test changes
-    };
-
-    const calculateTotalizerFlow = () => {
-        const filteredRows = allData.filter((row) => row.MK_2_Test_Name === selectedTestName);
-
-        if (filteredRows.length === 0) {
-            setTotalizerFlow(null);
-            return;
-        }
-
-        // Filter out invalid and negative values
-        const validRows = filteredRows.filter((row) => row.CR_FT_001 && row.CR_FT_001 > 0);
-
-        if (validRows.length < 2) {
-            // If less than 2 valid rows, we cannot calculate a meaningful totalizer flow
-            setTotalizerFlow(0);
-            return;
-        }
-        // Calculate the totalizer flow dynamically
-        let totalFlow = 0;
-        for (let i = 0; i < validRows.length - 1; i++) {
-            const currentRow = validRows[i];
-            const nextRow = validRows[i + 1];
-
-            const currentTimestamp = new Date(currentRow.timestamp).getTime();
-            const nextTimestamp = new Date(nextRow.timestamp).getTime();
-
-            const durationInSeconds = (nextTimestamp - currentTimestamp) / 1000;
-
-            // Add flow contribution for the time duration between two rows
-            if (durationInSeconds > 0) {
-                totalFlow += currentRow.CR_FT_001 * durationInSeconds;
+        const testName = event.target.value;
+        setSelectedTestName(testName);
+    
+        if (!testName) return;
+    
+        const testData = allData.filter(row => row.MK_2_Test_Name === testName);
+        let extendedData = [...testData];
+    
+        if (testData.length > 0) {
+            let lastValidIndex = testData.length - 1;
+    
+            // Find where the test name becomes null
+            for (let i = lastValidIndex + 1; i < allData.length; i++) {
+                if (!allData[i].MK_2_Test_Name) {
+                    break;
+                }
+                extendedData.push(allData[i]);
             }
+    
+            console.log("Test Start:", testData[0].ist_timestamp);
+            console.log("Test End:", extendedData[extendedData.length - 1].ist_timestamp);
         }
-        // Calculate the total test duration in seconds
-        const startTimestamp = new Date(validRows[0].timestamp).getTime();
-        const endTimestamp = new Date(validRows[validRows.length - 1].timestamp).getTime();
-        const totalDurationInSeconds = (endTimestamp - startTimestamp) / 1000;
-
-        // Avoid division by zero
-        const totalizer = totalDurationInSeconds > 0 ? totalFlow / totalDurationInSeconds : 0;
-
-        setTotalizerFlow(totalizer); // Set the totalizer flow value
-    }; 
- 
-    const columns = [
+    
+        setData(extendedData);
+    };
+   const columns = [
         { field: 'ist_timestamp', headerName: 'IST Timestamp', width: 205 },
         { field: 'MK_2_Test_Name', headerName: 'mark2 Test Name', width: 250 },
-        // { field: 'MK_2_Test_Description', headerName: 'mark2 Test Description', width: 170 },
-        // { field: 'MK_2_Test_Remarks', headerName: 'mark2 Test Remarks', width: 170 },
         {
             field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
               {
-            field: "LICR_0102_PV", headerName: "LICR-0102-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-          {
-            field: "LICR_0103_PV", headerName: "LICR-0103-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-          {
-            field: "PICR_0101_PV1", headerName: "PICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-            {
-              field: "PICR_0102_PV", headerName: "PICR-0102-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "PICR_0103_PV", headerName: "PICR-0103-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "ABB_Flow_Meter", headerName: "ABB-Flow-Meter", width: 100, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "H2_Flow", headerName: "H2-Flow", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "O2_Flow", headerName: "O2-Flow", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "Cell_back_pressure", headerName: "Cell-back-pressure", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "H2_Pressure_outlet", headerName: "H2-Pressure-outlet", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "O2_Pressure_outlet", headerName: "O2-Pressure-outlet", width:120, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "H2_Stack_pressure_difference", headerName: "H2-Stack-pressure-difference", width: 170, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "O2_Stack_pressure_difference", headerName: "O2-Stack-pressure-difference", width: 170, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "Ly_Rectifier_current", headerName: "Ly-Rectifier-current", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "Ly_Rectifier_voltage", headerName: "Ly-Rectifier-voltage", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            {
-              field: "Cell_Voltage_Multispan", headerName: "Cell-Voltage-Multispan", width: 130, valueFormatter: (params) => Number(params.value).toFixed(4)
-            },
-            
-                {
-            field: "RECT_CT_001", headerName: "RECT-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-          {
-            field: "RECT_VT_001", headerName: "RECT-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-          { 
-            field: "PLC_TIME_STAMP", headerName: "PLC-TIME-STAMP", width: 180, valueFormatter: (params) => params.value },
-      
+            field: "LICR_0102_PV", headerName: "LICR-0102-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },     
     ];
-
     return (
         <Box m="15px" mt="-60px">
             <Header
@@ -306,32 +181,16 @@ PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] || row["PLC-TIME-STAMP"],
                                 ))}
                             </Select>
                         </FormControl>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={calculateTotalizerFlow}
-                            sx={{ mt: 2 }}
-                            disabled={!selectedTestName}
-                        >
-                            Calculate Totalizer Flow
-                        </Button>
                     </Box>
                 )}
                 {isFetching ? (
                     <Typography variant="h5" color="secondary">Data fetching....</Typography>
                 ) : selectedTestName && filteredRows.length > 0 ? (
                     <Box sx={{ height: 600, width: '100%' }}>
-                        {totalizerFlow !== null && (
-                            <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
-                                Totalizer Flow for "{selectedTestName}": {totalizerFlow.toFixed(2)} Liters/Second
-                            </Typography>
-                        )}
             <div>
                         <p>
                             Details for Test Name: {data[0]?.MK_2_Test_Name}
-
                         </p>
-
                          <p>
                             Details for Test Description:{data[0]?.MK_2_Test_Description}
                         </p>
@@ -362,8 +221,374 @@ PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] || row["PLC-TIME-STAMP"],
         </Box>
     );
 }
-
 export default IoTDataViewer;
+
+// import React, { useState } from 'react';
+// import {
+//     Select,
+//     MenuItem,
+//     FormControl,
+//     InputLabel,
+//     Button,
+//     Box,
+//     TextField,
+//     Grid,
+//     Typography,
+// } from '@mui/material';
+// import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+// import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+// import Header from 'src/component/Header';
+
+// function IoTDataViewer() {
+//     const [startTime, setStartTime] = useState(null);
+//     const [endTime, setEndTime] = useState(null);
+//     const [allData, setAllData] = useState([]);
+//     const [data, setData] = useState([]);
+//     const [error, setError] = useState('');
+//     const [selectedTestName, setSelectedTestName] = useState(null);
+//     const [isFetching, setIsFetching] = useState(false);
+//     const [totalizerFlow, setTotalizerFlow] = useState(null);
+
+//     const fetchData = async () => {
+//         setIsFetching(true);
+//         try {
+//             const convertToIST = (date) => {
+//                 const offsetInMilliseconds = 5.5 * 60 * 60 * 1000;
+//                 return new Date(date.getTime() + offsetInMilliseconds).toISOString().slice(0, 19);
+//             };
+//             const startTimeIST = startTime ? convertToIST(startTime) : null;
+//             const endTimeIST = endTime ? convertToIST(endTime) : null;
+//             const response = await fetch('https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data/historical-data', {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                 },
+                
+//                 body: JSON.stringify({
+//                     start_time: startTimeIST,
+//                     end_time: endTimeIST,
+//                 }),
+//             });
+//             const rawResult = await response.json();
+//             const result = rawResult.body ? JSON.parse(rawResult.body) : rawResult;
+//             if (response.ok) {
+//                 const processedData = (result.data || []).map((row, index) => ({
+//                     id: index,
+//                    timestamp: row.timestamp || row.time_bucket,
+//                     ist_timestamp: row.ist_timestamp || row.time_bucket,
+//                     MK_2_Test_Name: row.device_data?.["MK_2_Test_Name"] || row["MK_2_Test_Name"],
+//                     MK_2_Test_Description: row.device_data?.["MK_2_Test_Description"] || row["MK_2_Test_Description"],
+//                     MK_2_Test_Remarks: row.device_data?.["MK_2_Test_Remarks"] || row["MK_2_Test_Remarks"],
+                    
+//                     LICR_0101_PV: row.device_data?.["LICR-0101-PV"] !== undefined && row.device_data?.["LICR-0101-PV"] !== null 
+//                     ? row.device_data?.["LICR-0101-PV"]
+//                     : row["LICR-0101-PV"] || 0,
+// LICR_0102_PV: row.device_data?.["LICR-0102-PV"] || row["LICR-0102-PV"],
+// LICR_0103_PV: row.device_data?.["LICR-0103-PV"] || row["LICR-0103-PV"],
+// PICR_0101_PV1: row.device_data?.["PICR-0101-PV1"] !== undefined && row.device_data?.["PICR-0101-PV1"] !== null
+// ? row.device_data?.["PICR-0101-PV1"]
+// : row["PICR-0101-PV1"] || 0,
+
+// PICR_0102_PV: row.device_data?.["PICR-0102-PV"] || row["PICR-0102-PV"],
+// PICR_0103_PV: row.device_data?.["PICR-0103-PV"] || row["PICR-0103-PV"],
+// TICR_0101_PV: row.device_data?.["TICR-0101-PV"] || row["TICR-0101-PV"],
+// ABB_Flow_Meter: row.device_data?.["ABB-Flow-Meter"] || row["ABB-Flow-Meter"],
+// H2_Flow: row.device_data?.["H2-Flow"] !== undefined && row.device_data?.["H2-Flow"] !== null
+// ? row.device_data?.["H2-Flow"]
+// : row["H2-Flow"] || 0,
+// O2_Flow: row.device_data?.["O2-Flow"] !== undefined && row.device_data?.["O2-Flow"] !== null
+// ? row.device_data?.["O2-Flow"]
+// : row["O2-Flow"] || 0,
+// Cell_back_pressure: row.device_data?.["Cell-back-pressure"] !== undefined && row.device_data?.["Cell-back-pressurez"] !== null
+//                     ? row.device_data?.["Cell-back-pressure"]
+//                     : row["Cell-back-pressure"] || 0,
+// H2_Pressure_outlet: row.device_data?.["H2-Pressure-outlet"] || row["H2-Pressure-outlet"],
+// O2_Pressure_outlet: row.device_data?.["O2-Pressure-outlet"] || row["O2-Pressure-outlet"],
+// H2_Stack_pressure_difference: row.device_data?.["H2-Stack-pressure-difference"] !== undefined && row.device_data?.["H2-Stack-pressure-difference"] !== null 
+//                               ? row.device_data?.["H2-Stack-pressure-difference"]
+//                               : row["H2-Stack-pressure-difference"] || 0,
+
+// O2_Stack_pressure_difference: row.device_data?.["O2-Stack-pressure-difference"] !== undefined && row.device_data?.["O2-Stack-pressure-difference"] !== null 
+//                               ? row.device_data?.["O2-Stack-pressure-difference"]
+//                               : row["O2-Stack-pressure-difference"] || 0,
+
+// Ly_Rectifier_current: row.device_data?.["Ly-Rectifier-current"] !== undefined && row.device_data?.["Ly-Rectifier-current"] !== null 
+//                       ? row.device_data?.["Ly-Rectifier-current"]
+//                       : row["Ly-Rectifier-current"] || 0,
+
+// Ly_Rectifier_voltage: row.device_data?.["Ly-Rectifier-voltage"] !== undefined && row.device_data?.["Ly-Rectifier-voltage"] !== null 
+//                        ? row.device_data?.["Ly-Rectifier-voltage"]
+//                        : row["Ly-Rectifier-voltage"] || 0,
+
+// Cell_Voltage_Multispan: row.device_data?.["Cell-Voltage-Multispan"] !== undefined && row.device_data?.["Cell-Voltage-Multispan"] !== null
+// ? row.device_data?.["Cell-Voltage-Multispan"]
+// : row["Cell-Voltage-Multispan"] || 0,
+// RECT_CT_001: row.device_data?.["RECT-CT-001"] !== undefined && row.device_data?.["RECT-CT-001"] !== null
+// ? row.device_data?.["RECT-CT-001"]
+// : row["rect_ct_001"] || 0,
+// RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.["RECT-VT-001"] !== null
+// ? row.device_data?.["RECT-VT-001"]
+// : row["rect_vt_001"] || 0,
+// PLC_TIME_STAMP: row.device_data?.["PLC-TIME-STAMP"] || row["PLC-TIME-STAMP"],
+//                 }));
+
+//                 const uniqueTestNames = new Set();
+//                 const deduplicatedData = processedData.filter((row) => {
+//                     if (row.MK_2_Test_Name && !uniqueTestNames.has(row.MK_2_Test_Name)) {
+//                         uniqueTestNames.add(row.MK_2_Test_Name);
+//                         return true;
+//                     }
+//                     return false;
+//                 });
+//                 setAllData(processedData);
+//                 setData(deduplicatedData);
+//                 setError('');
+//             } else {
+//                 setAllData([]);
+//                 setData([]);
+//                 setError(result.message || 'Failed to fetch data');
+//             }
+//         } catch (err) {
+//             console.error("Error in Fetch:", err);
+//             setAllData([]);
+//             setData([]);
+//             setError(err.message || 'An unexpected error occurred');
+//         } finally {
+//             setIsFetching(false);
+//         }
+//     };
+
+//     const filteredRows = selectedTestName
+//     ? allData.filter((row) => row.MK_2_Test_Name === selectedTestName)
+//     : [];
+
+//     const handleTestNameChange = (event) => {
+//         setSelectedTestName(event.target.value);
+//         setTotalizerFlow(null); // Reset totalizer flow when test changes
+//     };
+
+//     const calculateTotalizerFlow = () => {
+//         const filteredRows = allData.filter((row) => row.MK_2_Test_Name === selectedTestName);
+
+//         if (filteredRows.length === 0) {
+//             setTotalizerFlow(null);
+//             return;
+//         }
+
+//         // Filter out invalid and negative values
+//         const validRows = filteredRows.filter((row) => row.CR_FT_001 && row.CR_FT_001 > 0);
+
+//         if (validRows.length < 2) {
+//             // If less than 2 valid rows, we cannot calculate a meaningful totalizer flow
+//             setTotalizerFlow(0);
+//             return;
+//         }
+//         // Calculate the totalizer flow dynamically
+//         let totalFlow = 0;
+//         for (let i = 0; i < validRows.length - 1; i++) {
+//             const currentRow = validRows[i];
+//             const nextRow = validRows[i + 1];
+
+//             const currentTimestamp = new Date(currentRow.timestamp).getTime();
+//             const nextTimestamp = new Date(nextRow.timestamp).getTime();
+
+//             const durationInSeconds = (nextTimestamp - currentTimestamp) / 1000;
+
+//             // Add flow contribution for the time duration between two rows
+//             if (durationInSeconds > 0) {
+//                 totalFlow += currentRow.CR_FT_001 * durationInSeconds;
+//             }
+//         }
+//         // Calculate the total test duration in seconds
+//         const startTimestamp = new Date(validRows[0].timestamp).getTime();
+//         const endTimestamp = new Date(validRows[validRows.length - 1].timestamp).getTime();
+//         const totalDurationInSeconds = (endTimestamp - startTimestamp) / 1000;
+
+//         // Avoid division by zero
+//         const totalizer = totalDurationInSeconds > 0 ? totalFlow / totalDurationInSeconds : 0;
+
+//         setTotalizerFlow(totalizer); // Set the totalizer flow value
+//     }; 
+ 
+//     const columns = [
+//         { field: 'ist_timestamp', headerName: 'IST Timestamp', width: 205 },
+//         { field: 'MK_2_Test_Name', headerName: 'mark2 Test Name', width: 250 },
+//         // { field: 'MK_2_Test_Description', headerName: 'mark2 Test Description', width: 170 },
+//         // { field: 'MK_2_Test_Remarks', headerName: 'mark2 Test Remarks', width: 170 },
+//         {
+//             field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//               {
+//             field: "LICR_0102_PV", headerName: "LICR-0102-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "LICR_0103_PV", headerName: "LICR-0103-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "PICR_0101_PV1", headerName: "PICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//             {
+//               field: "PICR_0102_PV", headerName: "PICR-0102-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "PICR_0103_PV", headerName: "PICR-0103-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "ABB_Flow_Meter", headerName: "ABB-Flow-Meter", width: 100, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "H2_Flow", headerName: "H2-Flow", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "O2_Flow", headerName: "O2-Flow", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "Cell_back_pressure", headerName: "Cell-back-pressure", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "H2_Pressure_outlet", headerName: "H2-Pressure-outlet", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "O2_Pressure_outlet", headerName: "O2-Pressure-outlet", width:120, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "H2_Stack_pressure_difference", headerName: "H2-Stack-pressure-difference", width: 170, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "O2_Stack_pressure_difference", headerName: "O2-Stack-pressure-difference", width: 170, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "Ly_Rectifier_current", headerName: "Ly-Rectifier-current", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "Ly_Rectifier_voltage", headerName: "Ly-Rectifier-voltage", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+//             {
+//               field: "Cell_Voltage_Multispan", headerName: "Cell-Voltage-Multispan", width: 130, valueFormatter: (params) => Number(params.value).toFixed(4)
+//             },
+            
+//                 {
+//             field: "RECT_CT_001", headerName: "RECT-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           {
+//             field: "RECT_VT_001", headerName: "RECT-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//           { 
+//             field: "PLC_TIME_STAMP", headerName: "PLC-TIME-STAMP", width: 180, valueFormatter: (params) => params.value },
+      
+//     ];
+
+//     return (
+//         <Box m="15px" mt="-60px">
+//             <Header
+//                 title="Report Analytics"
+//                 subtitle="Fetch Report using Start Date-time and End Date-time"
+//             />
+//             <div>
+//                 <LocalizationProvider dateAdapter={AdapterDateFns}>
+//                     <Grid container spacing={2} alignItems="center">
+//                         <Grid item xs={3}>
+//                             <DateTimePicker
+//                                 label="Start Date Time"
+//                                 value={startTime}
+//                                 onChange={(newValue) => setStartTime(newValue)}
+//                                 renderInput={(params) => <TextField {...params} fullWidth />}
+//                             />
+//                         </Grid>
+//                         <Grid item xs={3}>
+//                             <DateTimePicker
+//                                 label="End Date Time"
+//                                 value={endTime}
+//                                 onChange={(newValue) => setEndTime(newValue)}
+//                                 renderInput={(params) => <TextField {...params} fullWidth />}
+//                             />
+//                         </Grid>
+//                         <Grid item xs={2}>
+//                             <Button
+//                                 variant="contained"
+//                                 color="secondary"
+//                                 onClick={fetchData}
+//                                 disabled={!startTime || !endTime || isFetching}
+//                             >
+//                                 {isFetching ? "Fetching..." : "Fetch Data"}
+//                             </Button>
+//                         </Grid>
+//                     </Grid>
+//                 </LocalizationProvider>
+//                 {error && <p style={{ color: 'red' }}>{error}</p>}
+//                 {!isFetching && data.length > 0 && (
+//                     <Box sx={{ mt: 4, mb: 4, width: '300px' }}>
+//                         <FormControl fullWidth>
+//                             <InputLabel id="test-name-select-label">Select Test-Name</InputLabel>
+//                             <Select
+//                                 labelId="test-name-select-label"
+//                                 value={selectedTestName || ''}
+//                                 onChange={handleTestNameChange}
+//                             >
+//                                 {data.map((row) => (
+//                                     <MenuItem key={row.id} value={row.MK_2_Test_Name}>
+//                                         {row.MK_2_Test_Name}
+//                                     </MenuItem>
+//                                 ))}
+//                             </Select>
+//                         </FormControl>
+//                         <Button
+//                             variant="contained"
+//                             color="primary"
+//                             onClick={calculateTotalizerFlow}
+//                             sx={{ mt: 2 }}
+//                             disabled={!selectedTestName}
+//                         >
+//                             Calculate Totalizer Flow
+//                         </Button>
+//                     </Box>
+//                 )}
+//                 {isFetching ? (
+//                     <Typography variant="h5" color="secondary">Data fetching....</Typography>
+//                 ) : selectedTestName && filteredRows.length > 0 ? (
+//                     <Box sx={{ height: 600, width: '100%' }}>
+//                         {totalizerFlow !== null && (
+//                             <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
+//                                 Totalizer Flow for "{selectedTestName}": {totalizerFlow.toFixed(2)} Liters/Second
+//                             </Typography>
+//                         )}
+//             <div>
+//                         <p>
+//                             Details for Test Name: {data[0]?.MK_2_Test_Name}
+
+//                         </p>
+
+//                          <p>
+//                             Details for Test Description:{data[0]?.MK_2_Test_Description}
+//                         </p>
+//                         <p>
+//                             Details for Test Remarks:{data[0]?.MK_2_Test_Remarks}
+//                         </p>
+//                         </div>
+//                         <DataGrid
+//                             rows={filteredRows}
+//                             columns={columns}
+//                             components={{ Toolbar: GridToolbar }}
+//                             getRowId={(row) => row.id}
+//                             componentsProps={{
+//                                 toolbar:{
+//                                     sx: {
+//                                         "& .MuiButton-root": {
+//                                             color: "rgb(34 197 94)",
+//                                         },
+//                                     },
+//                                 },
+//                             }}
+//                         />
+//                     </Box>
+//                 ) : (
+//                     <Typography variant="h6" color="textSecondary"></Typography>
+//                 )}
+//             </div>
+//         </Box>
+//     );
+// }
+
+// export default IoTDataViewer;
 
 
 

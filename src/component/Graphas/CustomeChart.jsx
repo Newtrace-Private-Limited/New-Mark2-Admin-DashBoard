@@ -1,817 +1,838 @@
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setLayout,
+  addChart,
+  removeChart,
+  updateChart,
+} from "../../redux/layoutActions";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  ScatterChart,
+  Scatter,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
+import GridLayout from "react-grid-layout";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+  IconButton,
+  InputLabel,
+  FormControl,
+  Select,
+  MenuItem,
+  useTheme,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DragHandleIcon from "@mui/icons-material/DragHandle";
+import { debounce } from "lodash";
+import { tokens } from "../../theme";
+import { useWebSocket } from "src/WebSocketProvider";
+import { SketchPicker } from "react-color";
+// Colors for the chart
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const Max_data_point = 20;
 
-import React from 'react'
+const CustomCharts = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
-const CustomeChart = () => {
-  return (
-    <div>
-      Custome real time charts
-    </div>
-  )
-}
+  const dispatch = useDispatch();
+  const charts = useSelector((state) => state.layout.customCharts);
+  const layout = useSelector((state) => state.layout.customChartsLayout);
+  const [chartDialogOpen, setChartDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [tempChartData, setTempChartData] = useState(null);
+  const websocketData = useWebSocket();
+  const [colorPickerOpen, setColorPickerOpen] = useState(false);
+  const [selectedYAxisId, setSelectedYAxisId] = useState(null);
+  // Load saved charts and layout when the component mounts
 
-export default CustomeChart
-
-
-// import React, { useEffect, useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import {
-//   setLayout,
-//   addChart,
-//   removeChart,
-//   updateChart,
-// } from "../../redux/layoutActions";
-// import {
-//   LineChart,
-//   Line,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   Legend,
-//   ResponsiveContainer,
-//   BarChart,
-//   Bar,
-//   ScatterChart,
-//   Scatter,
-//   PieChart,
-//   Pie,
-//   Cell,
-// } from "recharts";
-// import GridLayout from "react-grid-layout";
-// import {
-//   Box,
-//   Button,
-//   Dialog,
-//   DialogActions,
-//   DialogContent,
-//   DialogTitle,
-//   Typography,
-//   IconButton,
-//   InputLabel,
-//   FormControl,
-//   Select,
-//   MenuItem,
-//   useTheme,
-// } from "@mui/material";
-// import DeleteIcon from "@mui/icons-material/Delete";
-// import DragHandleIcon from "@mui/icons-material/DragHandle";
-// import { debounce } from "lodash";
-// import { tokens } from "../../theme";
-// import { useWebSocket } from "src/WebSocketProvider";
-// import { SketchPicker } from "react-color";
-// // Colors for the chart
-// const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-// const Max_data_point = 20;
-
-// const CustomCharts = () => {
-//   const theme = useTheme();
-//   const colors = tokens(theme.palette.mode);
-
-//   const dispatch = useDispatch();
-//   const charts = useSelector((state) => state.layout.customCharts);
-//   const layout = useSelector((state) => state.layout.customChartsLayout);
-//   const [chartDialogOpen, setChartDialogOpen] = useState(false);
-//   const [dialogOpen, setDialogOpen] = useState(false);
-//   const [tempChartData, setTempChartData] = useState(null);
-//   const websocketData = useWebSocket();
-//   const [colorPickerOpen, setColorPickerOpen] = useState(false);
-//   const [selectedYAxisId, setSelectedYAxisId] = useState(null);
-//   // Load saved charts and layout when the component mounts
-
-//   useEffect(() => {
-//     const savedLayout = JSON.parse(localStorage.getItem("customChartsLayout")) || [];
-//     dispatch(setLayout(savedLayout, "customCharts"));
-//   }, [dispatch]);
+  useEffect(() => {
+    const savedLayout = JSON.parse(localStorage.getItem("customChartsLayout")) || [];
+    dispatch(setLayout(savedLayout, "customCharts"));
+  }, [dispatch]);
   
-//   // Save layout changes (debounced to avoid excessive dispatches)
-//   const saveLayout = debounce((newLayout) => {
-//     dispatch(setLayout(newLayout, "custom"));
-//     localStorage.setItem("customChartsLayout", JSON.stringify(newLayout));
-//   }, 500);
+  // Save layout changes (debounced to avoid excessive dispatches)
+  const saveLayout = debounce((newLayout) => {
+    dispatch(setLayout(newLayout, "custom"));
+    localStorage.setItem("customChartsLayout", JSON.stringify(newLayout));
+  }, 500);
 
-//   // Add a new custom chart of the specified type
-//   const addCustomChart = (type) => {
-//     const newChartId = Date.now();
-//     const newChart = {
-//       id: newChartId,
-//       type,
-//       data: [], // Initially empty, will be populated via WebSocket
-//       xAxisDataKey: "",
-//       yAxisDataKeys: [
-//         {
-//           id: "left-0",
-//           dataKeys: ["AX-LT-011"],
-//           range: "0-500",
-//           color: "#ca33e8",
-//           lineStyle: "solid",
-//         },
-//       ],
-//     };
-//     dispatch(addChart(newChart, "custom"));
-//     saveLayout([
-//       ...layout,
-//       { i: newChartId.toString(), x: 0, y: Infinity, w: 6, h: 8 },
-//     ]);
-//     setChartDialogOpen(false);
-//   };
+  // Add a new custom chart of the specified type
+  const addCustomChart = (type) => {
+    const newChartId = Date.now();
+    const newChart = {
+      id: newChartId,
+      type,
+      data: [], // Initially empty, will be populated via WebSocket
+      xAxisDataKey: "",
+      yAxisDataKeys: [
+        {
+          id: "left-0",
+          dataKeys: ["LICR-0101-PV"],
+          range: "0-500",
+          color: "#ca33e8",
+          lineStyle: "solid",
+        },
+      ],
+    };
+    dispatch(addChart(newChart, "custom"));
+    saveLayout([
+      ...layout,
+      { i: newChartId.toString(), x: 0, y: Infinity, w: 6, h: 8 },
+    ]);
+    setChartDialogOpen(false);
+  };
 
-//   // Remove a chart and update layout accordingly
-//   const deleteChart = (chartId) => {
-//     dispatch(removeChart(chartId, "custom"));
-//     saveLayout(layout.filter((l) => l.i !== chartId.toString()));
-//   };
+  // Remove a chart and update layout accordingly
+  const deleteChart = (chartId) => {
+    dispatch(removeChart(chartId, "custom"));
+    saveLayout(layout.filter((l) => l.i !== chartId.toString()));
+  };
  
-//   // Open the configuration dialog for a specific chart
-//   const openDialog = (chart) => {
-//     setTempChartData(chart);
-//     setDialogOpen(true);
-//   };
+  // Open the configuration dialog for a specific chart
+  const openDialog = (chart) => {
+    setTempChartData(chart);
+    setDialogOpen(true);
+  };
 
-//   // Save configuration changes to Redux and close the dialog
-//   const saveConfiguration = () => {
-//     if (tempChartData) {
-//       dispatch(updateChart(tempChartData, "custom"));
-//       setDialogOpen(false);
-//     }
-//   };
+  // Save configuration changes to Redux and close the dialog
+  const saveConfiguration = () => {
+    if (tempChartData) {
+      dispatch(updateChart(tempChartData, "custom"));
+      setDialogOpen(false);
+    }
+  };
 
-//   // WebSocket connection and data handling
-//   useEffect(() => {
-//     const ws = new WebSocket(
-//       "wss://otiq3un7zb.execute-api.us-east-1.amazonaws.com/dev/"
-//     );
+  // WebSocket connection and data handling
+  useEffect(() => {
+    const ws = new WebSocket(
+      "wss://otiq3un7zb.execute-api.us-east-1.amazonaws.com/dev/"
+    );
   
-//     ws.onmessage = (event) => {
-//       const message = JSON.parse(event.data);
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
   
-//       const updatedCharts = charts.map((chart) => {
-//         if (
-//           chart.yAxisDataKeys.some((yAxis) =>
-//             yAxis.dataKeys.includes("AX-LT-011")
-//           )
-//         ) {
-//           // Append new data point
-//           const newData = [...chart.data, message];
+      const updatedCharts = charts.map((chart) => {
+        if (
+          chart.yAxisDataKeys.some((yAxis) =>
+            yAxis.dataKeys.includes("LICR-0101-PV")
+          )
+        ) {
+          // Append new data point
+          const newData = [...chart.data, message];
           
-//           // Ensure we only keep the latest Max_data_point data points
-//           const limitedData = newData.slice(-Max_data_point); // Keep only the last Max_data_point data points
+          // Ensure we only keep the latest Max_data_point data points
+          const limitedData = newData.slice(-Max_data_point); // Keep only the last Max_data_point data points
           
-//           return {
-//             ...chart,
-//             data: limitedData, // Update the chart with the limited data
-//           };
-//         }
-//         return chart;
-//       });
+          return {
+            ...chart,
+            data: limitedData, // Update the chart with the limited data
+          };
+        }
+        return chart;
+      });
   
-//       updatedCharts.forEach((chart) => dispatch(updateChart(chart, "custom")));
-//     };
+      updatedCharts.forEach((chart) => dispatch(updateChart(chart, "custom")));
+    };
   
-//     ws.onclose = () => console.log("WebSocket connection closed");
+    ws.onclose = () => console.log("WebSocket connection closed");
   
-//     return () => ws.close(); // Clean up on component unmount
-//   }, [charts, dispatch]);
+    return () => ws.close(); // Clean up on component unmount
+  }, [charts, dispatch]);
 
-//   const closeDialog = () => setDialogOpen(false);
+  const closeDialog = () => setDialogOpen(false);
 
-//   const handleDataKeyChange = (yAxisId, event) => {
-//     const { value } = event.target;
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
-//         yAxis.id === yAxisId ? { ...yAxis, dataKeys: value } : yAxis
-//       ),
-//     }));
-//   };
+  const handleDataKeyChange = (yAxisId, event) => {
+    const { value } = event.target;
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
+        yAxis.id === yAxisId ? { ...yAxis, dataKeys: value } : yAxis
+      ),
+    }));
+  };
 
-//   const handleXAxisDataKeyChange = (event) => {
-//     const { value } = event.target;
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       xAxisDataKey: value,
-//     }));
-//   };
+  const handleXAxisDataKeyChange = (event) => {
+    const { value } = event.target;
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      xAxisDataKey: value,
+    }));
+  };
 
-//   const handleLineStyleChange = (yAxisId, event) => {
-//     const { value } = event.target;
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
-//         yAxis.id === yAxisId ? { ...yAxis, lineStyle: value } : yAxis
-//       ),
-//     }));
-//   };
+  const handleLineStyleChange = (yAxisId, event) => {
+    const { value } = event.target;
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
+        yAxis.id === yAxisId ? { ...yAxis, lineStyle: value } : yAxis
+      ),
+    }));
+  };
 
-//   const handleRangeChange = (yAxisId, event) => {
-//     const { value } = event.target;
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
-//         yAxis.id === yAxisId ? { ...yAxis, range: value } : yAxis
-//       ),
-//     }));
-//   };
+  const handleRangeChange = (yAxisId, event) => {
+    const { value } = event.target;
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
+        yAxis.id === yAxisId ? { ...yAxis, range: value } : yAxis
+      ),
+    }));
+  };
 
-//   const addYAxis = () => {
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       yAxisDataKeys: [
-//         ...prevChart.yAxisDataKeys,
-//         {
-//           id: `left-${prevChart.yAxisDataKeys.length}`,
-//           dataKeys: [],
-//           range: "0-500",
-//           color: "#279096",
-//           lineStyle: "solid",
-//         },
-//       ],
-//     }));
-//   };
+  const addYAxis = () => {
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      yAxisDataKeys: [
+        ...prevChart.yAxisDataKeys,
+        {
+          id: `left-${prevChart.yAxisDataKeys.length}`,
+          dataKeys: [],
+          range: "0-500",
+          color: "#279096",
+          lineStyle: "solid",
+        },
+      ],
+    }));
+  };
 
-//   const deleteYAxis = (yAxisId) => {
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       yAxisDataKeys: prevChart.yAxisDataKeys.filter(
-//         (yAxis) => yAxis.id !== yAxisId
-//       ),
-//     }));
-//   };
-//   const openColorPicker = (yAxisId) => {
-//     setSelectedYAxisId(yAxisId);
-//     setColorPickerOpen(true);
-//   };
-//   const handleColorChange = (color) => {
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
-//         yAxis.id === selectedYAxisId ? { ...yAxis, color: color.hex } : yAxis
-//       ),
-//     }));
-//     setColorPickerOpen(false);
-//   };
+  const deleteYAxis = (yAxisId) => {
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      yAxisDataKeys: prevChart.yAxisDataKeys.filter(
+        (yAxis) => yAxis.id !== yAxisId
+      ),
+    }));
+  };
+  const openColorPicker = (yAxisId) => {
+    setSelectedYAxisId(yAxisId);
+    setColorPickerOpen(true);
+  };
+  const handleColorChange = (color) => {
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
+        yAxis.id === selectedYAxisId ? { ...yAxis, color: color.hex } : yAxis
+      ),
+    }));
+    setColorPickerOpen(false);
+  };
 
-//   const getYAxisDomain = (range) => {
-//     switch (range) {
-//       case "0-500":
-//         return [0, 500];
-//       case "0-100":
-//         return [0, 100];
-//       case "0-1200":
-//         return [0, 1200];
-//       default:
-//         return [0, 500];
-//     }
-//   };
+  const getYAxisDomain = (range) => {
+    switch (range) {
+      case "0-500":
+        return [0, 500];
+      case "0-100":
+        return [0, 100];
+      case "0-1200":
+        return [0, 1200];
+      default:
+        return [0, 500];
+    }
+  };
 
-//   const getLineStyle = (lineStyle) => {
-//     switch (lineStyle) {
-//       case "solid":
-//         return "";
-//       case "dotted":
-//         return "1 1";
-//       case "dashed":
-//         return "5 5";
-//       case "dot-dash":
-//         return "3 3 1 3";
-//       case "dash-dot-dot":
-//         return "3 3 1 1 1 3";
-//       default:
-//         return "";
-//     }
-//   };
-//   const renderChart = (chart) => {
-//     switch (chart.type) {
-//       case "Line":
-//         return renderLineChart(chart);
-//       case "Bar":
-//         return renderBarChart(chart);
-//       case "Scatter":
-//         return renderScatterChart(chart);
-//       case "XY":
-//         return renderXYChart(chart);
-//       case "Pie":
-//         return renderPieChart(chart);
-//       default:
-//         return null;
-//     }
-//   };
+  const getLineStyle = (lineStyle) => {
+    switch (lineStyle) {
+      case "solid":
+        return "";
+      case "dotted":
+        return "1 1";
+      case "dashed":
+        return "5 5";
+      case "dot-dash":
+        return "3 3 1 3";
+      case "dash-dot-dot":
+        return "3 3 1 1 1 3";
+      default:
+        return "";
+    }
+  };
+  const renderChart = (chart) => {
+    switch (chart.type) {
+      case "Line":
+        return renderLineChart(chart);
+      case "Bar":
+        return renderBarChart(chart);
+      case "Scatter":
+        return renderScatterChart(chart);
+      case "XY":
+        return renderXYChart(chart);
+      case "Pie":
+        return renderPieChart(chart);
+      default:
+        return null;
+    }
+  };
 
-//   const renderLineChart = (chart) => (
-//     <ResponsiveContainer width="100%" height="100%">
-//       <LineChart data={chart.data}>
-//         <CartesianGrid strokeDasharray="3 3" />
-//         <XAxis
+  const renderLineChart = (chart) => (
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart data={chart.data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
        
-//         />
-//         {chart.yAxisDataKeys.map((yAxis) => (
-//           <YAxis
-//             key={yAxis.id}
-//             yAxisId={yAxis.id}
-//             domain={getYAxisDomain(yAxis.range)}
-//             stroke={yAxis.color}
-//           />
-//         ))}
-//         <Tooltip
-//         cursor={{ strokeDasharray: '3 3' }}
-//         content={({ payload }) => {
-//           if (payload && payload.length) {
-//             const point = payload[0].payload;
-//             return (
-//               <div className="custom-tooltip">
-//                 {chart.yAxisDataKeys.map((yAxis) => (
+        />
+        {chart.yAxisDataKeys.map((yAxis) => (
+          <YAxis
+            key={yAxis.id}
+            yAxisId={yAxis.id}
+            domain={getYAxisDomain(yAxis.range)}
+            stroke={yAxis.color}
+          />
+        ))}
+        <Tooltip
+        cursor={{ strokeDasharray: '3 3' }}
+        content={({ payload }) => {
+          if (payload && payload.length) {
+            const point = payload[0].payload;
+            return (
+              <div className="custom-tooltip">
+                {chart.yAxisDataKeys.map((yAxis) => (
                   
-//                   <p key={yAxis.id}>
-//                     {`Y (${yAxis.dataKeys[0]}): ${point[yAxis.dataKeys[0]]}`}
-//                   </p>
+                  <p key={yAxis.id}>
+                    {`Y (${yAxis.dataKeys[0]}): ${point[yAxis.dataKeys[0]]}`}
+                  </p>
                   
-//                 ))}
+                ))}
                 
-//                 <p>
-//                 {`Timestamp: ${new Date(new Date(websocketData.timestamp).getTime() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-IN', {
-//                   hour12: true,  // Optional: If you want a 12-hour format with AM/PM
-//                   weekday: 'short', // Optional: To include the weekday name
-//                   year: 'numeric',
-//                   month: 'short',
-//                   day: 'numeric',
-//                   hour: '2-digit',
-//                   minute: '2-digit',
-//                   second: '2-digit'
-//                 })}`}
-//               </p>
-//               </div>
-//             );
-//           }
-//           return null;
-//         }}
+                <p>
+                {`Timestamp: ${new Date(new Date(websocketData.timestamp).getTime() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-IN', {
+                  hour12: true,  // Optional: If you want a 12-hour format with AM/PM
+                  weekday: 'short', // Optional: To include the weekday name
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit'
+                })}`}
+              </p>
+              </div>
+            );
+          }
+          return null;
+        }}
          
-//       />
-//       <Legend />
-//         {chart.yAxisDataKeys.map((yAxis) =>
-//           yAxis.dataKeys.map((key) => (
-//             <Line
-//               key={key}
-//               dataKey={key}
-//               fill={yAxis.color}
-//               yAxisId={yAxis.id}
-//               stroke={yAxis.color}
-//               strokeDasharray={getLineStyle(yAxis.lineStyle)}
-//             />
-//           ))
-//         )}
-//       </LineChart>
-//     </ResponsiveContainer>
-//   );
+      />
+      <Legend />
+        {chart.yAxisDataKeys.map((yAxis) =>
+          yAxis.dataKeys.map((key) => (
+            <Line
+              key={key}
+              dataKey={key}
+              fill={yAxis.color}
+              yAxisId={yAxis.id}
+              stroke={yAxis.color}
+              strokeDasharray={getLineStyle(yAxis.lineStyle)}
+            />
+          ))
+        )}
+      </LineChart>
+    </ResponsiveContainer>
+  );
 
-//   const renderScatterChart = (chart) => (
-//     <ResponsiveContainer width="100%" height="100%">
-//       <ScatterChart data={chart.data}>
-//         <CartesianGrid strokeDasharray="3 3" />
-//         <XAxis 
+  const renderScatterChart = (chart) => (
+    <ResponsiveContainer width="100%" height="100%">
+      <ScatterChart data={chart.data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis 
        
-//         />
-//         {chart.yAxisDataKeys.map((yAxis) => (
-//           <YAxis
-//             key={yAxis.id}
-//             yAxisId={yAxis.id}
-//             domain={getYAxisDomain(yAxis.range)}
-//             stroke={yAxis.color}
-//           />
-//         ))}
-//         <Tooltip
-//         cursor={{ strokeDasharray: '3 3' }}
-//         content={({ payload }) => {
-//           if (payload && payload.length) {
-//             const point = payload[0].payload;
-//             return (
-//               <div className="custom-tooltip">
+        />
+        {chart.yAxisDataKeys.map((yAxis) => (
+          <YAxis
+            key={yAxis.id}
+            yAxisId={yAxis.id}
+            domain={getYAxisDomain(yAxis.range)}
+            stroke={yAxis.color}
+          />
+        ))}
+        <Tooltip
+        cursor={{ strokeDasharray: '3 3' }}
+        content={({ payload }) => {
+          if (payload && payload.length) {
+            const point = payload[0].payload;
+            return (
+              <div className="custom-tooltip">
                 
-//                 {chart.yAxisDataKeys.map((yAxis) => (
-//                   <p key={yAxis.id}>
-//                     {`Y (${yAxis.dataKeys[0]}): ${point[yAxis.dataKeys[0]]}`}
-//                   </p>
-//                 ))}
-//                 <p>
-//   {`Timestamp: ${new Date(new Date(websocketData.timestamp).getTime() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-IN', {
-//     hour12: true,  // Optional: If you want a 12-hour format with AM/PM
-//     weekday: 'short', // Optional: To include the weekday name
-//     year: 'numeric',
-//     month: 'short',
-//     day: 'numeric',
-//     hour: '2-digit',
-//     minute: '2-digit',
-//     second: '2-digit'
-//   })}`}
-// </p>
+                {chart.yAxisDataKeys.map((yAxis) => (
+                  <p key={yAxis.id}>
+                    {`Y (${yAxis.dataKeys[0]}): ${point[yAxis.dataKeys[0]]}`}
+                  </p>
+                ))}
+                <p>
+  {`Timestamp: ${new Date(new Date(websocketData.timestamp).getTime() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-IN', {
+    hour12: true,  // Optional: If you want a 12-hour format with AM/PM
+    weekday: 'short', // Optional: To include the weekday name
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  })}`}
+</p>
 
-//               </div>
-//             );
-//           }
-//           return null;
-//         }}
-//       />
-//         <Legend />
-//         {chart.yAxisDataKeys.map((yAxis) =>
-//           yAxis.dataKeys.map((key) => (
-//             <Scatter
-//               key={key}
-//               dataKey={key}
-//               fill={yAxis.color}
-//               yAxisId={yAxis.id}
-//             />
-//           ))
-//         )}
-//       </ScatterChart>
-//     </ResponsiveContainer>
-//   );
+              </div>
+            );
+          }
+          return null;
+        }}
+      />
+        <Legend />
+        {chart.yAxisDataKeys.map((yAxis) =>
+          yAxis.dataKeys.map((key) => (
+            <Scatter
+              key={key}
+              dataKey={key}
+              fill={yAxis.color}
+              yAxisId={yAxis.id}
+            />
+          ))
+        )}
+      </ScatterChart>
+    </ResponsiveContainer>
+  );
 
 
-//   const Max3_data_point = 50;
+  const Max3_data_point = 50;
 
-//   const renderXYChart = (chart) => {
-//     // Limit the data to the latest 20 points
-//     const updatedData = chart.data.slice(-Max3_data_point);
+  const renderXYChart = (chart) => {
+    // Limit the data to the latest 20 points
+    const updatedData = chart.data.slice(-Max3_data_point);
   
-//     return (
-//       <ResponsiveContainer width="100%" height="100%">
-//         <ScatterChart data={updatedData}>
-//           <CartesianGrid strokeDasharray="3 3" />
-//           <XAxis
-//             dataKey={chart.xAxisDataKey}
-//             type="number"
-//             domain={["auto", "auto"]} // Automatically adjust the domain based on data
-//             tickFormatter={(value) => value.toFixed(4)}
-//           />
-//           {chart.yAxisDataKeys.map((yAxis, yAxisIndex) => (
-//             <YAxis
-//               key={yAxisIndex} // Unique key for each YAxis
-//               dataKey={chart.yAxisDataKey}
-//               yAxisId={yAxis.id}
-//               domain={["auto", "auto"]} // or use yAxis.range if defined
-//               stroke={yAxis.color}
-//               tickFormatter={(value) => value.toFixed(4)}
-//             />
-//           ))}
-//           <Tooltip
-//             cursor={{ strokeDasharray: '3 3' }}
-//             content={({ payload }) => {
-//               if (payload && payload.length) {
-//                 const point = payload[0].payload;
-//                 return (
-//                   <div className="custom-tooltip">
-//                     <p>{`X (${chart.xAxisDataKey}): ${point[chart.xAxisDataKey]}`}</p>
-//                     {chart.yAxisDataKeys.map((yAxis) => (
-//                       <p key={yAxis.id}>
-//                         {`Y (${yAxis.dataKeys[0]}): ${point[yAxis.dataKeys[0]]}`}
-//                       </p>
-//                     ))}
-//                     <p>
-//                       {`Timestamp: ${new Date(new Date(websocketData.timestamp).getTime() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-IN', {
-//                         hour12: true, 
-//                         weekday: 'short', 
-//                         year: 'numeric',
-//                         month: 'short',
-//                         day: 'numeric',
-//                         hour: '2-digit',
-//                         minute: '2-digit',
-//                         second: '2-digit'
-//                       })}`}
-//                     </p>
-//                   </div>
-//                 );
-//               }
-//               return null;
-//             }}
-//           />
-//           <Legend />
-//           {chart.yAxisDataKeys.map((yAxis) =>
-//             yAxis.dataKeys.map((key, keyIndex) => (
-//               <Scatter
-//                 key={keyIndex} // Unique key for each scatter
-//                 dataKey={key}
-//                 fill={yAxis.color}
-//                 yAxisId={yAxis.id}
-//                 name={`${chart.xAxisDataKey} vs ${yAxis.dataKeys}`} // Ensure naming is clear and non-conflicting
-//               />
-//             ))
-//           )}
-//         </ScatterChart>
-//       </ResponsiveContainer>
-//     );
-//   };
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <ScatterChart data={updatedData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey={chart.xAxisDataKey}
+            type="number"
+            domain={["auto", "auto"]} // Automatically adjust the domain based on data
+            tickFormatter={(value) => value.toFixed(4)}
+          />
+          {chart.yAxisDataKeys.map((yAxis, yAxisIndex) => (
+            <YAxis
+              key={yAxisIndex} // Unique key for each YAxis
+              dataKey={chart.yAxisDataKey}
+              yAxisId={yAxis.id}
+              domain={["auto", "auto"]} // or use yAxis.range if defined
+              stroke={yAxis.color}
+              tickFormatter={(value) => value.toFixed(4)}
+            />
+          ))}
+          <Tooltip
+            cursor={{ strokeDasharray: '3 3' }}
+            content={({ payload }) => {
+              if (payload && payload.length) {
+                const point = payload[0].payload;
+                return (
+                  <div className="custom-tooltip">
+                    <p>{`X (${chart.xAxisDataKey}): ${point[chart.xAxisDataKey]}`}</p>
+                    {chart.yAxisDataKeys.map((yAxis) => (
+                      <p key={yAxis.id}>
+                        {`Y (${yAxis.dataKeys[0]}): ${point[yAxis.dataKeys[0]]}`}
+                      </p>
+                    ))}
+                    <p>
+                      {`Timestamp: ${new Date(new Date(websocketData.timestamp).getTime() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-IN', {
+                        hour12: true, 
+                        weekday: 'short', 
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}`}
+                    </p>
+                  </div>
+                );
+              }
+              return null;
+            }}
+          />
+          <Legend />
+          {chart.yAxisDataKeys.map((yAxis) =>
+            yAxis.dataKeys.map((key, keyIndex) => (
+              <Scatter
+                key={keyIndex} // Unique key for each scatter
+                dataKey={key}
+                fill={yAxis.color}
+                yAxisId={yAxis.id}
+                name={`${chart.xAxisDataKey} vs ${yAxis.dataKeys}`} // Ensure naming is clear and non-conflicting
+              />
+            ))
+          )}
+        </ScatterChart>
+      </ResponsiveContainer>
+    );
+  };
   
 
   
-//   const Max2_data_point = 2;
-//   const renderBarChart = (chart) => {
-//     const updatedData = chart.data.slice(-Max2_data_point);
-//     return (
-//       <ResponsiveContainer width="100%" height="100%">
-//       <BarChart data={updatedData}>
-//         <CartesianGrid strokeDasharray="3 3" />
-//         <XAxis  
-//        />
-//         {chart.yAxisDataKeys.map((yAxis) => (
-//           <YAxis
-//             key={yAxis.id}
-//             yAxisId={yAxis.id}
-//             domain={getYAxisDomain(yAxis.range)}
-//             stroke={yAxis.color}
-//           />
-//         ))}
-//         <Tooltip
-//         cursor={{ strokeDasharray: '3 3' }}
-//         content={({ payload }) => {
-//           if (payload && payload.length) {
-//             const point = payload[0].payload;
-//             return (
-//               <div className="custom-tooltip">
-//                 {chart.yAxisDataKeys.map((yAxis) => (
-//                   <p key={yAxis.id}>
-//                     {`Y (${yAxis.dataKeys[0]}): ${point[yAxis.dataKeys[0]]}`}
-//                   </p>
-//                 ))}
-//                 <p>
-//   {`Timestamp: ${new Date(new Date(websocketData.timestamp).getTime() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-IN', {
-//     hour12: true,  // Optional: If you want a 12-hour format with AM/PM
-//     weekday: 'short', // Optional: To include the weekday name
-//     year: 'numeric',
-//     month: 'short',
-//     day: 'numeric',
-//     hour: '2-digit',
-//     minute: '2-digit',
-//     second: '2-digit'
-//   })}`}
-// </p>
-//               </div>
-//             );
-//           }
-//           return null;
-//         }}
-//       />
+  const Max2_data_point = 2;
+  const renderBarChart = (chart) => {
+    const updatedData = chart.data.slice(-Max2_data_point);
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={updatedData}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis  
+       />
+        {chart.yAxisDataKeys.map((yAxis) => (
+          <YAxis
+            key={yAxis.id}
+            yAxisId={yAxis.id}
+            domain={getYAxisDomain(yAxis.range)}
+            stroke={yAxis.color}
+          />
+        ))}
+        <Tooltip
+        cursor={{ strokeDasharray: '3 3' }}
+        content={({ payload }) => {
+          if (payload && payload.length) {
+            const point = payload[0].payload;
+            return (
+              <div className="custom-tooltip">
+                {chart.yAxisDataKeys.map((yAxis) => (
+                  <p key={yAxis.id}>
+                    {`Y (${yAxis.dataKeys[0]}): ${point[yAxis.dataKeys[0]]}`}
+                  </p>
+                ))}
+                <p>
+  {`Timestamp: ${new Date(new Date(websocketData.timestamp).getTime() + (5.5 * 60 * 60 * 1000)).toLocaleString('en-IN', {
+    hour12: true,  // Optional: If you want a 12-hour format with AM/PM
+    weekday: 'short', // Optional: To include the weekday name
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  })}`}
+</p>
+              </div>
+            );
+          }
+          return null;
+        }}
+      />
 
-//         <Legend />
-//         {chart.yAxisDataKeys.map((yAxis) =>
-//           yAxis.dataKeys.map((key) => (
-//             <Bar
-//               key={key}
-//               dataKey={key}
-//               fill={yAxis.color}
-//               yAxisId={yAxis.id}
-//             />
-//           ))
-//         )}
-//       </BarChart>
-//     </ResponsiveContainer>
-//     );
-//   };
-//   const renderPieChart = (chart) => {
-//     const latestData = chart.data.slice(-1)[0];
-//     const dataKeys = chart.yAxisDataKeys.flatMap((yAxis) => yAxis.dataKeys);
-//     const pieData = dataKeys.map((key) => ({
-//       name: key,
-//       value: latestData ? latestData[key] : 0,
-//     }));
+        <Legend />
+        {chart.yAxisDataKeys.map((yAxis) =>
+          yAxis.dataKeys.map((key) => (
+            <Bar
+              key={key}
+              dataKey={key}
+              fill={yAxis.color}
+              yAxisId={yAxis.id}
+            />
+          ))
+        )}
+      </BarChart>
+    </ResponsiveContainer>
+    );
+  };
+  const renderPieChart = (chart) => {
+    const latestData = chart.data.slice(-1)[0];
+    const dataKeys = chart.yAxisDataKeys.flatMap((yAxis) => yAxis.dataKeys);
+    const pieData = dataKeys.map((key) => ({
+      name: key,
+      value: latestData ? latestData[key] : 0,
+    }));
 
-//     return (
-//       <ResponsiveContainer width="100%" height="100%">
-//         <PieChart>
-//           <Pie
-//             data={pieData}
-//             dataKey="value"
-//             nameKey="name"
-//             outerRadius={120}
-//             label
-//           >
-//             {pieData.map((entry, index) => (
-//               <Cell
-//                 key={`cell-${index}`}
-//                 fill={COLORS[index % COLORS.length]}
-//               />
-//             ))}
-//           </Pie>
-//           <Tooltip />
-//           <Legend />
-//         </PieChart>
-//       </ResponsiveContainer>
-//     );
-//   };
-//   return (
-//     <>
-//       <Box display="flex" justifyContent="flex-end" >
-//         <Button color="secondary" variant="contained" onClick={() => setChartDialogOpen(true)}>
-//           Add Custom Chart
-//         </Button>
-//       </Box>
-//       <GridLayout
-//         className="layout"
-//         layout={layout}
-//         cols={12}
-//         rowHeight={30}
-//         width={1630}
-//         onLayoutChange={saveLayout}
-//         draggableHandle=".drag-handle"
-//       >
-//         {charts.map((chart) => (
-//           <Box
-//             key={chart.id}
-//             data-grid={
-//               layout.find((l) => l.i === chart.id.toString()) || {
-//                 x: 0,
-//                 y: Infinity,
-//                 w: 6,
-//                 h: 8,
-//               }
-//             }
-//             sx={{
-//               position: "relative",
-//               border: "1px solid #ccc",
-//               borderRadius: "8px",
-//               overflow: "hidden",
-//             }}
-//           >
-//             <Box
-//               display="flex"
-//               justifyContent="space-between"
-//               p={2}
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={pieData}
+            dataKey="value"
+            nameKey="name"
+            outerRadius={120}
+            label
+          >
+            {pieData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    );
+  };
+  return (
+    <>
+      <Box display="flex" justifyContent="flex-end" >
+        <Button color="secondary" variant="contained" onClick={() => setChartDialogOpen(true)}>
+          Add Custom Chart
+        </Button>
+      </Box>
+      <GridLayout
+        className="layout"
+        layout={layout}
+        cols={12}
+        rowHeight={30}
+        width={1630}
+        onLayoutChange={saveLayout}
+        draggableHandle=".drag-handle"
+      >
+        {charts.map((chart) => (
+          <Box
+            key={chart.id}
+            data-grid={
+              layout.find((l) => l.i === chart.id.toString()) || {
+                x: 0,
+                y: Infinity,
+                w: 6,
+                h: 8,
+              }
+            }
+            sx={{
+              position: "relative",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              p={2}
              
-//             >
-//               <IconButton className="drag-handle">
-//                 <DragHandleIcon />
-//               </IconButton>
-//               <Typography variant="h6">{chart.type} Chart</Typography>
-//               <IconButton
-//                 onClick={() => deleteChart(chart.id)}
-//                 style={{ cursor: "pointer" }}
-//               >
-//                 <DeleteIcon />
-//               </IconButton>
-//             </Box>
-//             <Box sx={{ height: "calc(100% - 80px)" }}>{renderChart(chart)}</Box>
-//             <Box
-//               display="flex"
-//               justifyContent="space-between"
-//               p={2}
-//               marginTop={-6}
-//             >
-//               <Button
-//                 variant="outlined"
-//                 color="secondary"
-//                 onClick={() => openDialog(chart)}
-//               >
-//                 Configure Chart
-//               </Button>
-//             </Box>
-//           </Box>
-//         ))}
-//       </GridLayout>
+            >
+              <IconButton className="drag-handle">
+                <DragHandleIcon />
+              </IconButton>
+              <Typography variant="h6">{chart.type} Chart</Typography>
+              <IconButton
+                onClick={() => deleteChart(chart.id)}
+                style={{ cursor: "pointer" }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+            <Box sx={{ height: "calc(100% - 80px)" }}>{renderChart(chart)}</Box>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              p={2}
+              marginTop={-6}
+            >
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => openDialog(chart)}
+              >
+                Configure Chart
+              </Button>
+            </Box>
+          </Box>
+        ))}
+      </GridLayout>
 
-//       <Dialog open={chartDialogOpen} onClose={() => setChartDialogOpen(false)}>
-//         <DialogTitle>Select Chart Type</DialogTitle>
-//         <DialogContent>
-//           <Box display="flex" flexDirection="column" gap={2}>
-//             <Button variant="contained" onClick={() => addCustomChart("Line")}>
-//               Add Line Chart
-//             </Button>
-//             <Button variant="contained" onClick={() => addCustomChart("Bar")}>
-//               Add Bar Chart
-//             </Button>
-//             <Button
-//               variant="contained"
-//               onClick={() => addCustomChart("Scatter")}
-//             >
-//               Add Scatter Chart
-//             </Button>
-//             <Button variant="contained" onClick={() => addCustomChart("XY")}>
-//               Add XY Chart
-//             </Button>
-//             <Button variant="contained" onClick={() => addCustomChart("Pie")}>
-//               Add Pie Chart
-//             </Button>
-//           </Box>
-//         </DialogContent>
-//         <DialogActions>
-//           <Button onClick={() => setChartDialogOpen(false)} color="secondary">
-//             Cancel
-//           </Button>
-//         </DialogActions>
-//       </Dialog>
+      <Dialog open={chartDialogOpen} onClose={() => setChartDialogOpen(false)}>
+        <DialogTitle>Select Chart Type</DialogTitle>
+        <DialogContent>
+          <Box display="flex" flexDirection="column" gap={2}>
+            <Button variant="contained" onClick={() => addCustomChart("Line")}>
+              Add Line Chart
+            </Button>
+            <Button variant="contained" onClick={() => addCustomChart("Bar")}>
+              Add Bar Chart
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => addCustomChart("Scatter")}
+            >
+              Add Scatter Chart
+            </Button>
+            <Button variant="contained" onClick={() => addCustomChart("XY")}>
+              Add XY Chart
+            </Button>
+            <Button variant="contained" onClick={() => addCustomChart("Pie")}>
+              Add Pie Chart
+            </Button>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setChartDialogOpen(false)} color="secondary">
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-//       {tempChartData && (
-//         <Dialog
-//           open={dialogOpen}
-//           onClose={closeDialog}
-//           fullWidth
-//           maxWidth="md"
-//           marginBottom="5px"
-//         >
-//           <DialogTitle>Configure Chart</DialogTitle>
-//           <DialogContent>
-//             <Box
-//               display="flex"
-//               flexDirection="column"
-//               maxHeight="400px"
-//               overflow="auto"
-//             >
-//               {tempChartData.type === "XY" && (
-//                 <Box marginBottom={2}>
-//                   <Typography variant="h6">X-Axis</Typography>
-//                   <FormControl margin="normal">
-//                     <InputLabel>X-Axis Data Key</InputLabel>
-//                     <Select
-//                       value={tempChartData.xAxisDataKey}
-//                       onChange={handleXAxisDataKeyChange}
-//                     >
-//                       <MenuItem value="AX-LT-011">AX-LT-011</MenuItem>
-//                       <MenuItem value="AX-LT-021">AX-LT-021</MenuItem>
-//                                         </Select>
-//                   </FormControl>
-//                 </Box>
-//               )}
-//               {tempChartData.yAxisDataKeys.map((yAxis, index) => (
-//                 <Box
-//                   key={yAxis.id}
-//                   display="flex"
-//                   flexDirection="column"
-//                   marginBottom={2}
-//                 >
-//                   <Box
-//                     display="flex"
-//                     justifyContent="space-between"
-//                     alignItems="center"
-//                   >
-//                     <Typography variant="h6">Y-Axis {index + 1}</Typography>
-//                     <IconButton onClick={() => deleteYAxis(yAxis.id)}>
-//                       <DeleteIcon />
-//                     </IconButton>
-//                   </Box>
-//                   <FormControl fullWidth margin="normal">
-//                     <InputLabel>Data Keys</InputLabel>
-//                     <Select
-//                       multiple  
-//                       value={yAxis.dataKeys}
-//                       onChange={(event) => handleDataKeyChange(yAxis.id, event)}
-//                     >
-//                       <MenuItem value="AX-LT-011">AX-LT-011</MenuItem>
-//                       <MenuItem value="AX-LT-021">AX-LT-021</MenuItem>
-//                                        </Select>
-//                   </FormControl>
-//                   <FormControl fullWidth margin="normal">
-//                     <InputLabel>Range</InputLabel>
-//                     <Select
-//                       value={yAxis.range}
-//                       onChange={(event) => handleRangeChange(yAxis.id, event)}
-//                     >
-//                       <MenuItem value="0-100">0-100</MenuItem>
-//                       <MenuItem value="0-500">0-500</MenuItem>
-//                       <MenuItem value="0-1200">0-1200</MenuItem>
-//                     </Select>
-//                   </FormControl>
-//                   <FormControl fullWidth margin="normal">
-//                     <InputLabel>Line Style</InputLabel>
-//                     <Select
-//                       value={yAxis.lineStyle}
-//                       onChange={(event) =>
-//                         handleLineStyleChange(yAxis.id, event)
-//                       }
-//                     >
-//                       <MenuItem value="solid">Solid</MenuItem>
-//                       <MenuItem value="dotted">Dotted</MenuItem>
-//                       <MenuItem value="dashed">Dashed</MenuItem>
-//                       <MenuItem value="dot-dash">Dot Dash</MenuItem>
-//                       <MenuItem value="dash-dot-dot">Dash Dot Dot</MenuItem>
-//                     </Select>
-//                   </FormControl>
-//                   <Button color="secondary" onClick={() => openColorPicker(yAxis.id)}>
-//                   Select Color
-//                 </Button>
-//                 {colorPickerOpen && selectedYAxisId === yAxis.id && (
-//                   <SketchPicker
-//                     color={yAxis.color}
-//                     onChangeComplete={handleColorChange}
-//                   />
-//                 )}
-//                 </Box>
-//               ))}
-//               <Button variant="contained" color="secondary" onClick={addYAxis}>
-//                 Add Y-Axis
-//               </Button>
-//             </Box>
-//           </DialogContent>
-//           <DialogActions>
-//             <Button onClick={closeDialog} color="secondary">
-//               Cancel
-//             </Button>
-//             <Button onClick={saveConfiguration} color="secondary">
-//               Save
-//             </Button>
-//           </DialogActions>
-//         </Dialog>
-//       )}
-//     </>
-//   );
-// };
+      {tempChartData && (
+        <Dialog
+          open={dialogOpen}
+          onClose={closeDialog}
+          fullWidth
+          maxWidth="md"
+          marginBottom="5px"
+        >
+          <DialogTitle>Configure Chart</DialogTitle>
+          <DialogContent>
+            <Box
+              display="flex"
+              flexDirection="column"
+              maxHeight="400px"
+              overflow="auto"
+            >
+              {tempChartData.type === "XY" && (
+                <Box marginBottom={2}>
+                  <Typography variant="h6">X-Axis</Typography>
+                  <FormControl margin="normal">
+                    <InputLabel>X-Axis Data Key</InputLabel>
+                    <Select
+                      value={tempChartData.xAxisDataKey}
+                      onChange={handleXAxisDataKeyChange}
+                    >
+                    <MenuItem value="LICR-0101-PV">LICR-0101-PV</MenuItem>
+<MenuItem value="LICR-0102-PV">LICR-0102-PV</MenuItem>
+<MenuItem value="LICR-0103-PV">LICR-0103-PV</MenuItem>
+<MenuItem value="PICR-0101-PV">PICR-0101-PV</MenuItem>
+<MenuItem value="PICR-0102-PV">PICR-0102-PV</MenuItem>
+<MenuItem value="PICR-0103-PV">PICR-0103-PV</MenuItem>
+<MenuItem value="TICR-0101-PV">TICR-0101-PV</MenuItem>
+<MenuItem value="ABB-Flow-Meter">ABB-Flow-Meter</MenuItem>
+<MenuItem value="H2-Flow">H2-Flow</MenuItem>
+<MenuItem value="O2-Flow">O2-Flow</MenuItem>
+<MenuItem value="Cell-back-pressure">Cell-back-pressure</MenuItem>
+<MenuItem value="H2-Pressure-outlet">H2-Pressure-outlet</MenuItem>
+<MenuItem value="O2-Pressure-outlet">O2-Pressure-outlet</MenuItem>
+<MenuItem value="H2-Stack-pressure-difference">H2-Stack-pressure-difference</MenuItem>
+<MenuItem value="O2-Stack-pressure-difference">O2-Stack-pressure-difference</MenuItem>
+<MenuItem value="Ly-Rectifier-current">Ly-Rectifier-current</MenuItem>
+<MenuItem value="Ly-Rectifier-voltage">Ly-Rectifier-voltage</MenuItem>
+<MenuItem value="Cell-Voltage-Multispan">Cell-Voltage-Multispan</MenuItem>
 
-// export default CustomCharts;
+                     
+                                        </Select>
+                  </FormControl>
+                </Box>
+              )}
+              {tempChartData.yAxisDataKeys.map((yAxis, index) => (
+                <Box
+                  key={yAxis.id}
+                  display="flex"
+                  flexDirection="column"
+                  marginBottom={2}
+                >
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Typography variant="h6">Y-Axis {index + 1}</Typography>
+                    <IconButton onClick={() => deleteYAxis(yAxis.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Data Keys</InputLabel>
+                    <Select
+                      multiple  
+                      value={yAxis.dataKeys}
+                      onChange={(event) => handleDataKeyChange(yAxis.id, event)}
+                    >
+                    <MenuItem value="LICR-0101-PV">LICR-0101-PV</MenuItem>
+                    <MenuItem value="LICR-0102-PV">LICR-0102-PV</MenuItem>
+                    <MenuItem value="LICR-0103-PV">LICR-0103-PV</MenuItem>
+                    <MenuItem value="PICR-0101-PV">PICR-0101-PV</MenuItem>
+                    <MenuItem value="PICR-0102-PV">PICR-0102-PV</MenuItem>
+                    <MenuItem value="PICR-0103-PV">PICR-0103-PV</MenuItem>
+                    <MenuItem value="TICR-0101-PV">TICR-0101-PV</MenuItem>
+                    <MenuItem value="ABB-Flow-Meter">ABB-Flow-Meter</MenuItem>
+                    <MenuItem value="H2-Flow">H2-Flow</MenuItem>
+                    <MenuItem value="O2-Flow">O2-Flow</MenuItem>  
+                    <MenuItem value="Cell-back-pressure">Cell-back-pressure</MenuItem>
+                    <MenuItem value="H2-Pressure-outlet">H2-Pressure-outlet</MenuItem>
+                    <MenuItem value="O2-Pressure-outlet">O2-Pressure-outlet</MenuItem>
+                    <MenuItem value="H2-Stack-pressure-difference">H2-Stack-pressure-difference</MenuItem>
+                    <MenuItem value="O2-Stack-pressure-difference">O2-Stack-pressure-difference</MenuItem>
+                    <MenuItem value="Ly-Rectifier-current">Ly-Rectifier-current</MenuItem>
+                    <MenuItem value="Ly-Rectifier-voltage">Ly-Rectifier-voltage</MenuItem>
+                    <MenuItem value="Cell-Voltage-Multispan">Cell-Voltage-Multispan</MenuItem>
+                    
+                                       </Select>
+                  </FormControl>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Range</InputLabel>
+                    <Select
+                      value={yAxis.range}
+                      onChange={(event) => handleRangeChange(yAxis.id, event)}
+                    >
+                      <MenuItem value="0-100">0-100</MenuItem>
+                      <MenuItem value="0-500">0-500</MenuItem>
+                      <MenuItem value="0-1200">0-1200</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Line Style</InputLabel>
+                    <Select
+                      value={yAxis.lineStyle}
+                      onChange={(event) =>
+                        handleLineStyleChange(yAxis.id, event)
+                      }
+                    >
+                      <MenuItem value="solid">Solid</MenuItem>
+                      <MenuItem value="dotted">Dotted</MenuItem>
+                      <MenuItem value="dashed">Dashed</MenuItem>
+                      <MenuItem value="dot-dash">Dot Dash</MenuItem>
+                      <MenuItem value="dash-dot-dot">Dash Dot Dot</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <Button color="secondary" onClick={() => openColorPicker(yAxis.id)}>
+                  Select Color
+                </Button>
+                {colorPickerOpen && selectedYAxisId === yAxis.id && (
+                  <SketchPicker
+                    color={yAxis.color}
+                    onChangeComplete={handleColorChange}
+                  />
+                )}
+                </Box>
+              ))}
+              <Button variant="contained" color="secondary" onClick={addYAxis}>
+                Add Y-Axis
+              </Button>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeDialog} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={saveConfiguration} color="secondary">
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+    </>
+  );
+};
+
+export default CustomCharts;
 
 
 // import React, { useEffect, useState,useRef } from "react";

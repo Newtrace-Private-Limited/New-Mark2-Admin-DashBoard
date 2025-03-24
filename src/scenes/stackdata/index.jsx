@@ -62,9 +62,9 @@ const DataTable = () => {
           : row["LICR-0101-PV"] || 0,
 LICR_0102_PV: row.device_data?.["LICR-0102-PV"] || row["LICR-0102-PV"],
 LICR_0103_PV: row.device_data?.["LICR-0103-PV"] || row["LICR-0103-PV"],
-PICR_0101_PV1: row.device_data?.["PICR-0101-PV1"] !== undefined && row.device_data?.["PICR-0101-PV1"] !== null
-? row.device_data?.["PICR-0101-PV1"]
-: row["PICR-0101-PV1"] || 0,
+PICR_0101_PV: row.device_data?.["PICR-0101-PV"] !== undefined && row.device_data?.["PICR-0101-PV"] !== null
+? row.device_data?.["PICR-0101-PV"]
+: row["PICR-0101-PV"] || 0,
 
 PICR_0102_PV: row.device_data?.["PICR-0102-PV"] || row["PICR-0102-PV"],
 PICR_0103_PV: row.device_data?.["PICR-0103-PV"] || row["PICR-0103-PV"],
@@ -159,7 +159,7 @@ RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.
       {
         field: "LICR_0103_PV", headerName: "LICR-0103-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
       {
-        field: "PICR_0101_PV1", headerName: "PICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
+        field: "PICR_0101_PV", headerName: "PICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
         {
           field: "PICR_0102_PV", headerName: "PICR-0102-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
         },

@@ -203,7 +203,7 @@ const RealTime = () => {
       }
     });
   }, [data]);
-
+  
   return (
     <Box m="15px" mt="-60px">
       <div

@@ -1,749 +1,642 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import GridLayout from "react-grid-layout";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Brush,
+} from "recharts";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Typography,
+  IconButton,
+  Grid,
+  TextField,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+} from "@mui/material";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { SketchPicker } from "react-color";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DragHandleIcon from "@mui/icons-material/DragHandle";
+import axios from "axios";
+import { debounce } from "lodash";
+import {
+  format,
+  subMinutes,
+  subHours,
+  subDays,
+  subWeeks,
+  subMonths,
+  parseISO,
+} from "date-fns";
+import { setLayout, addChart, removeChart, updateChart } from "../../redux/layoutActions";
+import Header from "src/component/Header";
 
-const index = () => {
+const HistoricalCharts = () => {
+  const [chartData, setChartData] = useState({});
+  const [tempChartData, setTempChartData] = useState(null);
+  const [chartDialogOpen, setChartDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedYAxisId, setSelectedYAxisId] = useState(null);
+  const [dateDialogOpen, setDateDialogOpen] = useState(false);
+  const [chartDateRanges, setChartDateRanges] = useState({});
+  const [mode, setMode] = useState("B");
+  const [currentChartId, setCurrentChartId] = useState(null);
+  const wsClientRefs = useRef({});
+  const [colorPickerOpen, setColorPickerOpen] = useState(false);
+
+  const dispatch = useDispatch();
+  const layout = useSelector((state) => state.layout.historicalLayout) || JSON.parse(localStorage.getItem("historicalChartsLayout")) || [];
+  const charts = useSelector((state) => state.layout.historicalCharts) || JSON.parse(localStorage.getItem("historicalCharts")) || [];
+
+  useEffect(() => {
+    if (!layout.length) {
+      const savedLayout = JSON.parse(localStorage.getItem("historicalChartsLayout")) || [];
+      dispatch(setLayout(savedLayout, "historical"));
+    }
+  }, [dispatch, layout.length]);
+
+  const saveLayout = debounce((newLayout) => {
+    dispatch(setLayout(newLayout, "historical"));
+    localStorage.setItem("historicalChartsLayout", JSON.stringify(newLayout));
+  }, 500);
+
+  const addCustomChart = () => {
+    const newChartId = Date.now();
+    const newChart = {
+      id: newChartId,
+      type: "Line",
+      xAxisDataKey: "timestamp",
+      yAxisDataKeys: [
+        {
+          id: "left-0",
+          dataKeys: ["LICR-0101-PV"],
+          range: "0-500",
+          color: "#ca33e8",
+          lineStyle: "solid",
+        },
+      ],
+    };
+    dispatch(addChart(newChart, "historical"));
+    const updatedLayout = [...layout, { i: newChartId.toString(), x: 0, y: Infinity, w: 6, h: 8 }];
+    dispatch(setLayout(updatedLayout, "historical"));
+    localStorage.setItem("historicalChartsLayout", JSON.stringify(updatedLayout));
+  };
+
+  const deleteChart = (chartId) => {
+    dispatch(removeChart(chartId, "historical"));
+    const updatedLayout = layout.filter((l) => l.i !== chartId.toString());
+    dispatch(setLayout(updatedLayout, "historical"));
+    localStorage.setItem("historicalChartsLayout", JSON.stringify(updatedLayout));
+  };
+
+  const saveConfiguration = () => {
+    if (tempChartData) {
+      dispatch(updateChart(tempChartData, "historical"));
+      setDialogOpen(false);
+    }
+  };
+
+  const handleTimeRangeChange = (chartId, value) => {
+    let start;
+    switch (value) {
+      case "20_minute":
+        start = subMinutes(new Date(), 20);
+        break;
+      case "30_minutes":
+        start = subMinutes(new Date(), 30);
+        break;
+      case "1_hour":
+        start = subHours(new Date(), 1);
+        break;
+      case "6_hours":
+        start = subHours(new Date(), 6);
+        break;
+      case "12_hours":
+        start = subHours(new Date(), 12);
+        break;
+      case "1_day":
+        start = subDays(new Date(), 1);
+        break;
+      case "2_day":
+        start = subDays(new Date(), 2);
+        break;
+      case "1_week":
+        start = subWeeks(new Date(), 1);
+        break;
+      case "1_month":
+        start = subMonths(new Date(), 1);
+        break;
+      default:
+        start = subMinutes(new Date(), 1);
+    }
+
+    setChartDateRanges((prevRanges) => ({
+      ...prevRanges,
+      [chartId]: { startDate: start, endDate: new Date() },
+    }));
+  };
+
+  const fetchChartData = async (chartId) => {
+    const { startDate, endDate } = chartDateRanges[chartId] || {};
+    if (!startDate) return;
+  
+    try {
+      const formattedStartDate = format(startDate, "yyyy-MM-dd'T'HH:mm");
+      const formattedEndDate =
+        mode === "C"
+          ? format(new Date(), "yyyy-MM-dd'T'HH:mm")
+          : format(endDate, "yyyy-MM-dd'T'HH:mm");
+  
+      const response = await axios.post(
+        "https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data",
+        { start_time: formattedStartDate, end_time: formattedEndDate },
+        { headers: { "Content-Type": "application/json" } }
+      );
+  
+      if (response.status === 200) {
+        const parsedBody = response.data; // Assume JSON is already parsed
+        const fetchedData = (parsedBody.data || []).map((row) => {
+          // Determine data format: detailed or aggregated
+          if (row.device_data) {
+            // Detailed data format (e.g., < 3 hours)
+            const { device_data, ...rest } = row;
+  
+            return {
+              timestamp: rest.ist_timestamp || rest.time_bucket, // Use appropriate timestamp
+              ...(device_data || {}), // Flatten device_data keys
+            };
+          } else {
+            // Aggregated data format (e.g., > 3 hours)
+            return {
+              timestamp: row.time_bucket, // Use aggregated timestamp
+              "LICR-0101-PV": row.licr_0101_pv || 0,
+              "LICR-0102-PV": row.licr_0102_pv || 0,
+              "LICR-0103-PV": row.licr_0103_pv || 0,
+              "PICR-0101-PV": row.picr_0101_pv || 0,
+              "PICR-0102-PV": row.picr_0102_pv || 0,
+              "PICR-0103-PV": row.picr_0103_pv || 0,
+              "TICR-0101-PV": row.ticr_0101_pv || 0,
+              "ABB-Flow-Meter": row.abb_flow_meter || 0,
+              "H2-Flow": row.h2_flow || 0,
+              "O2-Flow": row.o2_flow || 0,
+              "Cell-back-pressure": row.cell_back_pressure || 0,
+              "H2-Pressure-outlet": row.h2_pressure_outlet || 0,
+              "O2-Pressure-outlet": row.o2_pressure_outlet || 0,
+              "H2-Stack-pressure-difference": row.h2_stack_pressure_difference || 0,
+              "O2-Stack-pressure-difference": row.o2_stack_pressure_difference || 0,
+              "Ly-Rectifier-current": row.ly_rectifier_current || 0,
+              "Ly-Rectifier-voltage": row.ly_rectifier_voltage || 0,
+              "Cell-Voltage-Multispan": row.cell_voltage_multispan || 0         
+            };
+          }
+        });
+  
+        // console.log("Fetched Data for Chart:", fetchedData); // Debugging
+  
+        setChartData((prevData) => ({
+          ...prevData,
+          [chartId]: fetchedData,
+        }));
+  
+        if (mode === "C") {
+          setupRealTimeWebSocket(chartId);
+        }
+      } else {
+        console.error("Failed to fetch data. Status:", response.status);
+      }
+    } catch (error) {
+      console.error("Error fetching data from the API:", error);
+    }
+  };
+
+  const setupRealTimeWebSocket = (chartId) => {
+    if (wsClientRefs.current[chartId]) {
+      wsClientRefs.current[chartId].close();
+    }
+
+    wsClientRefs.current[chartId] = new WebSocket(
+      "wss://otiq3un7zb.execute-api.us-east-1.amazonaws.com/dev/"
+    );
+
+    wsClientRefs.current[chartId].onopen = () => {
+      // console.log(`WebSocket connection established for chart ${chartId}`);
+    };
+
+    wsClientRefs.current[chartId].onmessage = (message) => {
+      try {
+        const receivedData = JSON.parse(message.data);
+        const newData = {
+          timestamp: parseISO(receivedData["PLC-TIME-STAMP"]) || new Date(),
+          "LICR-0101-PV": receivedData["LICR-0101-PV"] || null,
+  "LICR-0102-PV": receivedData["LICR-0102-PV"] || null,
+  "LICR-0103-PV": receivedData["LICR-0103-PV"] || null,
+  "PICR-0101-PV": receivedData["PICR-0101-PV"] || null,
+  "PICR-0102-PV": receivedData["PICR-0102-PV"] || null,
+  "PICR-0103-PV": receivedData["PICR-0103-PV"] || null,
+  "TICR-0101-PV": receivedData["TICR-0101-PV"] || null,
+  "ABB-Flow-Meter": receivedData["ABB-Flow-Meter"] || null,
+  "H2-Flow": receivedData["H2-Flow"] || null,
+  "O2-Flow": receivedData["O2-Flow"] || null,
+  "Cell-back-pressure": receivedData["Cell-back-pressure"] || null,
+  "H2-Pressure-outlet": receivedData["H2-Pressure-outlet"] || null,
+  "O2-Pressure-outlet": receivedData["O2-Pressure-outlet"] || null,
+  "H2-Stack-pressure-difference": receivedData["H2-Stack-pressure-difference"] || null,
+  "O2-Stack-pressure-difference": receivedData["O2-Stack-pressure-difference"] || null,
+  "Ly-Rectifier-current": receivedData["Ly-Rectifier-current"] || null,
+  "Ly-Rectifier-voltage": receivedData["Ly-Rectifier-voltage"] || null,
+  "Cell-Voltage-Multispan": receivedData["Cell-Voltage-Multispan"] || null
+         
+};
+        setChartData((prevData) => ({
+          ...prevData,
+          [chartId]: [...(prevData[chartId] || []), newData],
+        }));
+      } catch (error) {
+        console.error("Error processing WebSocket message:", error);
+      }
+    };
+
+    wsClientRefs.current[chartId].onclose = (event) => {
+      console.error(`WebSocket disconnected for chart ${chartId}. Reconnecting...`);
+      setTimeout(() => setupRealTimeWebSocket(chartId), 1000);
+    };
+  };
+  const handleRangeChange = (yAxisId, event) => {
+    const { value } = event.target;
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
+        yAxis.id === yAxisId ? { ...yAxis, range: value } : yAxis
+      ),
+    }));
+  };
+  const deleteYAxis = (yAxisId) => {
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      yAxisDataKeys: prevChart.yAxisDataKeys.filter(
+        (yAxis) => yAxis.id !== yAxisId
+      ),
+    }));
+  };
+  
+  const handleDataKeyChange = (yAxisId, event) => {
+    const { value } = event.target;
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
+        yAxis.id === yAxisId ? { ...yAxis, dataKeys: value } : yAxis
+      ),
+    }));
+  };
+  const openColorPicker = (yAxisId) => {
+    setSelectedYAxisId(yAxisId);
+    setColorPickerOpen(true);
+  };
+  const openDialog = (chart) => {
+    setTempChartData(chart);
+    setDialogOpen(true);
+  };
+    const closeDialog = () => setDialogOpen(false);
+
+  const handleLineStyleChange = (yAxisId, event) => {
+    const { value } = event.target;
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
+        yAxis.id === yAxisId ? { ...yAxis, lineStyle: value } : yAxis
+      ),
+    }));
+  };
+  const handleColorChange = (color) => {
+    setTempChartData((prevChart) => ({
+      ...prevChart,
+      yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
+        yAxis.id === selectedYAxisId ? { ...yAxis, color: color.hex } : yAxis
+      ),
+    }));
+    setColorPickerOpen(false);
+  };
+
+  const getYAxisDomain = (range) => {
+    switch (range) {
+      case "0-500":
+        return [0, 500];
+      case "0-100":
+        return [0, 100];
+      case "0-1200":
+        return [0, 1200];
+      default:
+        return [0, 500];
+    }
+  };
+
+  const getLineStyle = (lineStyle) => {
+    switch (lineStyle) {
+      case "solid":
+        return "";
+      case "dotted":
+        return "1 1";
+      case "dashed":
+        return "5 5";
+      case "dot-dash":
+        return "3 3 1 3";
+      case "dash-dot-dot":
+        return "3 3 1 1 1 3";
+      default:
+        return "";
+    }
+  };
+
+  const handleDateRangeApply = () => {
+    setDateDialogOpen(false);
+    fetchChartData(currentChartId);
+  };
+
+  const renderLineChart = (chart) => {
+    const data = chartData[chart.id] || [];
+  
+    // console.log(`Rendering Chart ID: ${chart.id}, Data:`, data); // Debugging
+  
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis
+            dataKey="timestamp"
+          />
+          {chart.yAxisDataKeys.map((yAxis) => (
+            <YAxis
+              key={yAxis.id}
+              yAxisId={yAxis.id}
+              domain={getYAxisDomain(yAxis.range)}
+              stroke={yAxis.color}
+            />
+          ))}
+          <Tooltip /> 
+          <Brush/>
+          <Legend />
+          {chart.yAxisDataKeys.map((yAxis) =>
+            yAxis.dataKeys.map((key) => (
+              <Line
+                key={key}
+                type="monotone"
+                dataKey={key} // Dynamically map data keys
+                stroke={yAxis.color}
+                strokeDasharray={getLineStyle(yAxis.lineStyle)}
+                yAxisId={yAxis.id}
+              />
+            ))
+          )}
+        </LineChart>
+      </ResponsiveContainer>
+    );
+  };
+  const renderChart = (chart) => (
+    <Box sx={{ height: "100%" }}>
+      <Box sx={{ height: "calc(100% - 60px)", width: "100%" }}>
+        {renderLineChart(chart)}
+      </Box>
+      <Box display="flex" justifyContent="space-around" mt={1}>
+        <Button variant="contained" color="secondary" onClick={() => setTempChartData(chart) || setDialogOpen(true)}>Configure Chart</Button>
+        <Button variant="contained" color="secondary" onClick={() => setCurrentChartId(chart.id) || setDateDialogOpen(true)}>Choose Date Range</Button>
+      </Box>
+    </Box>
+  );
   return (
-    <div>
-      Historical Line Analytics
-      
-    </div>
-  )
-}
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+       <Box m="15px" mt="-60px">
+    <Header
+        title="Historical Line Analytics"
+        subtitle="Welcome to your Historical Line Analytics"
+      />
+      <Box display="flex" justifyContent="flex-end" marginBottom={4}>
+        <Button variant="contained" color="secondary" onClick={() => setChartDialogOpen(true)}>Add Historical Chart</Button>
+      </Box>
+      <GridLayout
+        className="layout"
+        layout={layout}
+        cols={12}
+        rowHeight={45}
+        width={1630}
+        onLayoutChange={(newLayout) => dispatch(setLayout(newLayout, "historical"))}
+        onResizeStop={(newLayout) => saveLayout(newLayout)}
+        onDragStop={(newLayout) => saveLayout(newLayout)}
+        draggableHandle=".drag-handle"
+        isResizable
+        isDraggable
+      >
+        {charts.map((chart) => (
+          <Box
+            key={chart.id}
+            data-grid={
+              layout.find((l) => l.i === chart.id.toString()) || {
+                x: 0,
+                y: Infinity,
+                w: 6,
+                h: 8,
+              }
+            }
+            sx={{ position: "relative", border: "1px solid #ccc", borderRadius: "8px", overflow: "hidden" }}
+          >
+            <Box display="flex" justifyContent="space-between" p={2} sx={{ backgroundColor: "" }}>
+              <IconButton className="drag-handle">
+                <DragHandleIcon />
+              </IconButton>
+              <Typography variant="h6">{chart.type} Chart</Typography>
+              <IconButton aria-label="delete" onClick={() => deleteChart(chart.id)}>
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+            <Box sx={{ height: "calc(100% - 100px)" }}>
+              {renderChart(chart)}
+            </Box>
+          </Box>
+        ))}
+      </GridLayout>
 
-export default index
-  
+      <Dialog open={chartDialogOpen} onClose={() => setChartDialogOpen(false)}>
+        <DialogTitle>Select Chart Type</DialogTitle>
+        <DialogContent>
+          <Button variant="contained" onClick={addCustomChart}>Add Line Chart</Button>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setChartDialogOpen(false)} color="secondary">Cancel</Button>
+        </DialogActions>
+      </Dialog>
 
-// import React, { useState, useEffect, useRef } from "react";
-// import { useSelector, useDispatch } from "react-redux";
-// import GridLayout from "react-grid-layout";
-// import {
-//   LineChart,
-//   Line,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   Legend,
-//   ResponsiveContainer,
-//   Brush,
-// } from "recharts";
-// import {
-//   Box,
-//   Button,
-//   Dialog,
-//   DialogActions,
-//   DialogContent,
-//   DialogTitle,
-//   FormControl,
-//   InputLabel,
-//   Select,
-//   MenuItem,
-//   Typography,
-//   IconButton,
-//   Grid,
-//   TextField,
-//   RadioGroup,
-//   FormControlLabel,
-//   Radio,
-// } from "@mui/material";
-// import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-// import { SketchPicker } from "react-color";
-// import DeleteIcon from "@mui/icons-material/Delete";
-// import DragHandleIcon from "@mui/icons-material/DragHandle";
-// import axios from "axios";
-// import { debounce } from "lodash";
-// import {
-//   format,
-//   subMinutes,
-//   subHours,
-//   subDays,
-//   subWeeks,
-//   subMonths,
-//   parseISO,
-// } from "date-fns";
-// import { setLayout, addChart, removeChart, updateChart } from "../../redux/layoutActions";
-// import Header from "src/component/Header";
+      <Dialog open={dateDialogOpen} onClose={() => setDateDialogOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Select Date Range</DialogTitle>
+        <DialogContent>
+          <FormControl component="fieldset">
+            <RadioGroup row value={mode} onChange={(e) => setMode(e.target.value)}>
+              <FormControlLabel value="B" control={<Radio />} label="Select Date Range" />
+              <FormControlLabel value="C" control={<Radio />} label="Start Date & Continue Real-Time" />
+            </RadioGroup>
+          </FormControl>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={6}>
+              <DateTimePicker
+                label="Start Date and Time"
+                value={chartDateRanges[currentChartId]?.startDate || null}
+                onChange={(date) =>
+                  setChartDateRanges((prevRanges) => ({
+                    ...prevRanges,
+                    [currentChartId]: { ...prevRanges[currentChartId], startDate: date },
+                  }))
+                }
+                renderInput={(params) => <TextField {...params} fullWidth />}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <DateTimePicker
+                label="End Date and Time"
+                value={chartDateRanges[currentChartId]?.endDate || null}
+                onChange={(date) =>
+                  setChartDateRanges((prevRanges) => ({
+                    ...prevRanges,
+                    [currentChartId]: { ...prevRanges[currentChartId], endDate: date },
+                  }))
+                }
+                renderInput={(params) => <TextField {...params} fullWidth />}
+                disabled={mode === "C"}
+              />
+            </Grid>
+          </Grid>
+          <Box display="flex" justifyContent="flex-end" marginBottom={2}>
+            <FormControl className="w-28 top-3">
+              <InputLabel id="time-range-label" >Time Range</InputLabel>
+              <Select
+                labelId="time-range-label"
+                value={chartDateRanges[currentChartId]?.range || ""}
+                onChange={(e) => handleTimeRangeChange(currentChartId, e.target.value)}
+              >
+                <MenuItem value="20_minute">Last 20 minute</MenuItem>
+                <MenuItem value="30_minutes">Last 30 minutes</MenuItem>
+                <MenuItem value="1_hour">Last 1 hour</MenuItem>
+                <MenuItem value="6_hours">Last 6 hours</MenuItem>
+                <MenuItem value="12_hours">Last 12 hours</MenuItem>
+                <MenuItem value="1_day">Last 1 day</MenuItem>
+                <MenuItem value="2_day">Last 2 days</MenuItem>
+                <MenuItem value="1_week">Last 1 week</MenuItem>
+                <MenuItem value="1_month">Last 1 month</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>  
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDateDialogOpen(false)} color="secondary">Cancel</Button>
+          <Button onClick={handleDateRangeApply} color="secondary" disabled={!chartDateRanges[currentChartId]?.startDate || (mode === "B" && !chartDateRanges[currentChartId]?.endDate)}>Apply</Button>
+        </DialogActions>
+      </Dialog>
 
-// const HistoricalCharts = () => {
-//   const [chartData, setChartData] = useState({});
-//   const [tempChartData, setTempChartData] = useState(null);
-//   const [chartDialogOpen, setChartDialogOpen] = useState(false);
-//   const [dialogOpen, setDialogOpen] = useState(false);
-//   const [selectedYAxisId, setSelectedYAxisId] = useState(null);
-//   const [dateDialogOpen, setDateDialogOpen] = useState(false);
-//   const [chartDateRanges, setChartDateRanges] = useState({});
-//   const [mode, setMode] = useState("B");
-//   const [currentChartId, setCurrentChartId] = useState(null);
-//   const wsClientRefs = useRef({});
-//   const [colorPickerOpen, setColorPickerOpen] = useState(false);
-
-//   const dispatch = useDispatch();
-//   const layout = useSelector((state) => state.layout.historicalLayout) || JSON.parse(localStorage.getItem("historicalChartsLayout")) || [];
-//   const charts = useSelector((state) => state.layout.historicalCharts) || JSON.parse(localStorage.getItem("historicalCharts")) || [];
-
-//   useEffect(() => {
-//     if (!layout.length) {
-//       const savedLayout = JSON.parse(localStorage.getItem("historicalChartsLayout")) || [];
-//       dispatch(setLayout(savedLayout, "historical"));
-//     }
-//   }, [dispatch, layout.length]);
-
-//   const saveLayout = debounce((newLayout) => {
-//     dispatch(setLayout(newLayout, "historical"));
-//     localStorage.setItem("historicalChartsLayout", JSON.stringify(newLayout));
-//   }, 500);
-
-//   const addCustomChart = () => {
-//     const newChartId = Date.now();
-//     const newChart = {
-//       id: newChartId,
-//       type: "Line",
-//       xAxisDataKey: "timestamp",
-//       yAxisDataKeys: [
-//         {
-//           id: "left-0",
-//           dataKeys: ["AX-LT-011"],
-//           range: "0-500",
-//           color: "#ca33e8",
-//           lineStyle: "solid",
-//         },
-//       ],
-//     };
-//     dispatch(addChart(newChart, "historical"));
-//     const updatedLayout = [...layout, { i: newChartId.toString(), x: 0, y: Infinity, w: 6, h: 8 }];
-//     dispatch(setLayout(updatedLayout, "historical"));
-//     localStorage.setItem("historicalChartsLayout", JSON.stringify(updatedLayout));
-//   };
-
-//   const deleteChart = (chartId) => {
-//     dispatch(removeChart(chartId, "historical"));
-//     const updatedLayout = layout.filter((l) => l.i !== chartId.toString());
-//     dispatch(setLayout(updatedLayout, "historical"));
-//     localStorage.setItem("historicalChartsLayout", JSON.stringify(updatedLayout));
-//   };
-
-//   const saveConfiguration = () => {
-//     if (tempChartData) {
-//       dispatch(updateChart(tempChartData, "historical"));
-//       setDialogOpen(false);
-//     }
-//   };
-
-//   const handleTimeRangeChange = (chartId, value) => {
-//     let start;
-//     switch (value) {
-//       case "20_minute":
-//         start = subMinutes(new Date(), 20);
-//         break;
-//       case "30_minutes":
-//         start = subMinutes(new Date(), 30);
-//         break;
-//       case "1_hour":
-//         start = subHours(new Date(), 1);
-//         break;
-//       case "6_hours":
-//         start = subHours(new Date(), 6);
-//         break;
-//       case "12_hours":
-//         start = subHours(new Date(), 12);
-//         break;
-//       case "1_day":
-//         start = subDays(new Date(), 1);
-//         break;
-//       case "2_day":
-//         start = subDays(new Date(), 2);
-//         break;
-//       case "1_week":
-//         start = subWeeks(new Date(), 1);
-//         break;
-//       case "1_month":
-//         start = subMonths(new Date(), 1);
-//         break;
-//       default:
-//         start = subMinutes(new Date(), 1);
-//     }
-
-//     setChartDateRanges((prevRanges) => ({
-//       ...prevRanges,
-//       [chartId]: { startDate: start, endDate: new Date() },
-//     }));
-//   };
-
-//   const fetchChartData = async (chartId) => {
-//     const { startDate, endDate } = chartDateRanges[chartId] || {};
-//     if (!startDate) return;
-  
-//     try {
-//       const formattedStartDate = format(startDate, "yyyy-MM-dd'T'HH:mm");
-//       const formattedEndDate =
-//         mode === "C"
-//           ? format(new Date(), "yyyy-MM-dd'T'HH:mm")
-//           : format(endDate, "yyyy-MM-dd'T'HH:mm");
-  
-//       const response = await axios.post(
-//         "https://3di0yc14j3.execute-api.us-east-1.amazonaws.com/dev/iot-data",
-//         { start_time: formattedStartDate, end_time: formattedEndDate },
-//         { headers: { "Content-Type": "application/json" } }
-//       );
-  
-//       if (response.status === 200) {
-//         const parsedBody = response.data; // Assume JSON is already parsed
-//         const fetchedData = (parsedBody.data || []).map((row) => {
-//           // Determine data format: detailed or aggregated
-//           if (row.device_data) {
-//             // Detailed data format (e.g., < 3 hours)
-//             const { device_data, ...rest } = row;
-  
-//             return {
-//               timestamp: rest.ist_timestamp || rest.time_bucket, // Use appropriate timestamp
-//               ...(device_data || {}), // Flatten device_data keys
-//             };
-//           } else {
-//             // Aggregated data format (e.g., > 3 hours)
-//             return {
-//               timestamp: row.time_bucket, // Use aggregated timestamp
-//               "AX-LT-011": row.avg_ax_lt_011 || 0, // Use average values
-//               "AX-LT-021": row.avg_ax_lt_021 || 0,
-//               "CW-TT-011": row.cw_tt_011 || 0,
-// "CW-TT-021": row.cw_tt_021 || 0,
-// "CR-LT-011": row.cr_lt_011 || 0,
-// "CR-PT-011": row.cr_pt_011 || 0,
-// "CR-LT-021": row.cr_lt_021 || 0,
-// "CR-PT-021": row.cr_pt_021 || 0,
-// "CR-PT-001": row.cr_pt_001 || 0,
-// "CR-TT-001": row.cr_tt_001 || 0,
-// "CR-FT-001": row.cr_ft_001 || 0,
-// "CR-TT-002": row.cr_tt_002 || 0,
-// "GS-AT-011": row.gs_at_011 || 0,
-// "GS-AT-012": row.gs_at_012 || 0,
-// "GS-PT-011": row.gs_pt_011 || 0,
-// "GS-TT-011": row.gs_tt_011 || 0,
-// "GS-AT-022": row.gs_at_022 || 0,
-// "GS-PT-021": row.gs_pt_021 || 0,
-// "GS-TT-021": row.gs_tt_021 || 0,
-// "PR-TT-001": row.pr_tt_001 || 0,
-// "PR-TT-061": row.pr_tt_061 || 0,
-// "PR-TT-072": row.pr_tt_072 || 0,
-// "PR-FT-001": row.pr_ft_001 || 0,
-// "PR-AT-001": row.pr_at_001 || 0,
-// "PR-AT-003": row.pr_at_003 || 0,
-// "PR-AT-005": row.pr_at_005 || 0,
-// "DM-LSH-001": row.dm_lsh_001 || 0,
-// "DM-LSL-001": row.dm_lsl_001 || 0,
-// "GS-LSL-021": row.gs_lsl_021 || 0,
-// "GS-LSL-011": row.gs_lsl_011 || 0,
-// "PR-VA-301": row.pr_va_301 || 0,
-// "PR-VA-352": row.pr_va_352 || 0,
-// "PR-VA-312": row.pr_va_312 || 0,
-// "PR-VA-351": row.pr_va_351 || 0,
-// "PR-VA-361AIN": row.pr_va_361ain || 0,
-// "PR-VA-361AOUT": row.pr_va_361aout || 0,
-// "PR-VA-361BIN": row.pr_va_361bin || 0,
-// "PR-VA-361BOUT": row.pr_va_361bout || 0,
-// "PR-VA-362AIN": row.pr_va_362ain || 0,
-// "PR-VA-362AOUT": row.pr_va_362aout || 0,
-// "N2-VA-311": row.n2_va_311 || 0,
-// "GS-VA-311": row.gs_va_311 || 0,
-// "GS-VA-312": row.gs_va_312 || 0,
-// "N2-VA-321": row.n2_va_321 || 0,
-// "GS-VA-321": row.gs_va_321 || 0,
-// "GS-VA-322": row.gs_va_322 || 0,
-// "GS-VA-022": row.gs_va_022 || 0,
-// "GS-VA-021": row.gs_va_021 || 0,
-// "AX-VA-351": row.ax_va_351 || 0,
-// "AX-VA-311": row.ax_va_311 || 0,
-// "AX-VA-312": row.ax_va_312 || 0,
-// "AX-VA-321": row.ax_va_321 || 0,
-// "AX-VA-322": row.ax_va_322 || 0,
-// "AX-VA-391": row.ax_va_391 || 0,
-// "DM-VA-301": row.dm_va_301 || 0,
-// "DCD0-VT-001": row.dcdb0_vt_001 || 0,
-// "DCD0-CT-001": row.dcdb0_ct_001 || 0,
-// "DCD1-VT-001": row.dcdb1_vt_001 || 0,
-// "DCD1-CT-001": row.dcdb1_ct_001 || 0,
-// "DCD2-VT-001": row.dcdb2_vt_001 || 0,
-// "DCD2-CT-001": row.dcdb2_ct_001 || 0,
-// "DCD3-VT-001": row.dcdb3_vt_001 || 0,
-// "DCD3-CT-001": row.dcdb3_ct_001 || 0,
-// "DCD4-VT-001": row.dcdb4_vt_001 || 0,
-// "DCD4-CT-001": row.dcdb4_ct_001 || 0,
-// "RECT-CT-001": row.rect_ct_001 || 0,
-// "RECT-VT-001": row.rect_vt_001 || 0,
-// "PLC-TIME-STAMP": row.plc_time_stamp || 0,
-// "TEST-NAME": row.test_name || 0,
-// "TEST-REMARKS": row.test_remarks || 0,
-// "TEST-DESCRIPTION": row.test_description || 0
-
-
-              
-//             };
-//           }
-//         });
-  
-//         // console.log("Fetched Data for Chart:", fetchedData); // Debugging
-  
-//         setChartData((prevData) => ({
-//           ...prevData,
-//           [chartId]: fetchedData,
-//         }));
-  
-//         if (mode === "C") {
-//           setupRealTimeWebSocket(chartId);
-//         }
-//       } else {
-//         console.error("Failed to fetch data. Status:", response.status);
-//       }
-//     } catch (error) {
-//       console.error("Error fetching data from the API:", error);
-//     }
-//   };
-
-//   const setupRealTimeWebSocket = (chartId) => {
-//     if (wsClientRefs.current[chartId]) {
-//       wsClientRefs.current[chartId].close();
-//     }
-
-//     wsClientRefs.current[chartId] = new WebSocket(
-//       "wss://otiq3un7zb.execute-api.us-east-1.amazonaws.com/dev/"
-//     );
-
-//     wsClientRefs.current[chartId].onopen = () => {
-//       // console.log(`WebSocket connection established for chart ${chartId}`);
-//     };
-
-//     wsClientRefs.current[chartId].onmessage = (message) => {
-//       try {
-//         const receivedData = JSON.parse(message.data);
-//         const newData = {
-//           timestamp: parseISO(receivedData["PLC-TIME-STAMP"]) || new Date(),
-//           "AX-LT-011": receivedData["AX-LT-011"] || null,
-// "AX-LT-021": receivedData["AX-LT-021"] || null,
-// };
-//         setChartData((prevData) => ({
-//           ...prevData,
-//           [chartId]: [...(prevData[chartId] || []), newData],
-//         }));
-//       } catch (error) {
-//         console.error("Error processing WebSocket message:", error);
-//       }
-//     };
-
-//     wsClientRefs.current[chartId].onclose = (event) => {
-//       console.error(`WebSocket disconnected for chart ${chartId}. Reconnecting...`);
-//       setTimeout(() => setupRealTimeWebSocket(chartId), 1000);
-//     };
-//   };
-//   const handleRangeChange = (yAxisId, event) => {
-//     const { value } = event.target;
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
-//         yAxis.id === yAxisId ? { ...yAxis, range: value } : yAxis
-//       ),
-//     }));
-//   };
-//   const deleteYAxis = (yAxisId) => {
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       yAxisDataKeys: prevChart.yAxisDataKeys.filter(
-//         (yAxis) => yAxis.id !== yAxisId
-//       ),
-//     }));
-//   };
-  
-//   const handleDataKeyChange = (yAxisId, event) => {
-//     const { value } = event.target;
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
-//         yAxis.id === yAxisId ? { ...yAxis, dataKeys: value } : yAxis
-//       ),
-//     }));
-//   };
-//   const openColorPicker = (yAxisId) => {
-//     setSelectedYAxisId(yAxisId);
-//     setColorPickerOpen(true);
-//   };
-//   const openDialog = (chart) => {
-//     setTempChartData(chart);
-//     setDialogOpen(true);
-//   };
-//     const closeDialog = () => setDialogOpen(false);
-
-//   const handleLineStyleChange = (yAxisId, event) => {
-//     const { value } = event.target;
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
-//         yAxis.id === yAxisId ? { ...yAxis, lineStyle: value } : yAxis
-//       ),
-//     }));
-//   };
-//   const handleColorChange = (color) => {
-//     setTempChartData((prevChart) => ({
-//       ...prevChart,
-//       yAxisDataKeys: prevChart.yAxisDataKeys.map((yAxis) =>
-//         yAxis.id === selectedYAxisId ? { ...yAxis, color: color.hex } : yAxis
-//       ),
-//     }));
-//     setColorPickerOpen(false);
-//   };
-
-//   const getYAxisDomain = (range) => {
-//     switch (range) {
-//       case "0-500":
-//         return [0, 500];
-//       case "0-100":
-//         return [0, 100];
-//       case "0-1200":
-//         return [0, 1200];
-//       default:
-//         return [0, 500];
-//     }
-//   };
-
-//   const getLineStyle = (lineStyle) => {
-//     switch (lineStyle) {
-//       case "solid":
-//         return "";
-//       case "dotted":
-//         return "1 1";
-//       case "dashed":
-//         return "5 5";
-//       case "dot-dash":
-//         return "3 3 1 3";
-//       case "dash-dot-dot":
-//         return "3 3 1 1 1 3";
-//       default:
-//         return "";
-//     }
-//   };
-
-//   const handleDateRangeApply = () => {
-//     setDateDialogOpen(false);
-//     fetchChartData(currentChartId);
-//   };
-
-//   const renderLineChart = (chart) => {
-//     const data = chartData[chart.id] || [];
-  
-//     // console.log(`Rendering Chart ID: ${chart.id}, Data:`, data); // Debugging
-  
-//     return (
-//       <ResponsiveContainer width="100%" height="100%">
-//         <LineChart data={data}>
-//           <CartesianGrid strokeDasharray="3 3" />
-//           <XAxis
-//             dataKey="timestamp"
-//           />
-//           {chart.yAxisDataKeys.map((yAxis) => (
-//             <YAxis
-//               key={yAxis.id}
-//               yAxisId={yAxis.id}
-//               domain={getYAxisDomain(yAxis.range)}
-//               stroke={yAxis.color}
-//             />
-//           ))}
-//           <Tooltip /> 
-//           <Brush/>
-//           <Legend />
-//           {chart.yAxisDataKeys.map((yAxis) =>
-//             yAxis.dataKeys.map((key) => (
-//               <Line
-//                 key={key}
-//                 type="monotone"
-//                 dataKey={key} // Dynamically map data keys
-//                 stroke={yAxis.color}
-//                 strokeDasharray={getLineStyle(yAxis.lineStyle)}
-//                 yAxisId={yAxis.id}
-//               />
-//             ))
-//           )}
-//         </LineChart>
-//       </ResponsiveContainer>
-//     );
-//   };
-//   const renderChart = (chart) => (
-//     <Box sx={{ height: "100%" }}>
-//       <Box sx={{ height: "calc(100% - 60px)", width: "100%" }}>
-//         {renderLineChart(chart)}
-//       </Box>
-//       <Box display="flex" justifyContent="space-around" mt={1}>
-//         <Button variant="contained" color="secondary" onClick={() => setTempChartData(chart) || setDialogOpen(true)}>Configure Chart</Button>
-//         <Button variant="contained" color="secondary" onClick={() => setCurrentChartId(chart.id) || setDateDialogOpen(true)}>Choose Date Range</Button>
-//       </Box>
-//     </Box>
-//   );
-//   return (
-//     <LocalizationProvider dateAdapter={AdapterDateFns}>
-//        <Box m="15px" mt="-60px">
-//     <Header
-//         title="Historical Line Analytics"
-//         subtitle="Welcome to your Historical Line Analytics"
-//       />
-//       <Box display="flex" justifyContent="flex-end" marginBottom={4}>
-//         <Button variant="contained" color="secondary" onClick={() => setChartDialogOpen(true)}>Add Historical Chart</Button>
-//       </Box>
-//       <GridLayout
-//         className="layout"
-//         layout={layout}
-//         cols={12}
-//         rowHeight={45}
-//         width={1630}
-//         onLayoutChange={(newLayout) => dispatch(setLayout(newLayout, "historical"))}
-//         onResizeStop={(newLayout) => saveLayout(newLayout)}
-//         onDragStop={(newLayout) => saveLayout(newLayout)}
-//         draggableHandle=".drag-handle"
-//         isResizable
-//         isDraggable
-//       >
-//         {charts.map((chart) => (
-//           <Box
-//             key={chart.id}
-//             data-grid={
-//               layout.find((l) => l.i === chart.id.toString()) || {
-//                 x: 0,
-//                 y: Infinity,
-//                 w: 6,
-//                 h: 8,
-//               }
-//             }
-//             sx={{ position: "relative", border: "1px solid #ccc", borderRadius: "8px", overflow: "hidden" }}
-//           >
-//             <Box display="flex" justifyContent="space-between" p={2} sx={{ backgroundColor: "" }}>
-//               <IconButton className="drag-handle">
-//                 <DragHandleIcon />
-//               </IconButton>
-//               <Typography variant="h6">{chart.type} Chart</Typography>
-//               <IconButton aria-label="delete" onClick={() => deleteChart(chart.id)}>
-//                 <DeleteIcon />
-//               </IconButton>
-//             </Box>
-//             <Box sx={{ height: "calc(100% - 100px)" }}>
-//               {renderChart(chart)}
-//             </Box>
-//           </Box>
-//         ))}
-//       </GridLayout>
-
-//       <Dialog open={chartDialogOpen} onClose={() => setChartDialogOpen(false)}>
-//         <DialogTitle>Select Chart Type</DialogTitle>
-//         <DialogContent>
-//           <Button variant="contained" onClick={addCustomChart}>Add Line Chart</Button>
-//         </DialogContent>
-//         <DialogActions>
-//           <Button onClick={() => setChartDialogOpen(false)} color="secondary">Cancel</Button>
-//         </DialogActions>
-//       </Dialog>
-
-//       <Dialog open={dateDialogOpen} onClose={() => setDateDialogOpen(false)} fullWidth maxWidth="sm">
-//         <DialogTitle>Select Date Range</DialogTitle>
-//         <DialogContent>
-//           <FormControl component="fieldset">
-//             <RadioGroup row value={mode} onChange={(e) => setMode(e.target.value)}>
-//               <FormControlLabel value="B" control={<Radio />} label="Select Date Range" />
-//               <FormControlLabel value="C" control={<Radio />} label="Start Date & Continue Real-Time" />
-//             </RadioGroup>
-//           </FormControl>
-//           <Grid container spacing={2} alignItems="center">
-//             <Grid item xs={6}>
-//               <DateTimePicker
-//                 label="Start Date and Time"
-//                 value={chartDateRanges[currentChartId]?.startDate || null}
-//                 onChange={(date) =>
-//                   setChartDateRanges((prevRanges) => ({
-//                     ...prevRanges,
-//                     [currentChartId]: { ...prevRanges[currentChartId], startDate: date },
-//                   }))
-//                 }
-//                 renderInput={(params) => <TextField {...params} fullWidth />}
-//               />
-//             </Grid>
-//             <Grid item xs={6}>
-//               <DateTimePicker
-//                 label="End Date and Time"
-//                 value={chartDateRanges[currentChartId]?.endDate || null}
-//                 onChange={(date) =>
-//                   setChartDateRanges((prevRanges) => ({
-//                     ...prevRanges,
-//                     [currentChartId]: { ...prevRanges[currentChartId], endDate: date },
-//                   }))
-//                 }
-//                 renderInput={(params) => <TextField {...params} fullWidth />}
-//                 disabled={mode === "C"}
-//               />
-//             </Grid>
-//           </Grid>
-//           <Box display="flex" justifyContent="flex-end" marginBottom={2}>
-//             <FormControl className="w-28 top-3">
-//               <InputLabel id="time-range-label" >Time Range</InputLabel>
-//               <Select
-//                 labelId="time-range-label"
-//                 value={chartDateRanges[currentChartId]?.range || ""}
-//                 onChange={(e) => handleTimeRangeChange(currentChartId, e.target.value)}
-//               >
-//                 <MenuItem value="20_minute">Last 20 minute</MenuItem>
-//                 <MenuItem value="30_minutes">Last 30 minutes</MenuItem>
-//                 <MenuItem value="1_hour">Last 1 hour</MenuItem>
-//                 <MenuItem value="6_hours">Last 6 hours</MenuItem>
-//                 <MenuItem value="12_hours">Last 12 hours</MenuItem>
-//                 <MenuItem value="1_day">Last 1 day</MenuItem>
-//                 <MenuItem value="2_day">Last 2 days</MenuItem>
-//                 <MenuItem value="1_week">Last 1 week</MenuItem>
-//                 <MenuItem value="1_month">Last 1 month</MenuItem>
-//               </Select>
-//             </FormControl>
-//           </Box>  
-//         </DialogContent>
-//         <DialogActions>
-//           <Button onClick={() => setDateDialogOpen(false)} color="secondary">Cancel</Button>
-//           <Button onClick={handleDateRangeApply} color="secondary" disabled={!chartDateRanges[currentChartId]?.startDate || (mode === "B" && !chartDateRanges[currentChartId]?.endDate)}>Apply</Button>
-//         </DialogActions>
-//       </Dialog>
-
-//       {tempChartData && (
-//         <Dialog open={dialogOpen}
-//          onClose={() => setDialogOpen(false)} 
-//          fullWidth
-//           maxWidth="md">
-//           <DialogTitle>Configure Chart</DialogTitle>
-//           <DialogContent>
-//             <Box display="flex" flexDirection="column" maxHeight="400px" overflow="auto">
-//               {tempChartData.yAxisDataKeys.map((yAxis, index) => (
-//                 <Box key={yAxis.id} display="flex" flexDirection="column" marginBottom={2}>
-//                   <Box display="flex" justifyContent="space-between" alignItems="center">
-//                     <Typography variant="h6">Y-Axis {index + 1}</Typography>
-//                     <IconButton onClick={() => deleteYAxis(yAxis.id)}><DeleteIcon /></IconButton>
-//                   </Box>
-//                   <FormControl fullWidth margin="normal">
-//                     <InputLabel>Data Keys</InputLabel>
-//                     <Select multiple value={yAxis.dataKeys} onChange={(event) => handleDataKeyChange(yAxis.id, event)}>
+      {tempChartData && (
+        <Dialog open={dialogOpen}
+         onClose={() => setDialogOpen(false)} 
+         fullWidth
+          maxWidth="md">
+          <DialogTitle>Configure Chart</DialogTitle>
+          <DialogContent>
+            <Box display="flex" flexDirection="column" maxHeight="400px" overflow="auto">
+              {tempChartData.yAxisDataKeys.map((yAxis, index) => (
+                <Box key={yAxis.id} display="flex" flexDirection="column" marginBottom={2}>
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Typography variant="h6">Y-Axis {index + 1}</Typography>
+                    <IconButton onClick={() => deleteYAxis(yAxis.id)}><DeleteIcon /></IconButton>
+                  </Box>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Data Keys</InputLabel>
+                    <Select multiple value={yAxis.dataKeys} onChange={(event) => handleDataKeyChange(yAxis.id, event)}>
                  
-//                                      <MenuItem value="AX-LT-011">AX-LT-011</MenuItem>
-//                       <MenuItem value="AX-LT-021">AX-LT-021</MenuItem>
-// <MenuItem value="CW-TT-011">CW-TT-011</MenuItem>
-// <MenuItem value="CW-TT-021">CW-TT-021</MenuItem>
-// <MenuItem value="CR-LT-011">CR-LT-011</MenuItem>
-// <MenuItem value="CR-PT-011">CR-PT-011</MenuItem>
-// <MenuItem value="CR-LT-021">CR-LT-021</MenuItem>
-// <MenuItem value="CR-PT-021">CR-PT-021</MenuItem>
-// <MenuItem value="CR-PT-001">CR-PT-001</MenuItem>
-// <MenuItem value="CR-TT-001">CR-TT-001</MenuItem>
-// <MenuItem value="CR-FT-001">CR-FT-001</MenuItem>
-// <MenuItem value="CR-TT-002">CR-TT-002</MenuItem>
-// <MenuItem value="GS-AT-011">GS-AT-011</MenuItem>
-// <MenuItem value="GS-AT-012">GS-AT-012</MenuItem>
-// <MenuItem value="GS-PT-011">GS-PT-011</MenuItem>
-// <MenuItem value="GS-TT-011">GS-TT-011</MenuItem>
-// <MenuItem value="GS-AT-022">GS-AT-022</MenuItem>
-// <MenuItem value="GS-PT-021">GS-PT-021</MenuItem>
-// <MenuItem value="GS-TT-021">GS-TT-021</MenuItem>
-// <MenuItem value="PR-TT-001">PR-TT-001</MenuItem>
-// <MenuItem value="PR-TT-061">PR-TT-061</MenuItem>
-// <MenuItem value="PR-TT-072">PR-TT-072</MenuItem>
-// <MenuItem value="PR-FT-001">PR-FT-001</MenuItem>
-// <MenuItem value="PR-AT-001">PR-AT-001</MenuItem>
-// <MenuItem value="PR-AT-003">PR-AT-003</MenuItem>
-// <MenuItem value="PR-AT-005">PR-AT-005</MenuItem>
-// <MenuItem value="DM-LSH-001">DM-LSH-001</MenuItem>
-// <MenuItem value="DM-LSL-001">DM-LSL-001</MenuItem>
-// <MenuItem value="GS-LSL-021">GS-LSL-021</MenuItem>
-// <MenuItem value="GS-LSL-011">GS-LSL-011</MenuItem>
-// <MenuItem value="PR-VA-301">PR-VA-301</MenuItem>
-// <MenuItem value="PR-VA-352">PR-VA-352</MenuItem>
-// <MenuItem value="PR-VA-312">PR-VA-312</MenuItem>
-// <MenuItem value="PR-VA-351">PR-VA-351</MenuItem>
-// <MenuItem value="PR-VA-361Ain">PR-VA-361Ain</MenuItem>
-// <MenuItem value="PR-VA-361Aout">PR-VA-361Aout</MenuItem>
-// <MenuItem value="PR-VA-361Bin">PR-VA-361Bin</MenuItem>
-// <MenuItem value="PR-VA-361Bout">PR-VA-361Bout</MenuItem>
-// <MenuItem value="PR-VA-362Ain">PR-VA-362Ain</MenuItem>
-// <MenuItem value="PR-VA-362Aout">PR-VA-362Aout</MenuItem>
-// <MenuItem value="PR-VA-362Bin">PR-VA-362Bin</MenuItem>
-// <MenuItem value="PR-VA-362Bout">PR-VA-362Bout</MenuItem>
-// <MenuItem value="N2-VA-311">N2-VA-311</MenuItem>
-// <MenuItem value="GS-VA-311">GS-VA-311</MenuItem>
-// <MenuItem value="GS-VA-312">GS-VA-312</MenuItem>
-// <MenuItem value="N2-VA-321">N2-VA-321</MenuItem>
-// <MenuItem value="GS-VA-321">GS-VA-321</MenuItem>
-// <MenuItem value="GS-VA-322">GS-VA-322</MenuItem>
-// <MenuItem value="GS-VA-022">GS-VA-022</MenuItem>
-// <MenuItem value="GS-VA-021">GS-VA-021</MenuItem>
-// <MenuItem value="AX-VA-351">AX-VA-351</MenuItem>
-// <MenuItem value="AX-VA-311">AX-VA-311</MenuItem>
-// <MenuItem value="AX-VA-312">AX-VA-312</MenuItem>
-// <MenuItem value="AX-VA-321">AX-VA-321</MenuItem>
-// <MenuItem value="AX-VA-322">AX-VA-322</MenuItem>
-// <MenuItem value="AX-VA-391">AX-VA-391</MenuItem>
-// <MenuItem value="DM-VA-301">DM-VA-301</MenuItem>
-// <MenuItem value="DCDB0-VT-001">DCDB0-VT-001</MenuItem>
-// <MenuItem value="DCDB0-CT-001">DCDB0-CT-001</MenuItem>
-// <MenuItem value="DCDB1-VT-001">DCDB1-VT-001</MenuItem>
-// <MenuItem value="DCDB1-CT-001">DCDB1-CT-001</MenuItem>
-// <MenuItem value="DCDB2-VT-001">DCDB2-VT-001</MenuItem>
-// <MenuItem value="DCDB2-CT-001">DCDB2-CT-001</MenuItem>
-// <MenuItem value="DCDB3-VT-001">DCDB3-VT-001</MenuItem>
-// <MenuItem value="DCDB3-CT-001">DCDB3-CT-001</MenuItem>
-// <MenuItem value="DCDB4-VT-001">DCDB4-VT-001</MenuItem>
-// <MenuItem value="DCDB4-CT-001">DCDB4-CT-001</MenuItem>
-// <MenuItem value="RECT-CT-001">RECT-CT-001</MenuItem>
-// <MenuItem value="RECT-VT-001">RECT-VT-001</MenuItem>
+<MenuItem value="LICR-0101-PV">LICR-0101-PV</MenuItem>
+<MenuItem value="LICR-0102-PV">LICR-0102-PV</MenuItem>
+<MenuItem value="LICR-0103-PV">LICR-0103-PV</MenuItem>
+<MenuItem value="PICR-0101-PV">PICR-0101-PV</MenuItem>
+<MenuItem value="PICR-0102-PV">PICR-0102-PV</MenuItem>
+<MenuItem value="PICR-0103-PV">PICR-0103-PV</MenuItem>
+<MenuItem value="TICR-0101-PV">TICR-0101-PV</MenuItem>
+<MenuItem value="ABB-Flow-Meter">ABB-Flow-Meter</MenuItem>
+<MenuItem value="H2-Flow">H2-Flow</MenuItem>
+<MenuItem value="O2-Flow">O2-Flow</MenuItem>
+<MenuItem value="Cell-back-pressure">Cell-back-pressure</MenuItem>
+<MenuItem value="H2-Pressure-outlet">H2-Pressure-outlet</MenuItem>
+<MenuItem value="O2-Pressure-outlet">O2-Pressure-outlet</MenuItem>
+<MenuItem value="H2-Stack-pressure-difference">H2-Stack-pressure-difference</MenuItem>
+<MenuItem value="O2-Stack-pressure-difference">O2-Stack-pressure-difference</MenuItem>
+<MenuItem value="Ly-Rectifier-current">Ly-Rectifier-current</MenuItem>
+<MenuItem value="Ly-Rectifier-voltage">Ly-Rectifier-voltage</MenuItem>
+<MenuItem value="Cell-Voltage-Multispan">Cell-Voltage-Multispan</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Range</InputLabel>
+                    <Select value={yAxis.range} onChange={(event) => handleRangeChange(yAxis.id, event)}>
+                          <MenuItem value="0-100">0-100</MenuItem>
+                          <MenuItem value="0-500">0-500</MenuItem>
+                          <MenuItem value="0-1200">0-1200</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <FormControl fullWidth margin="normal">
+                    <InputLabel>Line Style</InputLabel>
+                    <Select value={yAxis.lineStyle} onChange={(event) => handleLineStyleChange(yAxis.id, event)}>
+                      <MenuItem value="solid">Solid</MenuItem>
+                      <MenuItem value="dotted">Dotted</MenuItem>
+                      <MenuItem value="dashed">Dashed</MenuItem>
+                      <MenuItem value="dot-dash">Dot Dash</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <Button color="secondary" onClick={() => openColorPicker(yAxis.id)}>Select Color</Button>
+                  {colorPickerOpen && selectedYAxisId === yAxis.id && <SketchPicker color={yAxis.color} onChangeComplete={handleColorChange} />}
+                </Box>
+              ))}
+              <Button variant="contained" color="secondary" onClick={() =>
+                setTempChartData((prevChart) => ({
+                  ...prevChart,
+                  yAxisDataKeys: [
+                    ...prevChart.yAxisDataKeys,
+                    {
+                      id: `left-${prevChart.yAxisDataKeys.length}`,
+                      dataKeys: [],
+                      range: "0-500",
+                      color: "#FF0000",
+                      lineStyle: "solid",
+                    },
+                  ],
+                }))
+              }>Add Y-Axis</Button>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDialogOpen(false)} color="secondary">Cancel</Button>
+            <Button onClick={saveConfiguration} color="secondary">Save</Button>
+          </DialogActions>
+        </Dialog>
+      )}
+        </Box>
+    </LocalizationProvider>
+  );
+};
 
-//                     </Select>
-//                   </FormControl>
-//                   <FormControl fullWidth margin="normal">
-//                     <InputLabel>Range</InputLabel>
-//                     <Select value={yAxis.range} onChange={(event) => handleRangeChange(yAxis.id, event)}>
-//                           <MenuItem value="0-100">0-100</MenuItem>
-//                           <MenuItem value="0-500">0-500</MenuItem>
-//                           <MenuItem value="0-1200">0-1200</MenuItem>
-//                     </Select>
-//                   </FormControl>
-//                   <FormControl fullWidth margin="normal">
-//                     <InputLabel>Line Style</InputLabel>
-//                     <Select value={yAxis.lineStyle} onChange={(event) => handleLineStyleChange(yAxis.id, event)}>
-//                       <MenuItem value="solid">Solid</MenuItem>
-//                       <MenuItem value="dotted">Dotted</MenuItem>
-//                       <MenuItem value="dashed">Dashed</MenuItem>
-//                       <MenuItem value="dot-dash">Dot Dash</MenuItem>
-//                     </Select>
-//                   </FormControl>
-//                   <Button color="secondary" onClick={() => openColorPicker(yAxis.id)}>Select Color</Button>
-//                   {colorPickerOpen && selectedYAxisId === yAxis.id && <SketchPicker color={yAxis.color} onChangeComplete={handleColorChange} />}
-//                 </Box>
-//               ))}
-//               <Button variant="contained" color="secondary" onClick={() =>
-//                 setTempChartData((prevChart) => ({
-//                   ...prevChart,
-//                   yAxisDataKeys: [
-//                     ...prevChart.yAxisDataKeys,
-//                     {
-//                       id: `left-${prevChart.yAxisDataKeys.length}`,
-//                       dataKeys: [],
-//                       range: "0-500",
-//                       color: "#FF0000",
-//                       lineStyle: "solid",
-//                     },
-//                   ],
-//                 }))
-//               }>Add Y-Axis</Button>
-//             </Box>
-//           </DialogContent>
-//           <DialogActions>
-//             <Button onClick={() => setDialogOpen(false)} color="secondary">Cancel</Button>
-//             <Button onClick={saveConfiguration} color="secondary">Save</Button>
-//           </DialogActions>
-//         </Dialog>
-//       )}
-//         </Box>
-//     </LocalizationProvider>
-//   );
-// };
-
-// export default HistoricalCharts;
-
-
+export default HistoricalCharts;
 
 // import React, { useState, useEffect, useRef } from "react";
 // import { useSelector, useDispatch } from "react-redux";
