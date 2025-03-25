@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
     Select,
     MenuItem,
@@ -9,22 +9,40 @@ import {
     TextField,
     Grid,
     Typography,
-} from '@mui/material';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import Header from 'src/component/Header';
-
+    DialogActions,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+} from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import Header from "src/component/Header";
+import {
+    ScatterChart,
+    Scatter,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+} from "recharts";
+const allDataKeys = [
+    "LICR_0101_PV", "LICR_0102_PV", "LICR_0103_PV", "PICR_0101_PV", "PICR_0102_PV", "PICR_0103_PV",
+    "TICR_0101_PV", "ABB_Flow_Meter", "H2_Flow", "O2_Flow", "Cell_Back_Pressure",
+    "H2_Pressure_Outlet", "H2_Stack_Pressure_Difference", "O2_Stack_Pressure_Difference",
+    "Ly_Rectifier_Current", "Ly_Rectifier_Voltage", "Cell_Voltage_Multispan",
+    "MK_2_Test_Name", "MK_2_Test_Description", "MK_2_Test_Remarks"
+];
 function IoTDataViewer() {
     const [startTime, setStartTime] = useState(null);
     const [endTime, setEndTime] = useState(null);
-    const [allData, setAllData] = useState([]);
+    const [allData, setAllData] = useState([]); 
     const [data, setData] = useState([]);
-    const [error, setError] = useState('');
-    const [selectedTestName, setSelectedTestName] = useState(null);
+    const [selectedTestName, setSelectedTestName] = useState("");
     const [isFetching, setIsFetching] = useState(false);
-    const [totalizerFlow, setTotalizerFlow] = useState(null);
+    const [error, setError] = useState("");
 
     const fetchData = async () => {
         setIsFetching(true);
@@ -35,193 +53,1220 @@ function IoTDataViewer() {
             };
             const startTimeIST = startTime ? convertToIST(startTime) : null;
             const endTimeIST = endTime ? convertToIST(endTime) : null;
-            const response = await fetch('https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data/historical-data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                
-                body: JSON.stringify({
-                    start_time: startTimeIST,
-                    end_time: endTimeIST,
-                }),
+            const response = await fetch("https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data/historical-data", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ start_time: startTimeIST, end_time: endTimeIST }),
             });
+
             const rawResult = await response.json();
             const result = rawResult.body ? JSON.parse(rawResult.body) : rawResult;
             if (response.ok) {
                 const processedData = (result.data || []).map((row, index) => ({
                     id: index,
-                   timestamp: row.timestamp || row.time_bucket,
                     ist_timestamp: row.ist_timestamp || row.time_bucket,
-                    MK_2_Test_Name: row.device_data?.["MK_2_Test_Name"] || row["MK_2_Test_Name"],
-                    MK_2_Test_Description: row.device_data?.["MK_2_Test_Description"] || row["MK_2_Test_Description"],
-                    MK_2_Test_Remarks: row.device_data?.["MK_2_Test_Remarks"] || row["MK_2_Test_Remarks"],
-                    
-                    LICR_0101_PV: row.device_data?.["LICR-0101-PV"] !== undefined && row.device_data?.["LICR-0101-PV"] !== null 
-                    ? row.device_data?.["LICR-0101-PV"]
-                    : row["LICR-0101-PV"] || 0,
-                    LICR_0102_PV: row.device_data?.["LICR-0102-PV"] || row["LICR-0102-PV"],
+                    "LICR_0101_PV": row.device_data?.["LICR-0101-PV"] || row["licr_0101_pv"] || 0,
+                    "LICR_0102_PV": row.device_data?.["LICR-0102-PV"] || row["licr_0102_pv"] || 0,
+                    "LICR_0103_PV": row.device_data?.["LICR-0103-PV"] || row["licr_0103_pv"] || 0,
+                    "PICR_0101_PV": row.device_data?.["PICR-0101-PV"] || row["picr_0101_pv"] || 0,
+                    "PICR_0102_PV": row.device_data?.["PICR-0102-PV"] || row["picr_0102_pv"] || 0,
+                    "PICR_0103_PV": row.device_data?.["PICR-0103-PV"] || row["picr_0103_pv"] || 0,
+                    "TICR_0101_PV": row.device_data?.["TICR-0101-PV"] || row["ticr_0101_pv"]|| 0,
+                    "ABB_Flow_Meter": row.device_data?.["ABB-Flow-Meter"] || row["abb_flow_meter"]||0,
+                    "H2_Flow": row.device_data?.["H2-Flow"] || row["h2_flow"] || 0,
+                    "O2_Flow": row.device_data?.["O2-Flow"] || row["o2_flow"] || 0,
+                    "Cell_Back_Pressure": row.device_data?.["Cell-back-pressure"] || row["cell_back_pressure"] || 0,
+                    "H2_Pressure_Outlet": row.device_data?.["H2-Pressure-outlet"] || row["h2_pressure_outlet"] || 0,
+                    "O2_Pressure_Outlet": row.device_data?.["O2-Pressure-outlet"] || row["o2_pressure_outlet"] || 0,
+                    "H2_Stack_Pressure_Difference": row.device_data?.["H2-Stack-pressure-difference"] || row["h2_stack_pressure_difference"] || 0,
+                    "O2_Stack_Pressure_Difference": row.device_data?.["O2-Stack-pressure-difference"] || row["o2_stack_pressure_difference"] || 0,
+                    "Ly_Rectifier_Current": row.device_data?.["Ly-Rectifier-current"] || row["ly_rectifier_current"] || 0,
+                    "Ly_Rectifier_Voltage": row.device_data?.["Ly-Rectifier-voltage"] || row["ly_rectifier_voltage"] || 0,
+                    "Cell_Voltage_Multispan": row.device_data?.["Cell-Voltage-Multispan"] || row["cell_voltage_multispan"] || 0,
+                    "MK_2_Test_Name": row.device_data?.["MK_2_Test_Name"] || row["mk_2_test_name"] ,
+                    "MK_2_Test_Description": row.device_data?.["MK_2_Test_Description"] || row["mk_2_test_description"] ,
+                    "MK_2_Test_Remarks": row.device_data?.["MK_2_Test_Remarks"] || row["mk_2_test_remarks"] 
                 }));
 
-                const uniqueTestNames = new Set();
-                const deduplicatedData = processedData.filter((row) => {
-                    if (row.MK_2_Test_Name && !uniqueTestNames.has(row.MK_2_Test_Name)) {
-                        uniqueTestNames.add(row.MK_2_Test_Name);
-                        return true;
-                    }
-                    return false;
-                });
                 setAllData(processedData);
-                setData(deduplicatedData);
-                setError('');
+                setData(processedData);
+                setError("");
             } else {
                 setAllData([]);
                 setData([]);
-                setError(result.message || 'Failed to fetch data');
+                setError(result.message || "Failed to fetch data");
             }
         } catch (err) {
             console.error("Error in Fetch:", err);
             setAllData([]);
             setData([]);
-            setError(err.message || 'An unexpected error occurred');
+            setError(err.message || "An unexpected error occurred");
         } finally {
             setIsFetching(false);
         }
     };
-
+    const uniqueTestNames = [...new Set(allData.map((row) => row.MK_2_Test_Name))];
     const filteredRows = selectedTestName
-    ? allData.filter((row) => row.MK_2_Test_Name === selectedTestName)
-    : [];
-
-    const handleTestNameChange = (event) => {
-        const testName = event.target.value;
-        setSelectedTestName(testName);
-    
-        if (!testName) return;
-    
-        const testData = allData.filter(row => row.MK_2_Test_Name === testName);
-        let extendedData = [...testData];
-    
-        if (testData.length > 0) {
-            let lastValidIndex = testData.length - 1;
-    
-            // Find where the test name becomes null
-            for (let i = lastValidIndex + 1; i < allData.length; i++) {
-                if (!allData[i].MK_2_Test_Name) {
-                    break;
-                }
-                extendedData.push(allData[i]);
+        ? allData.filter((row) => row.MK_2_Test_Name === selectedTestName)
+        : [];
+        function CustomTooltip({ active, payload }) {
+            if (active && payload && payload.length) {
+                const dataPoint = payload[0].payload;
+                return (
+                    <div style={{ background: "#fff", padding: "8px", border: "1px solid #ccc", borderRadius: "5px" }}>
+                        <p><strong>Timestamp:</strong> {dataPoint.ist_timestamp}</p>
+                        <p><strong>Voltage:</strong> {dataPoint.Cell_Voltage_Multispan}</p>
+                        <p><strong>Current:</strong> {dataPoint.Ly_Rectifier_Current}</p>
+                    </div>
+                );
             }
-    
-            console.log("Test Start:", testData[0].ist_timestamp);
-            console.log("Test End:", extendedData[extendedData.length - 1].ist_timestamp);
+            return null;
         }
-    
-        setData(extendedData);
-    };
-   const columns = [
-        { field: 'ist_timestamp', headerName: 'IST Timestamp', width: 205 },
-        { field: 'MK_2_Test_Name', headerName: 'mark2 Test Name', width: 250 },
-        {
-            field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
-              {
-            field: "LICR_0102_PV", headerName: "LICR-0102-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },     
+        function CustomTooltip2({ active, payload }) {
+            if (active && payload && payload.length) {
+                const dataPoint = payload[0].payload;
+                return (
+                    <div style={{ background: "#fff", padding: "8px", border: "1px solid #ccc", borderRadius: "5px" }}>
+                        <p><strong>Timestamp:</strong> {dataPoint.ist_timestamp}</p>
+                        <p><strong>Voltage:</strong> {dataPoint.Cell_Voltage_Multispan}</p>
+                        <p><strong>Current:</strong> {dataPoint.Ly_Rectifier_Current}</p>
+                        <p><strong>Temperature:</strong> {dataPoint.TICR_0101_PV}</p>
+                    </div>
+                );
+            }
+            return null;
+        }
+    const columns = [
+        { field: "ist_timestamp", headerName: "IST Timestamp", width: 200 },
+        { field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
+        { field: "LICR_0102_PV", headerName: "LICR-0102-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+        { field: "LICR_0103_PV", headerName: "LICR-0103-PV", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+        { field: "PICR_0101_PV", headerName: "PICR-0101-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+        { field: "PICR_0102_PV", headerName: "PICR-0102-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+        { field: "PICR_0103_PV", headerName: "PICR-0103-PV", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+        { field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+        { field: "ABB_Flow_Meter", headerName: "ABB-Flow-Meter", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4) },
+        { field: "H2_Flow", headerName: "H2-Flow", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+        { field: "O2_Flow", headerName: "O2-Flow", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+        { field: "Cell_Back_Pressure", headerName: "Cell-back-pressure", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+        { field: "H2_Pressure_Outlet", headerName: "H2-Pressure-outlet", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+        { field: "O2_Pressure_Outlet", headerName: "O2-Pressure-outlet", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+        { field: "H2_Stack_Pressure_Difference", headerName: "H2-Stack-pressure-difference", width: 180 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+        { field: "O2_Stack_Pressure_Difference", headerName: "O2-Stack-pressure-difference", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+        { field: "Ly_Rectifier_Current", headerName: "Ly-Rectifier-current", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+        { field: "Ly_Rectifier_Voltage", headerName: "Ly-Rectifier-voltage", width: 180 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+        { field: "Cell_Voltage_Multispan", headerName: "Cell-Voltage-Multispan", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+        { field: "MK_2_Test_Name", headerName: "MK_2_Test_Name", width: 180, },
+        { field: "MK_2_Test_Description", headerName: "MK_2_Test_Description", width: 180 },
+        { field: "MK_2_Test_Remarks", headerName: "MK_2_Test_Remarks", width: 180 }
     ];
+    // Data filtering for graphs
+    const dataForGraph1 = filteredRows.filter((row) => row.Ly_Rectifier_Current >= 0 && row.Ly_Rectifier_Current <= 499);
+    const dataForGraph2 = filteredRows.filter((row) => row.Ly_Rectifier_Current === 500);
+
+        // State for third scatter plot selection
+        const [isDialogOpen, setDialogOpen] = useState(false);
+        const [selectedX, setSelectedX] = useState("Ly_Rectifier_Current");
+        const [selectedY, setSelectedY] = useState("Ly_Rectifier_Voltage");
+    
+        const handleOpenDialog = () => setDialogOpen(true);
+        const handleCloseDialog = () => setDialogOpen(false);
     return (
-        <Box m="15px" mt="-60px">
-            <Header
-                title="Report Analytics"
-                subtitle="Fetch Report using Start Date-time and End Date-time"
-            />
-            <div>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                    <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={3}>
-                            <DateTimePicker
-                                label="Start Date Time"
-                                value={startTime}
-                                onChange={(newValue) => setStartTime(newValue)}
-                                renderInput={(params) => <TextField {...params} fullWidth />}
-                            />
-                        </Grid>
-                        <Grid item xs={3}>
-                            <DateTimePicker
-                                label="End Date Time"
-                                value={endTime}
-                                onChange={(newValue) => setEndTime(newValue)}
-                                renderInput={(params) => <TextField {...params} fullWidth />}
-                            />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                onClick={fetchData}
-                                disabled={!startTime || !endTime || isFetching}
-                            >
-                                {isFetching ? "Fetching..." : "Fetch Data"}
-                            </Button>
-                        </Grid>
-                    </Grid>
-                </LocalizationProvider>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {!isFetching && data.length > 0 && (
-                    <Box sx={{ mt: 4, mb: 4, width: '300px' }}>
-                        <FormControl fullWidth>
-                            <InputLabel id="test-name-select-label">Select Test-Name</InputLabel>
-                            <Select
-                                labelId="test-name-select-label"
-                                value={selectedTestName || ''}
-                                onChange={handleTestNameChange}
-                            >
-                                {data.map((row) => (
-                                    <MenuItem key={row.id} value={row.MK_2_Test_Name}>
-                                        {row.MK_2_Test_Name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                    </Box>
-                )}
-                {isFetching ? (
-                    <Typography variant="h5" color="secondary">Data fetching....</Typography>
-                ) : selectedTestName && filteredRows.length > 0 ? (
-                    <Box sx={{ height: 600, width: '100%' }}>
-            <div>
-                        <p>
-                            Details for Test Name: {data[0]?.MK_2_Test_Name}
-                        </p>
-                         <p>
-                            Details for Test Description:{data[0]?.MK_2_Test_Description}
-                        </p>
-                        <p>
-                            Details for Test Remarks:{data[0]?.MK_2_Test_Remarks}
-                        </p>
-                        </div>
-                        <DataGrid
-                            rows={filteredRows}
-                            columns={columns}
-                            components={{ Toolbar: GridToolbar }}
-                            getRowId={(row) => row.id}
-                            componentsProps={{
-                                toolbar:{
-                                    sx: {
-                                        "& .MuiButton-root": {
-                                            color: "rgb(34 197 94)",
-                                        },
-                                    },
-                                },
-                            }}
+        <Box m="15px">
+            <Header title="Report Analytics" subtitle="Fetch Report using Start Date-time and End Date-time" />
+
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={3}>
+                        <DateTimePicker
+                            label="Start Date Time"
+                            value={startTime}
+                            onChange={setStartTime}
+                            renderInput={(params) => <TextField {...params} fullWidth />}
                         />
-                    </Box>
-                ) : (
-                    <Typography variant="h6" color="textSecondary"></Typography>
-                )}
-            </div>
+                    </Grid>
+                    <Grid item xs={3}>
+                        <DateTimePicker
+                            label="End Date Time"
+                            value={endTime}
+                            onChange={setEndTime}
+                            renderInput={(params) => <TextField {...params} fullWidth />}
+                        />
+                    </Grid>
+                    <Grid item xs={2}>
+                        <Button variant="contained" color="secondary" onClick={fetchData} disabled={!startTime || !endTime || isFetching}>
+                            {isFetching ? "Fetching..." : "Fetch Data"}
+                        </Button>
+                    </Grid>
+                </Grid>
+            </LocalizationProvider>
+
+            {error && <p style={{ color: "red" }}>{error}</p>}
+
+            {/* Dropdown for selecting Test Name */}
+            {allData.length > 0 && (
+                <FormControl fullWidth sx={{ mt: 2 }}>
+                    <InputLabel>Select Test Name</InputLabel>
+                    <Select value={selectedTestName} onChange={(e) => setSelectedTestName(e.target.value)}>
+                        <MenuItem value="">None</MenuItem>
+                        {uniqueTestNames.map((testName, index) => (
+                            <MenuItem key={index} value={testName}>
+                                {testName}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            )}
+
+            {/* Data Table */}
+            {filteredRows.length > 0 && (
+                <Box sx={{ height: 400, width: "100%", mt: 2 }}>
+                    <DataGrid rows={filteredRows} columns={columns} components={{ Toolbar: GridToolbar }} />
+                </Box>
+            )}
+            {/* Conditional Graphs */}
+            {dataForGraph1.length > 0 && ( 
+                <>
+                    <Typography variant="h6" sx={{ mt: 4 }}>
+                        Graph 1: Ly-Rectifier-current vs Cell_Voltage_Multispan
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={400}>
+                    <ScatterChart> 
+                        <CartesianGrid />
+                        <XAxis type="number" dataKey="Ly_Rectifier_Current" name="Rectifier Current (A)" />
+                        <YAxis type="number" dataKey="Cell_Voltage_Multispan" name="Cell Voltage Multispan (V)" />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Scatter name="Data" data={dataForGraph1} fill="#8884d8" />
+                    </ScatterChart>
+                </ResponsiveContainer>
+                </>
+            )}
+            {dataForGraph2.length > 0 && (
+                <>
+                    <Typography variant="h6" sx={{ mt: 4 }}>
+                        Graph 2: TICR-0101-PV vs Cell_Voltage_Multispan
+                    </Typography>
+                    <ResponsiveContainer width="100%" height={400}>
+                        <ScatterChart>
+                            <CartesianGrid />
+                            <XAxis type="number" dataKey="TICR_0101_PV" name="TICR-0101-PV" />
+                            <YAxis type="number" dataKey="Cell_Voltage_Multispan" name="Voltage" />
+                            <Tooltip content={<CustomTooltip2 />} />
+                            <Scatter name="Data" data={dataForGraph2} fill="#82ca9d" />
+                        </ScatterChart>
+                    </ResponsiveContainer>
+                </>
+            )}
+                        {/* Configure Scatter Plot */}
+            <Button variant="contained" sx={{ mt: 3 }} onClick={handleOpenDialog}>
+                Configure Charts
+            </Button>
+
+            <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+                <DialogTitle>Select X-axis and Y-axis Data Keys</DialogTitle>
+                <DialogContent>
+                    <FormControl fullWidth sx={{ my: 2 }}>
+                        <InputLabel>X-Axis Data Key</InputLabel>
+                        <Select value={selectedX} onChange={(e) => setSelectedX(e.target.value)}>
+                            {allDataKeys.map(key => (
+                                <MenuItem key={key} value={key}>{key}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl fullWidth sx={{ my: 2 }}>
+                        <InputLabel>Y-Axis Data Key</InputLabel>
+                        <Select value={selectedY} onChange={(e) => setSelectedY(e.target.value)}>
+                            {allDataKeys.map(key => (
+                                <MenuItem key={key} value={key}>{key}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>Cancel</Button>
+                    <Button onClick={handleCloseDialog} variant="contained">
+                        Save & Plot
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+ {/* Third Scatter Plot (Dynamic Selection) */}
+ <Typography variant="h6" sx={{ mt: 4 }}>
+ Graph 3: {selectedX} vs {selectedY}
+</Typography>
+<ResponsiveContainer width="100%" height={400}>
+ <ScatterChart>
+     <CartesianGrid />
+     <XAxis type="number" dataKey={selectedX} name={selectedX} />
+     <YAxis type="number" dataKey={selectedY} name={selectedY} />
+     <Tooltip content={<CustomTooltip />} />
+     <Scatter name="Dynamic Data" data={data} fill="#ff7300" />
+ </ScatterChart>
+</ResponsiveContainer>
         </Box>
     );
 }
 export default IoTDataViewer;
+
+// import React, { useState } from "react";
+// import {
+//     Select,
+//     MenuItem,
+//     FormControl,
+//     InputLabel,
+//     Button,
+//     Box,
+//     TextField,
+//     Grid,
+//     Typography,
+//     DialogActions,
+//     Dialog,
+//     DialogTitle,
+//     DialogContent,
+// } from "@mui/material";
+// import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+// import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import Header from "src/component/Header";
+// import {
+//     ScatterChart,
+//     Scatter,
+//     XAxis,
+//     YAxis,
+//     CartesianGrid,
+//     Tooltip,
+//     ResponsiveContainer,
+// } from "recharts";
+// const allDataKeys = [
+//     "LICR_0101_PV", "LICR_0102_PV", "LICR_0103_PV", "PICR_0101_PV", "PICR_0102_PV", "PICR_0103_PV",
+//     "TICR_0101_PV", "ABB_Flow_Meter", "H2_Flow", "O2_Flow", "Cell_Back_Pressure",
+//     "H2_Pressure_Outlet", "H2_Stack_Pressure_Difference", "O2_Stack_Pressure_Difference",
+//     "Ly_Rectifier_Current", "Ly_Rectifier_Voltage", "Cell_Voltage_Multispan",
+//     "MK_2_Test_Name", "MK_2_Test_Description", "MK_2_Test_Remarks"
+// ];
+// function IoTDataViewer() {
+//     const [startTime, setStartTime] = useState(null);
+//     const [endTime, setEndTime] = useState(null);
+//     const [allData, setAllData] = useState([]);
+//     const [data, setData] = useState([]);
+//     const [selectedTestName, setSelectedTestName] = useState("");
+//     const [isFetching, setIsFetching] = useState(false);
+//     const [error, setError] = useState("");
+
+//     const fetchData = async () => {
+//         setIsFetching(true);
+//         try {
+//             const convertToIST = (date) => {
+//                 const offsetInMilliseconds = 5.5 * 60 * 60 * 1000;
+//                 return new Date(date.getTime() + offsetInMilliseconds).toISOString().slice(0, 19);
+//             };
+//             const startTimeIST = startTime ? convertToIST(startTime) : null;
+//             const endTimeIST = endTime ? convertToIST(endTime) : null;
+//             const response = await fetch("https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data", {
+//                 method: "POST",
+//                 headers: { "Content-Type": "application/json" },
+//                 body: JSON.stringify({ start_time: startTimeIST, end_time: endTimeIST }),
+//             });
+
+//             const rawResult = await response.json();
+//             const result = rawResult.body ? JSON.parse(rawResult.body) : rawResult;
+//             if (response.ok) {
+//                 const processedData = (result.data || []).map((row, index) => ({
+//                     id: index,
+//                     ist_timestamp: row.ist_timestamp || row.time_bucket,
+//                     "LICR_0101_PV": row.device_data?.["LICR-0101-PV"] || row["licr_0101_pv"],
+//                     "LICR_0102_PV": row.device_data?.["LICR-0102-PV"] || row["licr_0102_pv"],
+//                     "LICR_0103_PV": row.device_data?.["LICR-0103-PV"] || row["licr_0103_pv"],
+//                     "PICR_0101_PV": row.device_data?.["PICR-0101-PV"] || row["picr_0101_pv"],
+//                     "PICR_0102_PV": row.device_data?.["PICR-0102-PV"] || row["picr_0102_pv"],
+//                     "PICR_0103_PV": row.device_data?.["PICR-0103-PV"] || row["picr_0103_pv"],
+//                     "TICR_0101_PV": row.device_data?.["TICR-0101-PV"] || row["ticr_0101_pv"],
+//                     "ABB_Flow_Meter": row.device_data?.["ABB-Flow-Meter"] || row["abb_flow_meter"],
+//                     "H2_Flow": row.device_data?.["H2-Flow"] || row["h2_flow"],
+//                     "O2_Flow": row.device_data?.["O2-Flow"] || row["o2_flow"],
+//                     "Cell_Back_Pressure": row.device_data?.["Cell-back-pressure"] || row["cell_back_pressure"],
+//                     "H2_Pressure_Outlet": row.device_data?.["H2-Pressure-outlet"] || row["h2_pressure_outlet"],
+//                     "O2_Pressure_Outlet": row.device_data?.["O2-Pressure-outlet"] || row["o2_pressure_outlet"],
+//                     "H2_Stack_Pressure_Difference": row.device_data?.["H2-Stack-pressure-difference"] || row["h2_stack_pressure_difference"],
+//                     "O2_Stack_Pressure_Difference": row.device_data?.["O2-Stack-pressure-difference"] || row["o2_stack_pressure_difference"],
+//                     "Ly_Rectifier_Current": row.device_data?.["Ly-Rectifier-current"] || row["ly_rectifier_current"],
+//                     "Ly_Rectifier_Voltage": row.device_data?.["Ly-Rectifier-voltage"] || row["ly_rectifier_voltage"],
+//                     "Cell_Voltage_Multispan": row.device_data?.["Cell-Voltage-Multispan"] || row["cell_voltage_multispan"],
+//                     "MK_2_Test_Name": row.device_data?.["MK_2_Test_Name"] || row["mk_2_test_name"],
+//                     "MK_2_Test_Description": row.device_data?.["MK_2_Test_Description"] || row["mk_2_test_description"],
+//                     "MK_2_Test_Remarks": row.device_data?.["MK_2_Test_Remarks"] || row["mk_2_test_remarks"]
+//                 }));
+
+//                 setAllData(processedData);
+//                 setData(processedData);
+//                 setError("");
+//             } else {
+//                 setAllData([]);
+//                 setData([]);
+//                 setError(result.message || "Failed to fetch data");
+//             }
+//         } catch (err) {
+//             console.error("Error in Fetch:", err);
+//             setAllData([]);
+//             setData([]);
+//             setError(err.message || "An unexpected error occurred");
+//         } finally {
+//             setIsFetching(false);
+//         }
+//     };
+//     const uniqueTestNames = [...new Set(allData.map((row) => row.MK_2_Test_Name))];
+//     const filteredRows = selectedTestName
+//         ? allData.filter((row) => row.MK_2_Test_Name === selectedTestName)
+//         : [];
+//         function CustomTooltip({ active, payload }) {
+//             if (active && payload && payload.length) {
+//                 const dataPoint = payload[0].payload;
+//                 return (
+//                     <div style={{ background: "#fff", padding: "8px", border: "1px solid #ccc", borderRadius: "5px" }}>
+//                         <p><strong>Timestamp:</strong> {dataPoint.ist_timestamp}</p>
+//                         <p><strong>Voltage:</strong> {dataPoint.Cell_Voltage_Multispan}</p>
+//                         <p><strong>Current:</strong> {dataPoint.Ly_Rectifier_Current}</p>
+//                     </div>
+//                 );
+//             }
+//             return null;
+//         }
+//         function CustomTooltip2({ active, payload }) {
+//             if (active && payload && payload.length) {
+//                 const dataPoint = payload[0].payload;
+//                 return (
+//                     <div style={{ background: "#fff", padding: "8px", border: "1px solid #ccc", borderRadius: "5px" }}>
+//                         <p><strong>Timestamp:</strong> {dataPoint.ist_timestamp}</p>
+//                         <p><strong>Voltage:</strong> {dataPoint.Cell_Voltage_Multispan}</p>
+//                         <p><strong>Current:</strong> {dataPoint.Ly_Rectifier_Current}</p>
+//                         <p><strong>Temperature:</strong> {dataPoint.TICR_0101_PV}</p>
+//                     </div>
+//                 );
+//             }
+//             return null;
+//         }
+//     const columns = [
+//         { field: "ist_timestamp", headerName: "IST Timestamp", width: 200 },
+//         { field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "LICR_0102_PV", headerName: "LICR-0102-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "LICR_0103_PV", headerName: "LICR-0103-PV", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "PICR_0101_PV", headerName: "PICR-0101-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "PICR_0102_PV", headerName: "PICR-0102-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "PICR_0103_PV", headerName: "PICR-0103-PV", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "ABB_Flow_Meter", headerName: "ABB-Flow-Meter", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "H2_Flow", headerName: "H2-Flow", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "O2_Flow", headerName: "O2-Flow", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "Cell_Back_Pressure", headerName: "Cell-back-pressure", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "H2_Pressure_Outlet", headerName: "H2-Pressure-outlet", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "O2_Pressure_Outlet", headerName: "O2-Pressure-outlet", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "H2_Stack_Pressure_Difference", headerName: "H2-Stack-pressure-difference", width: 180 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "O2_Stack_Pressure_Difference", headerName: "O2-Stack-pressure-difference", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "Ly_Rectifier_Current", headerName: "Ly-Rectifier-current", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "Ly_Rectifier_Voltage", headerName: "Ly-Rectifier-voltage", width: 180 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "Cell_Voltage_Multispan", headerName: "Cell-Voltage-Multispan", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "MK_2_Test_Name", headerName: "MK_2_Test_Name", width: 180, },
+//         { field: "MK_2_Test_Description", headerName: "MK_2_Test_Description", width: 180 },
+//         { field: "MK_2_Test_Remarks", headerName: "MK_2_Test_Remarks", width: 180 }
+//     ];
+//     // Data filtering for graphs
+//     const dataForGraph1 = filteredRows.filter((row) => row.Ly_Rectifier_Current >= 0 && row.Ly_Rectifier_Current <= 499);
+//     const dataForGraph2 = filteredRows.filter((row) => row.Ly_Rectifier_Current === 500);
+
+//         // State for third scatter plot selection
+//         const [isDialogOpen, setDialogOpen] = useState(false);
+//         const [selectedX, setSelectedX] = useState("Ly_Rectifier_Current");
+//         const [selectedY, setSelectedY] = useState("Ly_Rectifier_Voltage");
+    
+//         const handleOpenDialog = () => setDialogOpen(true);
+//         const handleCloseDialog = () => setDialogOpen(false);
+//     return (
+//         <Box m="15px">
+//             <Header title="Report Analytics" subtitle="Fetch Report using Start Date-time and End Date-time" />
+
+//             <LocalizationProvider dateAdapter={AdapterDateFns}>
+//                 <Grid container spacing={2} alignItems="center">
+//                     <Grid item xs={3}>
+//                         <DateTimePicker
+//                             label="Start Date Time"
+//                             value={startTime}
+//                             onChange={setStartTime}
+//                             renderInput={(params) => <TextField {...params} fullWidth />}
+//                         />
+//                     </Grid>
+//                     <Grid item xs={3}>
+//                         <DateTimePicker
+//                             label="End Date Time"
+//                             value={endTime}
+//                             onChange={setEndTime}
+//                             renderInput={(params) => <TextField {...params} fullWidth />}
+//                         />
+//                     </Grid>
+//                     <Grid item xs={2}>
+//                         <Button variant="contained" color="secondary" onClick={fetchData} disabled={!startTime || !endTime || isFetching}>
+//                             {isFetching ? "Fetching..." : "Fetch Data"}
+//                         </Button>
+//                     </Grid>
+//                 </Grid>
+//             </LocalizationProvider>
+
+//             {error && <p style={{ color: "red" }}>{error}</p>}
+
+//             {/* Dropdown for selecting Test Name */}
+//             {allData.length > 0 && (
+//                 <FormControl fullWidth sx={{ mt: 2 }}>
+//                     <InputLabel>Select Test Name</InputLabel>
+//                     <Select value={selectedTestName} onChange={(e) => setSelectedTestName(e.target.value)}>
+//                         <MenuItem value="">None</MenuItem>
+//                         {uniqueTestNames.map((testName, index) => (
+//                             <MenuItem key={index} value={testName}>
+//                                 {testName}
+//                             </MenuItem>
+//                         ))}
+//                     </Select>
+//                 </FormControl>
+//             )}
+
+//             {/* Data Table */}
+//             {filteredRows.length > 0 && (
+//                 <Box sx={{ height: 400, width: "100%", mt: 2 }}>
+//                     <DataGrid rows={filteredRows} columns={columns} components={{ Toolbar: GridToolbar }} />
+//                 </Box>
+//             )}
+//             {/* Conditional Graphs */}
+//             {dataForGraph1.length > 0 && ( 
+//                 <>
+//                     <Typography variant="h6" sx={{ mt: 4 }}>
+//                         Graph 1: Ly-Rectifier-current vs Cell_Voltage_Multispan
+//                     </Typography>
+//                     <ResponsiveContainer width="100%" height={400}>
+//                     <ScatterChart> 
+//                         <CartesianGrid />
+//                         <XAxis type="number" dataKey="Ly_Rectifier_Current" name="Rectifier Current (A)" />
+//                         <YAxis type="number" dataKey="Cell_Voltage_Multispan" name="Cell Voltage Multispan (V)" />
+//                         <Tooltip content={<CustomTooltip />} />
+//                         <Scatter name="Data" data={dataForGraph1} fill="#8884d8" />
+//                     </ScatterChart>
+//                 </ResponsiveContainer>
+//                 </>
+//             )}
+//             {dataForGraph2.length > 0 && (
+//                 <>
+//                     <Typography variant="h6" sx={{ mt: 4 }}>
+//                         Graph 2: TICR-0101-PV vs Cell_Voltage_Multispan
+//                     </Typography>
+//                     <ResponsiveContainer width="100%" height={400}>
+//                         <ScatterChart>
+//                             <CartesianGrid />
+//                             <XAxis type="number" dataKey="TICR_0101_PV" name="TICR-0101-PV" />
+//                             <YAxis type="number" dataKey="Cell_Voltage_Multispan" name="Voltage" />
+//                             <Tooltip content={<CustomTooltip2 />} />
+//                             <Scatter name="Data" data={dataForGraph2} fill="#82ca9d" />
+//                         </ScatterChart>
+//                     </ResponsiveContainer>
+//                 </>
+//             )}
+//                         {/* Configure Scatter Plot */}
+//             <Button variant="contained" sx={{ mt: 3 }} onClick={handleOpenDialog}>
+//                 Configure Charts
+//             </Button>
+
+//             <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+//                 <DialogTitle>Select X-axis and Y-axis Data Keys</DialogTitle>
+//                 <DialogContent>
+//                     <FormControl fullWidth sx={{ my: 2 }}>
+//                         <InputLabel>X-Axis Data Key</InputLabel>
+//                         <Select value={selectedX} onChange={(e) => setSelectedX(e.target.value)}>
+//                             {allDataKeys.map(key => (
+//                                 <MenuItem key={key} value={key}>{key}</MenuItem>
+//                             ))}
+//                         </Select>
+//                     </FormControl>
+
+//                     <FormControl fullWidth sx={{ my: 2 }}>
+//                         <InputLabel>Y-Axis Data Key</InputLabel>
+//                         <Select value={selectedY} onChange={(e) => setSelectedY(e.target.value)}>
+//                             {allDataKeys.map(key => (
+//                                 <MenuItem key={key} value={key}>{key}</MenuItem>
+//                             ))}
+//                         </Select>
+//                     </FormControl>
+//                 </DialogContent>
+//                 <DialogActions>
+//                     <Button onClick={handleCloseDialog}>Cancel</Button>
+//                     <Button onClick={handleCloseDialog} variant="contained">
+//                         Save & Plot
+//                     </Button>
+//                 </DialogActions>
+//             </Dialog>
+
+//  {/* Third Scatter Plot (Dynamic Selection) */}
+//  <Typography variant="h6" sx={{ mt: 4 }}>
+//  Graph 3: {selectedX} vs {selectedY}
+// </Typography>
+// <ResponsiveContainer width="100%" height={400}>
+//  <ScatterChart>
+//      <CartesianGrid />
+//      <XAxis type="number" dataKey={selectedX} name={selectedX} />
+//      <YAxis type="number" dataKey={selectedY} name={selectedY} />
+//      <Tooltip content={<CustomTooltip />} />
+//      <Scatter name="Dynamic Data" data={data} fill="#ff7300" />
+//  </ScatterChart>
+// </ResponsiveContainer>
+//         </Box>
+//     );
+// }
+
+// export default IoTDataViewer;
+
+
+// for the belwo perfectlly woking 
+
+// import React, { useState } from "react";
+// import {
+//     Select,
+//     MenuItem,
+//     FormControl,
+//     InputLabel,
+//     Button,
+//     Box,
+//     TextField,
+//     Grid,
+//     Typography,
+// } from "@mui/material";
+// import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+// import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import Header from "src/component/Header";
+// import {
+//     ScatterChart,
+//     Scatter,
+//     XAxis,
+//     YAxis,
+//     CartesianGrid,
+//     Tooltip,
+//     ResponsiveContainer,
+// } from "recharts";
+
+// function IoTDataViewer() {
+//     const [startTime, setStartTime] = useState(null);
+//     const [endTime, setEndTime] = useState(null);
+//     const [allData, setAllData] = useState([]);
+//     const [data, setData] = useState([]);
+//     const [selectedTestName, setSelectedTestName] = useState("");
+//     const [isFetching, setIsFetching] = useState(false);
+//     const [error, setError] = useState("");
+
+//     const fetchData = async () => {
+//         setIsFetching(true);
+//         try {
+//             const convertToIST = (date) => {
+//                 const offsetInMilliseconds = 5.5 * 60 * 60 * 1000;
+//                 return new Date(date.getTime() + offsetInMilliseconds).toISOString().slice(0, 19);
+//             };
+//             const startTimeIST = startTime ? convertToIST(startTime) : null;
+//             const endTimeIST = endTime ? convertToIST(endTime) : null;
+//             const response = await fetch("https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data", {
+//                 method: "POST",
+//                 headers: { "Content-Type": "application/json" },
+//                 body: JSON.stringify({ start_time: startTimeIST, end_time: endTimeIST }),
+//             });
+
+//             const rawResult = await response.json();
+//             const result = rawResult.body ? JSON.parse(rawResult.body) : rawResult;
+//             if (response.ok) {
+//                 const processedData = (result.data || []).map((row, index) => ({
+//                     id: index,
+//                     ist_timestamp: row.ist_timestamp || row.time_bucket,
+//                     "LICR_0101_PV": row.device_data?.["LICR-0101-PV"] || row["licr_0101_pv"],
+//                     "LICR_0102_PV": row.device_data?.["LICR-0102-PV"] || row["licr_0102_pv"],
+//                     "LICR_0103_PV": row.device_data?.["LICR-0103-PV"] || row["licr_0103_pv"],
+//                     "PICR_0101_PV": row.device_data?.["PICR-0101-PV"] || row["picr_0101_pv"],
+//                     "PICR_0102_PV": row.device_data?.["PICR-0102-PV"] || row["picr_0102_pv"],
+//                     "PICR_0103_PV": row.device_data?.["PICR-0103-PV"] || row["picr_0103_pv"],
+//                     "TICR_0101_PV": row.device_data?.["TICR-0101-PV"] || row["ticr_0101_pv"],
+//                     "ABB_Flow_Meter": row.device_data?.["ABB-Flow-Meter"] || row["abb_flow_meter"],
+//                     "H2_Flow": row.device_data?.["H2-Flow"] || row["h2_flow"],
+//                     "O2_Flow": row.device_data?.["O2-Flow"] || row["o2_flow"],
+//                     "Cell_Back_Pressure": row.device_data?.["Cell-back-pressure"] || row["cell_back_pressure"],
+//                     "H2_Pressure_Outlet": row.device_data?.["H2-Pressure-outlet"] || row["h2_pressure_outlet"],
+//                     "O2_Pressure_Outlet": row.device_data?.["O2-Pressure-outlet"] || row["o2_pressure_outlet"],
+//                     "H2_Stack_Pressure_Difference": row.device_data?.["H2-Stack-pressure-difference"] || row["h2_stack_pressure_difference"],
+//                     "O2_Stack_Pressure_Difference": row.device_data?.["O2-Stack-pressure-difference"] || row["o2_stack_pressure_difference"],
+//                     "Ly_Rectifier_Current": row.device_data?.["Ly-Rectifier-current"] || row["ly_rectifier_current"],
+//                     "Ly_Rectifier_Voltage": row.device_data?.["Ly-Rectifier-voltage"] || row["ly_rectifier_voltage"],
+//                     "Cell_Voltage_Multispan": row.device_data?.["Cell-Voltage-Multispan"] || row["cell_voltage_multispan"],
+//                     "MK_2_Test_Name": row.device_data?.["MK_2_Test_Name"] || row["mk_2_test_name"],
+//                     "MK_2_Test_Description": row.device_data?.["MK_2_Test_Description"] || row["mk_2_test_description"],
+//                     "MK_2_Test_Remarks": row.device_data?.["MK_2_Test_Remarks"] || row["mk_2_test_remarks"]
+//                 }));
+
+//                 setAllData(processedData);
+//                 setData(processedData);
+//                 setError("");
+//             } else {
+//                 setAllData([]);
+//                 setData([]);
+//                 setError(result.message || "Failed to fetch data");
+//             }
+//         } catch (err) {
+//             console.error("Error in Fetch:", err);
+//             setAllData([]);
+//             setData([]);
+//             setError(err.message || "An unexpected error occurred");
+//         } finally {
+//             setIsFetching(false);
+//         }
+//     };
+
+//     const uniqueTestNames = [...new Set(allData.map((row) => row.MK_2_Test_Name))];
+
+//     const filteredRows = selectedTestName
+//         ? allData.filter((row) => row.MK_2_Test_Name === selectedTestName)
+//         : [];
+
+//         function CustomTooltip({ active, payload }) {
+//             if (active && payload && payload.length) {
+//                 const dataPoint = payload[0].payload;
+//                 return (
+//                     <div style={{ background: "#fff", padding: "8px", border: "1px solid #ccc", borderRadius: "5px" }}>
+//                         <p><strong>Timestamp:</strong> {dataPoint.ist_timestamp}</p>
+//                         <p><strong>Voltage:</strong> {dataPoint.Cell_Voltage_Multispan}</p>
+//                         <p><strong>Current:</strong> {dataPoint.Ly_Rectifier_Current}</p>
+//                     </div>
+//                 );
+//             }
+//             return null;
+//         }
+//         function CustomTooltip2({ active, payload }) {
+//             if (active && payload && payload.length) {
+//                 const dataPoint = payload[0].payload;
+//                 return (
+//                     <div style={{ background: "#fff", padding: "8px", border: "1px solid #ccc", borderRadius: "5px" }}>
+//                         <p><strong>Timestamp:</strong> {dataPoint.ist_timestamp}</p>
+//                         <p><strong>Voltage:</strong> {dataPoint.Cell_Voltage_Multispan}</p>
+//                         <p><strong>Current:</strong> {dataPoint.Ly_Rectifier_Current}</p>
+//                         <p><strong>Temperature:</strong> {dataPoint.TICR_0101_PV}</p>
+//                     </div>
+//                 );
+//             }
+//             return null;
+//         }
+//     const columns = [
+//         { field: "ist_timestamp", headerName: "IST Timestamp", width: 200 },
+//         { field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "LICR_0102_PV", headerName: "LICR-0102-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "LICR_0103_PV", headerName: "LICR-0103-PV", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "PICR_0101_PV", headerName: "PICR-0101-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "PICR_0102_PV", headerName: "PICR-0102-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "PICR_0103_PV", headerName: "PICR-0103-PV", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "ABB_Flow_Meter", headerName: "ABB-Flow-Meter", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "H2_Flow", headerName: "H2-Flow", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "O2_Flow", headerName: "O2-Flow", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "Cell_Back_Pressure", headerName: "Cell-back-pressure", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "H2_Pressure_Outlet", headerName: "H2-Pressure-outlet", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "O2_Pressure_Outlet", headerName: "O2-Pressure-outlet", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "H2_Stack_Pressure_Difference", headerName: "H2-Stack-pressure-difference", width: 180 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "O2_Stack_Pressure_Difference", headerName: "O2-Stack-pressure-difference", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "Ly_Rectifier_Current", headerName: "Ly-Rectifier-current", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "Ly_Rectifier_Voltage", headerName: "Ly-Rectifier-voltage", width: 180 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+//         { field: "Cell_Voltage_Multispan", headerName: "Cell-Voltage-Multispan", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+//         { field: "MK_2_Test_Name", headerName: "MK_2_Test_Name", width: 180, },
+//         { field: "MK_2_Test_Description", headerName: "MK_2_Test_Description", width: 180 },
+//         { field: "MK_2_Test_Remarks", headerName: "MK_2_Test_Remarks", width: 180 }
+//     ];
+
+//     // Data filtering for graphs
+//     const dataForGraph1 = filteredRows.filter((row) => row.Ly_Rectifier_Current >= 0 && row.Ly_Rectifier_Current <= 499);
+//     const dataForGraph2 = filteredRows.filter((row) => row.Ly_Rectifier_Current === 500);
+
+//     return (
+//         <Box m="15px">
+//             <Header title="Report Analytics" subtitle="Fetch Report using Start Date-time and End Date-time" />
+
+//             <LocalizationProvider dateAdapter={AdapterDateFns}>
+//                 <Grid container spacing={2} alignItems="center">
+//                     <Grid item xs={3}>
+//                         <DateTimePicker
+//                             label="Start Date Time"
+//                             value={startTime}
+//                             onChange={setStartTime}
+//                             renderInput={(params) => <TextField {...params} fullWidth />}
+//                         />
+//                     </Grid>
+//                     <Grid item xs={3}>
+//                         <DateTimePicker
+//                             label="End Date Time"
+//                             value={endTime}
+//                             onChange={setEndTime}
+//                             renderInput={(params) => <TextField {...params} fullWidth />}
+//                         />
+//                     </Grid>
+//                     <Grid item xs={2}>
+//                         <Button variant="contained" color="secondary" onClick={fetchData} disabled={!startTime || !endTime || isFetching}>
+//                             {isFetching ? "Fetching..." : "Fetch Data"}
+//                         </Button>
+//                     </Grid>
+//                 </Grid>
+//             </LocalizationProvider>
+
+//             {error && <p style={{ color: "red" }}>{error}</p>}
+
+//             {/* Dropdown for selecting Test Name */}
+//             {allData.length > 0 && (
+//                 <FormControl fullWidth sx={{ mt: 2 }}>
+//                     <InputLabel>Select Test Name</InputLabel>
+//                     <Select value={selectedTestName} onChange={(e) => setSelectedTestName(e.target.value)}>
+//                         <MenuItem value="">None</MenuItem>
+//                         {uniqueTestNames.map((testName, index) => (
+//                             <MenuItem key={index} value={testName}>
+//                                 {testName}
+//                             </MenuItem>
+//                         ))}
+//                     </Select>
+//                 </FormControl>
+//             )}
+
+//             {/* Data Table */}
+//             {filteredRows.length > 0 && (
+//                 <Box sx={{ height: 400, width: "100%", mt: 2 }}>
+//                     <DataGrid rows={filteredRows} columns={columns} components={{ Toolbar: GridToolbar }} />
+//                 </Box>
+//             )}
+//             {/* Conditional Graphs */}
+//             {dataForGraph1.length > 0 && ( 
+//                 <>
+//                     <Typography variant="h6" sx={{ mt: 4 }}>
+//                         Graph 1: Ly-Rectifier-current vs Cell_Voltage_Multispan
+//                     </Typography>
+//                     <ResponsiveContainer width="100%" height={400}>
+//                     <ScatterChart> 
+//                         <CartesianGrid />
+//                         <XAxis type="number" dataKey="Ly_Rectifier_Current" name="Rectifier Current (A)" />
+//                         <YAxis type="number" dataKey="Cell_Voltage_Multispan" name="Cell Voltage Multispan (V)" />
+//                         <Tooltip content={<CustomTooltip />} />
+//                         <Scatter name="Data" data={dataForGraph1} fill="#8884d8" />
+//                     </ScatterChart>
+//                 </ResponsiveContainer>
+//                 </>
+//             )}
+
+//             {dataForGraph2.length > 0 && (
+//                 <>
+//                     <Typography variant="h6" sx={{ mt: 4 }}>
+//                         Graph 2: TICR-0101-PV vs Cell_Voltage_Multispan
+//                     </Typography>
+//                     <ResponsiveContainer width="100%" height={400}>
+//                         <ScatterChart>
+//                             <CartesianGrid />
+//                             <XAxis type="number" dataKey="TICR_0101_PV" name="TICR-0101-PV" />
+//                             <YAxis type="number" dataKey="Cell_Voltage_Multispan" name="Voltage" />
+//                             <Tooltip content={<CustomTooltip2 />} />
+//                             <Scatter name="Data" data={dataForGraph2} fill="#82ca9d" />
+//                         </ScatterChart>
+//                     </ResponsiveContainer>
+//                 </>
+//             )}
+//         </Box>
+//     );
+// }
+
+// export default IoTDataViewer;
+
+
+
+// import React, { useState } from "react";
+// import {
+//     Select,
+//     MenuItem,
+//     FormControl,
+//     InputLabel,
+//     Button,
+//     Box,
+//     TextField,
+//     Grid,
+//     Typography,
+// } from "@mui/material";
+// import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+// import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import Header from "src/component/Header";
+
+// import {
+//     ScatterChart,
+//     Scatter,
+//     XAxis,
+//     YAxis,
+//     CartesianGrid,
+//     Tooltip,
+//     ResponsiveContainer,
+// } from "recharts";
+
+// function IoTDataViewer() {
+//     const [startTime, setStartTime] = useState(null);
+//     const [endTime, setEndTime] = useState(null);
+//     const [allData, setAllData] = useState([]);
+//     const [data, setData] = useState([]);
+//     const [selectedTestName, setSelectedTestName] = useState("");
+//     const [isFetching, setIsFetching] = useState(false);
+//     const [error, setError] = useState("");
+
+//     const fetchData = async () => {
+//         setIsFetching(true);
+//         try {
+//             const convertToIST = (date) => {
+//                 const offsetInMilliseconds = 5.5 * 60 * 60 * 1000;
+//                 return new Date(date.getTime() + offsetInMilliseconds).toISOString().slice(0, 19);
+//             };
+//             const startTimeIST = startTime ? convertToIST(startTime) : null;
+//             const endTimeIST = endTime ? convertToIST(endTime) : null;
+//             const response = await fetch("https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data", {
+//                 method: "POST",
+//                 headers: { "Content-Type": "application/json" },
+//                 body: JSON.stringify({ start_time: startTimeIST, end_time: endTimeIST }),
+//             });
+
+//             const rawResult = await response.json();
+//             const result = rawResult.body ? JSON.parse(rawResult.body) : rawResult;
+//             if (response.ok) {
+//                 const processedData = (result.data || []).map((row, index) => ({
+//                     id: index,
+//                     ist_timestamp: row.ist_timestamp || row.time_bucket,
+//                     MK_2_Test_Name: row.device_data?.["MK_2_Test_Name"] || row["mk_2_test_name"],
+//                     TICR_0101_PV: row.device_data?.["TICR-0101-PV"] || row["ticr_0101_pv"],
+//                     Ly_Rectifier_current: row.device_data?.["Ly-Rectifier-current"] || row["ly_rectifier_current"],
+//                     Ly_Rectifier_voltage: row.device_data?.["Ly-Rectifier-voltage"] || row["ly_rectifier_voltage"],
+//                 }));
+
+//                 setAllData(processedData);
+//                 setData(processedData);
+//                 setError("");
+//             } else {
+//                 setAllData([]);
+//                 setData([]);
+//                 setError(result.message || "Failed to fetch data");
+//             }
+//         } catch (err) {
+//             console.error("Error in Fetch:", err);
+//             setAllData([]);
+//             setData([]);
+//             setError(err.message || "An unexpected error occurred");
+//         } finally {
+//             setIsFetching(false);
+//         }
+//     };
+
+//     const uniqueTestNames = [...new Set(allData.map((row) => row.MK_2_Test_Name))];
+
+//     const filteredRows = selectedTestName
+//         ? allData.filter((row) => row.MK_2_Test_Name === selectedTestName)
+//         : [];
+
+//     const columns = [
+//         { field: "ist_timestamp", headerName: "IST Timestamp", width: 200 },
+//         { field: "MK_2_Test_Name", headerName: "Mark2 Test Name", width: 220 },
+//         { field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 150 },
+//         { field: "Ly_Rectifier_current", headerName: "Ly-Rectifier-current", width: 180 },
+//         { field: "Ly_Rectifier_voltage", headerName: "Ly-Rectifier-voltage", width: 180 },
+//     ];
+
+//     return (
+//         <Box m="15px">
+//             <Header title="Report Analytics" subtitle="Fetch Report using Start Date-time and End Date-time" />
+
+//             <LocalizationProvider dateAdapter={AdapterDateFns}>
+//                 <Grid container spacing={2} alignItems="center">
+//                     <Grid item xs={3}>
+//                         <DateTimePicker
+//                             label="Start Date Time"
+//                             value={startTime}
+//                             onChange={setStartTime}
+//                             renderInput={(params) => <TextField {...params} fullWidth />}
+//                         />
+//                     </Grid>
+//                     <Grid item xs={3}>
+//                         <DateTimePicker
+//                             label="End Date Time"
+//                             value={endTime}
+//                             onChange={setEndTime}
+//                             renderInput={(params) => <TextField {...params} fullWidth />}
+//                         />
+//                     </Grid>
+//                     <Grid item xs={2}>
+//                         <Button variant="contained" color="secondary" onClick={fetchData} disabled={!startTime || !endTime || isFetching}>
+//                             {isFetching ? "Fetching..." : "Fetch Data"}
+//                         </Button>
+//                     </Grid>
+//                 </Grid>
+//             </LocalizationProvider>
+
+//             {error && <p style={{ color: "red" }}>{error}</p>}
+
+//             {/* Dropdown for selecting Test Name */}
+//             {allData.length > 0 && (
+//                 <FormControl fullWidth sx={{ mt: 2 }}>
+//                     <InputLabel>Select Test Name</InputLabel>
+//                     <Select value={selectedTestName} onChange={(e) => setSelectedTestName(e.target.value)}>
+//                         <MenuItem value="">None</MenuItem>
+//                         {uniqueTestNames.map((testName, index) => (
+//                             <MenuItem key={index} value={testName}>
+//                                 {testName}
+//                             </MenuItem>
+//                         ))}
+//                     </Select>
+//                 </FormControl>
+//             )}
+
+//             {/* Data Table */}
+//             {filteredRows.length > 0 && (
+//                 <Box sx={{ height: 400, width: "100%", mt: 2 }}>
+//                     <DataGrid rows={filteredRows} columns={columns} components={{ Toolbar: GridToolbar }} />
+//                 </Box>
+//             )}
+
+//             {/* Scatter Graphs */}
+//             {filteredRows.length > 0 && (
+//                 <>
+//                     <Typography variant="h6" sx={{ mt: 4 }}>
+//                         Graph 1: Ly-Rectifier-current vs Ly-Rectifier-voltage
+//                     </Typography>
+//                     <ResponsiveContainer width="100%" height={400}>
+//                         <ScatterChart>
+//                             <CartesianGrid />
+//                             <XAxis type="number" dataKey="Ly_Rectifier_voltage" name="Voltage" />
+//                             <YAxis type="number" dataKey="Ly_Rectifier_current" name="Current" />
+//                             <Tooltip />
+//                             <Scatter name="Data" data={filteredRows} fill="#8884d8" />
+//                         </ScatterChart>
+//                     </ResponsiveContainer>
+
+//                     <Typography variant="h6" sx={{ mt: 4 }}>
+//                         Graph 2: TICR-0101-PV vs Ly-Rectifier-voltage
+//                     </Typography>
+//                     <ResponsiveContainer width="100%" height={400}>
+//                         <ScatterChart>
+//                             <CartesianGrid />
+//                             <XAxis type="number" dataKey="Ly_Rectifier_voltage" name="Voltage" />
+//                             <YAxis type="number" dataKey="TICR_0101_PV" name="TICR-0101-PV" />
+//                             <Tooltip />
+//                             <Scatter name="Data" data={filteredRows} fill="#82ca9d" />
+//                         </ScatterChart>
+//                     </ResponsiveContainer>
+//                 </>
+//             )}
+//         </Box>
+//     );
+// }
+// export default IoTDataViewer;
+
+
+// import React, { useState } from 'react';
+// import {
+//     Select,
+//     MenuItem,
+//     FormControl,
+//     InputLabel,
+//     Button,
+//     Box,
+//     TextField,
+//     Grid,
+//     Typography,
+// } from '@mui/material';
+// import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+// import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+// import Header from 'src/component/Header';
+
+// function IoTDataViewer() {
+//     const [startTime, setStartTime] = useState(null);
+//     const [endTime, setEndTime] = useState(null);
+//     const [allData, setAllData] = useState([]);
+//     const [data, setData] = useState([]);
+//     const [error, setError] = useState('');
+//     const [selectedTestName, setSelectedTestName] = useState(null);
+//     const [isFetching, setIsFetching] = useState(false);
+
+//     const fetchData = async () => {
+//         setIsFetching(true);
+//         try {
+//             const convertToIST = (date) => {
+//                 const offsetInMilliseconds = 5.5 * 60 * 60 * 1000;
+//                 return new Date(date.getTime() + offsetInMilliseconds).toISOString().slice(0, 19);
+//             };
+//             const startTimeIST = startTime ? convertToIST(startTime) : null;
+//             const endTimeIST = endTime ? convertToIST(endTime) : null;
+//             const response = await fetch('https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data', {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                 },
+                
+//                 body: JSON.stringify({
+//                     start_time: startTimeIST,
+//                     end_time: endTimeIST,
+//                 }),
+//             });
+//             const rawResult = await response.json();
+//             const result = rawResult.body ? JSON.parse(rawResult.body) : rawResult;
+//             if (response.ok) {
+//                 const processedData = (result.data || []).map((row, index) => ({
+//                     id: index,
+//                    timestamp: row.timestamp || row.time_bucket,
+//                     ist_timestamp: row.ist_timestamp || row.time_bucket,
+//                     MK_2_Test_Name: row.device_data?.["MK_2_Test_Name"] || row["mk_2_test_name"],
+//                     MK_2_Test_Description: row.device_data?.["MK_2_Test_Description"] || row["mk_2_test_description"],
+//                     MK_2_Test_Remarks: row.device_data?.["MK_2_Test_Remarks"] || row["mk_2_test_remarks"],
+
+//                      TICR_0101_PV: row.device_data?.["TICR-0101-PV"] || row["ticr_0101_pv"],
+//                      Ly_Rectifier_current: row.device_data?.["Ly-Rectifier-current"] || row["ly_rectifier_current"],
+//                      Ly_Rectifier_voltage: row.device_data?.["Ly-Rectifier-voltage"] || row["ly_rectifier_voltage"],
+//                 }));
+
+//                 const uniqueTestNames = new Set();
+//                 const deduplicatedData = processedData.filter((row) => {
+//                     if (row.MK_2_Test_Name && !uniqueTestNames.has(row.MK_2_Test_Name)) {
+//                         uniqueTestNames.add(row.MK_2_Test_Name);
+//                         return true;
+//                     }
+//                     return false;
+//                 });
+//                 setAllData(processedData);
+//                 setData(deduplicatedData);
+//                 setError('');
+//             } else {
+//                 setAllData([]);
+//                 setData([]);
+//                 setError(result.message || 'Failed to fetch data');
+//             }
+//         } catch (err) {
+//             console.error("Error in Fetch:", err);
+//             setAllData([]);
+//             setData([]);
+//             setError(err.message || 'An unexpected error occurred');
+//         } finally {
+//             setIsFetching(false);
+//         }
+//     };
+//     const filteredRows = selectedTestName
+//     ? allData.filter((row) => row.MK_2_Test_Name === selectedTestName)
+//     : [];
+
+//     const handleTestNameChange = (event) => {
+//         setSelectedTestName(event.target.value);
+//     };
+//    const columns = [
+//         { field: 'ist_timestamp', headerName: 'IST Timestamp', width: 205 },
+//         { field: 'MK_2_Test_Name', headerName: 'mark2 Test Name', width: 250 },
+//         {
+//             field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
+//           },
+//         {
+//             field: "Ly_Rectifier_current", headerName: "Ly-Rectifier-current", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+//           },
+//           {
+//             field: "Ly_Rectifier_voltage", headerName: "Ly-Rectifier-voltage", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+//           },  
+//     ];
+//     return (
+//         <Box m="15px" mt="-60px">
+//             <Header
+//                 title="Report Analytics"
+//                 subtitle="Fetch Report using Start Date-time and End Date-time"
+//             />
+//             <div>
+//                 <LocalizationProvider dateAdapter={AdapterDateFns}>
+//                     <Grid container spacing={2} alignItems="center">
+//                         <Grid item xs={3}>
+//                             <DateTimePicker
+//                                 label="Start Date Time"
+//                                 value={startTime}
+//                                 onChange={(newValue) => setStartTime(newValue)}
+//                                 renderInput={(params) => <TextField {...params} fullWidth />}
+//                             />
+//                         </Grid>
+//                         <Grid item xs={3}>
+//                             <DateTimePicker
+//                                 label="End Date Time"
+//                                 value={endTime}
+//                                 onChange={(newValue) => setEndTime(newValue)}
+//                                 renderInput={(params) => <TextField {...params} fullWidth />}
+//                             />
+//                         </Grid>
+//                         <Grid item xs={2}>
+//                             <Button
+//                                 variant="contained"
+//                                 color="secondary"
+//                                 onClick={fetchData}
+//                                 disabled={!startTime || !endTime || isFetching}
+//                             >
+//                                 {isFetching ? "Fetching..." : "Fetch Data"}
+//                             </Button>
+//                         </Grid>
+//                     </Grid>
+//                 </LocalizationProvider>
+//                 {error && <p style={{ color: 'red' }}>{error}</p>}
+//                 {!isFetching && data.length > 0 && (
+//                     <Box sx={{ mt: 4, mb: 4, width: '300px' }}>
+//                         <FormControl fullWidth>
+//                             <InputLabel id="test-name-select-label">Select Test-Name</InputLabel>
+//                             <Select
+//                                 labelId="test-name-select-label"
+//                                 value={selectedTestName || ''}
+//                                 onChange={handleTestNameChange}
+//                             >
+//                                 {data.map((row) => (
+//                                     <MenuItem key={row.id} value={row.MK_2_Test_Name}>
+//                                         {row.MK_2_Test_Name}
+//                                     </MenuItem>
+//                                 ))}
+//                             </Select>
+//                         </FormControl>
+//                     </Box>
+//                 )}
+//                 {isFetching ? (
+//                     <Typography variant="h5" color="secondary">Data fetching....</Typography>
+//                 ) : selectedTestName && filteredRows.length > 0 ? (
+//                     <Box sx={{ height: 600, width: '100%' }}>
+//             <div>
+//                         <p>
+//                             Details for Test Name: {data[0]?.MK_2_Test_Name}
+//                         </p>
+//                          <p>
+//                             Details for Test Description:{data[0]?.MK_2_Test_Description}
+//                         </p>
+//                         <p>
+//                             Details for Test Remarks:{data[0]?.MK_2_Test_Remarks}
+//                         </p>
+//                         </div>
+//                         <DataGrid
+//                             rows={filteredRows}
+//                             columns={columns}
+//                             components={{ Toolbar: GridToolbar }}
+//                             getRowId={(row) => row.id}
+//                             componentsProps={{
+//                                 toolbar:{
+//                                     sx: {
+//                                         "& .MuiButton-root": {
+//                                             color: "rgb(34 197 94)",
+//                                         },
+//                                     },
+//                                 },
+//                             }}
+//                         />
+//                     </Box>
+//                 ) : (
+//                     <Typography variant="h6" color="textSecondary"></Typography>
+//                 )}
+//             </div>
+//         </Box>
+//     );
+// }
+// export default IoTDataViewer;
 
 // import React, { useState } from 'react';
 // import {
@@ -364,10 +1409,10 @@ export default IoTDataViewer;
 //     ? allData.filter((row) => row.MK_2_Test_Name === selectedTestName)
 //     : [];
 
-//     const handleTestNameChange = (event) => {
-//         setSelectedTestName(event.target.value);
-//         setTotalizerFlow(null); // Reset totalizer flow when test changes
-//     };
+    // const handleTestNameChange = (event) => {
+    //     setSelectedTestName(event.target.value);
+    //     setTotalizerFlow(null); // Reset totalizer flow when test changes
+    // };
 
 //     const calculateTotalizerFlow = () => {
 //         const filteredRows = allData.filter((row) => row.MK_2_Test_Name === selectedTestName);
@@ -802,9 +1847,9 @@ export default IoTDataViewer;
 //             {
 //               field: "PICR_0103_PV", headerName: "PICR-0103-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
 //             },
-//             {
-//               field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
-//             },
+            // {
+            //   field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
+            // },
 //             {
 //               field: "ABB_Flow_Meter", headerName: "ABB-Flow-Meter", width: 100, valueFormatter: (params) => Number(params.value).toFixed(4)
 //             },
@@ -829,12 +1874,12 @@ export default IoTDataViewer;
 //             {
 //               field: "O2_Stack_pressure_difference", headerName: "O2-Stack-pressure-difference", width: 170, valueFormatter: (params) => Number(params.value).toFixed(4)
 //             },
-//             {
-//               field: "Ly_Rectifier_current", headerName: "Ly-Rectifier-current", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
-//             },
-//             {
-//               field: "Ly_Rectifier_voltage", headerName: "Ly-Rectifier-voltage", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
-//             },
+            // {
+            //   field: "Ly_Rectifier_current", headerName: "Ly-Rectifier-current", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+            // },
+            // {
+            //   field: "Ly_Rectifier_voltage", headerName: "Ly-Rectifier-voltage", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
+            // },
 //             {
 //               field: "Cell_Voltage_Multispan", headerName: "Cell-Voltage-Multispan", width: 130, valueFormatter: (params) => Number(params.value).toFixed(4)
 //             },

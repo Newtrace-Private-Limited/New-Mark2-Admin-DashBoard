@@ -168,7 +168,7 @@ const HistoricalCharts = () => {
           : format(endDate, "yyyy-MM-dd'T'HH:mm");
   
       const response = await axios.post(
-        "https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data",
+        "https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data/historical-data",
         { start_time: formattedStartDate, end_time: formattedEndDate },
         { headers: { "Content-Type": "application/json" } }
       );

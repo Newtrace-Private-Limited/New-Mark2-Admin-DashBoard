@@ -8,114 +8,72 @@ import { Box, Button, Grid, TextField, useTheme } from "@mui/material";
 import Header from "src/component/Header";
 import { tokens } from "../../theme";
 import { format } from "date-fns";
-import { CSVLink } from "react-csv"; // Import CSVLink for exporting to CSV
-  
+
 const DataTable = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   const [rows, setRows] = useState([]);
-  const [allRows, setAllRows] = useState([]);  // Store all records accumulated so far
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [pageSize, setPageSize] = useState(100);
-  const [page, setPage] = useState(1);  // Track current page
-  const [totalRecords, setTotalRecords] = useState(0); // Track total records count
   const [error, setError] = useState("");
 
   const fetchData = async (start, end, page, pageSize) => {
     setLoading(true);
     setError("");
     try {
+      // Format the start and end date to 'yyyy-MM-dd HH:mm' format
       const formattedStartTime = format(start, "yyyy-MM-dd HH:mm");
       const formattedEndTime = format(end, "yyyy-MM-dd HH:mm");
 
+      // Ensure both start and end date are selected
       if (!start || !end) {
         throw new Error("Start Date and End Date are required.");
       }
-  
+
       const response = await axios.post(
-        "https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data",
+        "https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data/historical-data",
         {
           start_time: formattedStartTime,
           end_time: formattedEndTime,
           page,
           page_size: pageSize,
-        }, 
+        },
         {
           headers: { "Content-Type": "application/json" },
         }
       );
+
       if (response.status === 200) {
         const result = response.data;
         const processedData = (result.data || []).map((row, index) => ({
-          id: index + (page - 1) * pageSize,
-          timestamp: row.timestamp || row.time_bucket,
+          id: index + (page - 1) * pageSize, // Ensure unique ID for pagination
           ist_timestamp: row.ist_timestamp || row.time_bucket,
-          MK_2_Test_Name: row.device_data?.["MK_2_Test_Name"] || row["MK_2_Test_Name"],
-          MK_2_Test_Description: row.device_data?.["MK_2_Test_Description"] || row["MK_2_Test_Description"],
-          MK_2_Test_Remarks: row.device_data?.["MK_2_Test_Remarks"] || row["MK_2_Test_Remarks"],
-          
-          LICR_0101_PV: row.device_data?.["LICR-0101-PV"] !== undefined && row.device_data?.["LICR-0101-PV"] !== null 
-          ? row.device_data?.["LICR-0101-PV"]
-          : row["LICR-0101-PV"] || 0,
-LICR_0102_PV: row.device_data?.["LICR-0102-PV"] || row["LICR-0102-PV"],
-LICR_0103_PV: row.device_data?.["LICR-0103-PV"] || row["LICR-0103-PV"],
-PICR_0101_PV: row.device_data?.["PICR-0101-PV"] !== undefined && row.device_data?.["PICR-0101-PV"] !== null
-? row.device_data?.["PICR-0101-PV"]
-: row["PICR-0101-PV"] || 0,
-
-PICR_0102_PV: row.device_data?.["PICR-0102-PV"] || row["PICR-0102-PV"],
-PICR_0103_PV: row.device_data?.["PICR-0103-PV"] || row["PICR-0103-PV"],
-TICR_0101_PV: row.device_data?.["TICR-0101-PV"] || row["TICR-0101-PV"],
-ABB_Flow_Meter: row.device_data?.["ABB-Flow-Meter"] || row["ABB-Flow-Meter"],
-H2_Flow: row.device_data?.["H2-Flow"] !== undefined && row.device_data?.["H2-Flow"] !== null
-? row.device_data?.["H2-Flow"]
-: row["H2-Flow"] || 0,
-O2_Flow: row.device_data?.["O2-Flow"] !== undefined && row.device_data?.["O2-Flow"] !== null
-? row.device_data?.["O2-Flow"]
-: row["O2-Flow"] || 0,
-Cell_back_pressure: row.device_data?.["Cell-back-pressure"] !== undefined && row.device_data?.["Cell-back-pressurez"] !== null
-          ? row.device_data?.["Cell-back-pressure"]
-          : row["Cell-back-pressure"] || 0,
-H2_Pressure_outlet: row.device_data?.["H2-Pressure-outlet"] || row["H2-Pressure-outlet"],
-O2_Pressure_outlet: row.device_data?.["O2-Pressure-outlet"] || row["O2-Pressure-outlet"],
-H2_Stack_pressure_difference: row.device_data?.["H2-Stack-pressure-difference"] !== undefined && row.device_data?.["H2-Stack-pressure-difference"] !== null 
-                    ? row.device_data?.["H2-Stack-pressure-difference"]
-                    : row["H2-Stack-pressure-difference"] || 0,
-
-O2_Stack_pressure_difference: row.device_data?.["O2-Stack-pressure-difference"] !== undefined && row.device_data?.["O2-Stack-pressure-difference"] !== null 
-                    ? row.device_data?.["O2-Stack-pressure-difference"]
-                    : row["O2-Stack-pressure-difference"] || 0,
-
-Ly_Rectifier_current: row.device_data?.["Ly-Rectifier-current"] !== undefined && row.device_data?.["Ly-Rectifier-current"] !== null 
-            ? row.device_data?.["Ly-Rectifier-current"]
-            : row["Ly-Rectifier-current"] || 0,
-
-Ly_Rectifier_voltage: row.device_data?.["Ly-Rectifier-voltage"] !== undefined && row.device_data?.["Ly-Rectifier-voltage"] !== null 
-             ? row.device_data?.["Ly-Rectifier-voltage"]
-             : row["Ly-Rectifier-voltage"] || 0,
-
-Cell_Voltage_Multispan: row.device_data?.["Cell-Voltage-Multispan"] !== undefined && row.device_data?.["Cell-Voltage-Multispan"] !== null
-? row.device_data?.["Cell-Voltage-Multispan"]
-: row["Cell-Voltage-Multispan"] || 0,
-RECT_CT_001: row.device_data?.["RECT-CT-001"] !== undefined && row.device_data?.["RECT-CT-001"] !== null
-? row.device_data?.["RECT-CT-001"]
-: row["rect_ct_001"] || 0,
-RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.["RECT-VT-001"] !== null
-? row.device_data?.["RECT-VT-001"]
-: row["rect_vt_001"] || 0,
+          "LICR_0101_PV": row.device_data?.["LICR-0101-PV"] || row["licr_0101_pv"] || 0,
+          "LICR_0102_PV": row.device_data?.["LICR-0102-PV"] || row["licr_0102_pv"] || 0,
+          "LICR_0103_PV": row.device_data?.["LICR-0103-PV"] || row["licr_0103_pv"] || 0,
+          "PICR_0101_PV": row.device_data?.["PICR-0101-PV"] || row["picr_0101_pv"] || 0,
+          "PICR_0102_PV": row.device_data?.["PICR-0102-PV"] || row["picr_0102_pv"] || 0,
+          "PICR_0103_PV": row.device_data?.["PICR-0103-PV"] || row["picr_0103_pv"] || 0,
+          "TICR_0101_PV": row.device_data?.["TICR-0101-PV"] || row["ticr_0101_pv"]|| 0,
+          "ABB_Flow_Meter": row.device_data?.["ABB-Flow-Meter"] || row["abb_flow_meter"]||0,
+          "H2_Flow": row.device_data?.["H2-Flow"] || row["h2_flow"] || 0,
+          "O2_Flow": row.device_data?.["O2-Flow"] || row["o2_flow"] || 0,
+          "Cell_Back_Pressure": row.device_data?.["Cell-back-pressure"] || row["cell_back_pressure"] || 0,
+          "H2_Pressure_Outlet": row.device_data?.["H2-Pressure-outlet"] || row["h2_pressure_outlet"] || 0,
+          "O2_Pressure_Outlet": row.device_data?.["O2-Pressure-outlet"] || row["o2_pressure_outlet"] || 0,
+          "H2_Stack_Pressure_Difference": row.device_data?.["H2-Stack-pressure-difference"] || row["h2_stack_pressure_difference"] || 0,
+          "O2_Stack_Pressure_Difference": row.device_data?.["O2-Stack-pressure-difference"] || row["o2_stack_pressure_difference"] || 0,
+          "Ly_Rectifier_Current": row.device_data?.["Ly-Rectifier-current"] || row["ly_rectifier_current"] || 0,
+          "Ly_Rectifier_Voltage": row.device_data?.["Ly-Rectifier-voltage"] || row["ly_rectifier_voltage"] || 0,
+          "Cell_Voltage_Multispan": row.device_data?.["Cell-Voltage-Multispan"] || row["cell_voltage_multispan"] || 0,
+          "MK_2_Test_Name": row.device_data?.["MK_2_Test_Name"] || row["mk_2_test_name"] ,
+          "MK_2_Test_Description": row.device_data?.["MK_2_Test_Description"] || row["mk_2_test_description"] ,
+          "MK_2_Test_Remarks": row.device_data?.["MK_2_Test_Remarks"] || row["mk_2_test_remarks"] 
         }));
-
-        // Set rows for current page view
         setRows(processedData);
-
-        // Accumulate all records so far
-        setAllRows((prevRows) => [...prevRows, ...processedData]);
-
-        // Set total records count for pagination
-        setTotalRecords(result.total_records);
       } else {
         throw new Error("Failed to fetch data");
       }
@@ -127,420 +85,98 @@ RECT_VT_001: row.device_data?.["RECT-VT-001"] !== undefined && row.device_data?.
       setLoading(false);
     }
   };
-
   const handleFetchData = () => {
     if (startDate && endDate) {
-      fetchData(startDate, endDate, page, pageSize); // Pass selected dates and pagination params
+      fetchData(startDate, endDate, 1, pageSize); // Pass selected dates and pagination params
     }
   };
-
-  const handleNextPage = () => {
-    if ((page * pageSize) < totalRecords) {
-      setPage(page + 1);
-      fetchData(startDate, endDate, page + 1, pageSize);  // Load next set of records
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (page > 1) {
-      setPage(page - 1);
-      fetchData(startDate, endDate, page - 1, pageSize);  // Load previous set of records
-    }
-  }; 
   const columns = [
-    { field: 'ist_timestamp', headerName: 'IST Timestamp', width: 205 },
-    { field: 'MK_2_Test_Name', headerName: 'mark2 Test Name', width: 250 },
-    // { field: 'MK_2_Test_Description', headerName: 'mark2 Test Description', width: 170 },
-    // { field: 'MK_2_Test_Remarks', headerName: 'mark2 Test Remarks', width: 170 },
-    {
-        field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
-          {
-        field: "LICR_0102_PV", headerName: "LICR-0102-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-      {
-        field: "LICR_0103_PV", headerName: "LICR-0103-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-      {
-        field: "PICR_0101_PV", headerName: "PICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-        {
-          field: "PICR_0102_PV", headerName: "PICR-0102-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "PICR_0103_PV", headerName: "PICR-0103-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "ABB_Flow_Meter", headerName: "ABB-Flow-Meter", width: 100, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "H2_Flow", headerName: "H2-Flow", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "O2_Flow", headerName: "O2-Flow", width: 70, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "Cell_back_pressure", headerName: "Cell-back-pressure", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "H2_Pressure_outlet", headerName: "H2-Pressure-outlet", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "O2_Pressure_outlet", headerName: "O2-Pressure-outlet", width:120, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "H2_Stack_pressure_difference", headerName: "H2-Stack-pressure-difference", width: 170, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "O2_Stack_pressure_difference", headerName: "O2-Stack-pressure-difference", width: 170, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "Ly_Rectifier_current", headerName: "Ly-Rectifier-current", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "Ly_Rectifier_voltage", headerName: "Ly-Rectifier-voltage", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        {
-          field: "Cell_Voltage_Multispan", headerName: "Cell-Voltage-Multispan", width: 130, valueFormatter: (params) => Number(params.value).toFixed(4)
-        },
-        
-            {
-        field: "RECT_CT_001", headerName: "RECT-CT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-      {
-        field: "RECT_VT_001", headerName: "RECT-VT-001", width: 90, valueFormatter: (params) => Number(params.value).toFixed(4) },
-        ];
-         // You can display MK_2_Test_Name from the first row or any other logic you prefer
-  const mk2TestName = rows.length > 0 ? rows[0].MK_2_Test_Name : "No Data"; // Default if no data
-  const mk2TestDescription = rows.length > 0 ? rows[0].MK_2_Test_Description : "No Data"; // Default if no data
-  const mk2TestRemarks = rows.length > 0 ? rows[0].MK_2_Test_Remarks : "No Data"; // Default if no data
+    { field: "ist_timestamp", headerName: "IST Timestamp", width: 200 },
+    { field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
+    { field: "LICR_0102_PV", headerName: "LICR-0102-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+    { field: "LICR_0103_PV", headerName: "LICR-0103-PV", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+    { field: "PICR_0101_PV", headerName: "PICR-0101-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+    { field: "PICR_0102_PV", headerName: "PICR-0102-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+    { field: "PICR_0103_PV", headerName: "PICR-0103-PV", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+    { field: "TICR_0101_PV", headerName: "TICR-0101-PV", width: 80,valueFormatter: (params) => Number(params.value).toFixed(4) },
+    { field: "ABB_Flow_Meter", headerName: "ABB-Flow-Meter", width: 120, valueFormatter: (params) => Number(params.value).toFixed(4) },
+    { field: "H2_Flow", headerName: "H2-Flow", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+    { field: "O2_Flow", headerName: "O2-Flow", width: 80 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+    { field: "Cell_Back_Pressure", headerName: "Cell-back-pressure", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+    { field: "H2_Pressure_Outlet", headerName: "H2-Pressure-outlet", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+    { field: "O2_Pressure_Outlet", headerName: "O2-Pressure-outlet", width: 120 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+    { field: "H2_Stack_Pressure_Difference", headerName: "H2-Stack-pressure-difference", width: 180 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+    { field: "O2_Stack_Pressure_Difference", headerName: "O2-Stack-pressure-difference", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+    { field: "Ly_Rectifier_Current", headerName: "Ly-Rectifier-current", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+    { field: "Ly_Rectifier_Voltage", headerName: "Ly-Rectifier-voltage", width: 180 ,valueFormatter: (params) => Number(params.value).toFixed(4)},
+    { field: "Cell_Voltage_Multispan", headerName: "Cell-Voltage-Multispan", width: 180, valueFormatter: (params) => Number(params.value).toFixed(4) },
+    { field: "MK_2_Test_Name", headerName: "MK_2_Test_Name", width: 180, },
+    { field: "MK_2_Test_Description", headerName: "MK_2_Test_Description", width: 180 },
+    { field: "MK_2_Test_Remarks", headerName: "MK_2_Test_Remarks", width: 180 }
+  ];
   return (
-    <Box m="20px">
-      <Header title="IOT Data" subtitle="Real-time IOT Data" />
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <Box m="15px" mt="-60px">
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <Header
+          title="Historical Data Table"
+          subtitle="Fetch data using start_time and end_time"
+        />
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={3}>
             <DateTimePicker
+              label="Start Date and Time"
               value={startDate}
-              onChange={(newValue) => setStartDate(newValue)}
-              renderInput={(props) => <TextField {...props} />}
-              label="Start Date"
+              onChange={setStartDate}
+              renderInput={(params) => <TextField {...params} />}
             />
-          </LocalizationProvider>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
+          </Grid>
+          <Grid item xs={3}>
             <DateTimePicker
+              label="End Date and Time"
               value={endDate}
-              onChange={(newValue) => setEndDate(newValue)}
-              renderInput={(props) => <TextField {...props} />}
-              label="End Date"
+              onChange={setEndDate}
+              renderInput={(params) => <TextField {...params} />}
             />
-          </LocalizationProvider>
+          </Grid>
+          <Grid item xs={3}>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleFetchData}
+              disabled={!startDate || !endDate}
+            >
+              Fetch Data
+            </Button>
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <Button
-            onClick={handleFetchData}
-            variant="contained"
-            color="primary"
-            disabled={loading}
-          >
-            Fetch Data
-          </Button>
-        </Grid>
-      </Grid>
-      {/* Display the MK_2_Test_Name in an H2 tag */}
-      <Box m="20px 0">
-        <h2>MK 2 Test Name: {mk2TestName}</h2>
-      </Box>
-      <Box m="20px 0">
-        <h2>MK 2 Test Description: {mk2TestDescription}</h2>
-      </Box>
-      <Box m="20px 0">
-        <h2>MK 2 Test Remarks: {mk2TestRemarks}</h2>
-      </Box>
-      <Box m="20px 0">
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <div style={{ height: 550, width: "100%" }}>
+        {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
+        <div style={{ height: 730, width: "100%", marginTop: 20 }}>
           <DataGrid
-            rows={rows} 
+            rows={rows}
             columns={columns}
             pageSize={pageSize}
-            rowsPerPageOptions={[100]}
-            components={{ Toolbar: GridToolbar }}
+            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+            rowsPerPageOptions={[25, 50, 100]}
             loading={loading}
+            components={{
+              Toolbar: GridToolbar,
+            }}
+            componentsProps={{
+              toolbar: {
+                sx: {
+                  "& .MuiButton-root": {
+                    color: "rgb(34 197 94)",
+                  },
+                },
+              },
+            }}
           />
         </div>
-      </Box>
-      <Box display="flex" justifyContent="space-between">
-        <Button onClick={handlePrevPage} disabled={page === 1}>
-          Prev
-        </Button>
-        <Button
-          onClick={handleNextPage}
-          disabled={page * pageSize >= totalRecords}
-        >
-          Next
-        </Button>
-      </Box>
-
-      {/* CSV Export Button */}
-      <CSVLink
-        data={allRows}  // Use allRows (all records) for exporting
-        filename="iot_data.csv"
-        className="btn btn-primary"
-      >
-        <Button variant="contained" color="secondary">
-          Download CSV
-          
-        </Button>
-      </CSVLink>
+      </LocalizationProvider>
     </Box>
   );
 };
 export default DataTable;
-
-
-// import React, { useState } from "react";
-// import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-// import axios from "axios";
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-// import { Box, Button, Grid, TextField, useTheme } from "@mui/material";
-// import Header from "src/component/Header";
-// import { tokens } from "../../theme";
-// import { format } from "date-fns";
-
-// const DataTable = () => {
-//   const theme = useTheme();
-//   const colors = tokens(theme.palette.mode);
-
-//   const [rows, setRows] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const [startDate, setStartDate] = useState(null);
-//   const [endDate, setEndDate] = useState(null);
-//   const [pageSize, setPageSize] = useState(100);
-//   const [error, setError] = useState("");
-
-//   const fetchData = async (start, end, page, pageSize) => {
-//     setLoading(true);
-//     setError("");
-//     try {
-//       // Format the start and end date to 'yyyy-MM-dd HH:mm' format
-//       const formattedStartTime = format(start, "yyyy-MM-dd HH:mm");
-//       const formattedEndTime = format(end, "yyyy-MM-dd HH:mm");
-
-//       // Ensure both start and end date are selected
-//       if (!start || !end) {
-//         throw new Error("Start Date and End Date are required.");
-//       }
-
-//       const response = await axios.post(
-//         "https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data",
-//         {
-//           start_time: formattedStartTime,
-//           end_time: formattedEndTime,
-//           page,
-//           page_size: pageSize,
-//         },
-//         {
-//           headers: { "Content-Type": "application/json" },
-//         }
-//       );
-
-//       if (response.status === 200) {
-//         const result = response.data;
-//         const processedData = (result.data || []).map((row, index) => ({
-//           id: index + (page - 1) * pageSize, // Ensure unique ID for pagination
-//           timestamp: row.timestamp || row.time_bucket,
-//           ist_timestamp: row.ist_timestamp || row.time_bucket,
-//           Test_Name: row.device_data?.["Test-Name"] || row["test_name"],
-//           MK_2_Test_Name:
-//             row.device_data?.["MK_2_Test_Name"] || row["MK_2_Test_Name"],
-
-//           LICR_0101_PV:
-//             row.device_data?.["LICR-0101-PV"] !== undefined &&
-//             row.device_data?.["LICR-0101-PV"] !== null
-//               ? row.device_data?.["LICR-0101-PV"]
-//               : row["LICR-0101-PV"] || 0,
-//           LICR_0102_PV:
-//             row.device_data?.["LICR-0102-PV"] || row["LICR-0102-PV"],
-//           LICR_0103_PV:
-//             row.device_data?.["LICR-0103-PV"] || row["LICR-0103-PV"],
-//           PICR_0101_PV1:
-//             row.device_data?.["PICR-0101-PV1"] !== undefined &&
-//             row.device_data?.["PICR-0101-PV1"] !== null
-//               ? row.device_data?.["PICR-0101-PV1"]
-//               : row["PICR-0101-PV1"] || 0,
-
-//           PICR_0102_PV:
-//             row.device_data?.["PICR-0102-PV"] || row["PICR-0102-PV"],
-//           PICR_0103_PV:
-//             row.device_data?.["PICR-0103-PV"] || row["PICR-0103-PV"],
-//           TICR_0101_PV:
-//             row.device_data?.["TICR-0101-PV"] || row["TICR-0101-PV"],
-//           ABB_Flow_Meter:
-//             row.device_data?.["ABB-Flow-Meter"] || row["ABB-Flow-Meter"],
-//           H2_Flow:
-//             row.device_data?.["H2-Flow"] !== undefined &&
-//             row.device_data?.["H2-Flow"] !== null
-//               ? row.device_data?.["H2-Flow"]
-//               : row["H2-Flow"] || 0,
-//           O2_Flow:
-//             row.device_data?.["O2-Flow"] !== undefined &&
-//             row.device_data?.["O2-Flow"] !== null
-//               ? row.device_data?.["O2-Flow"]
-//               : row["O2-Flow"] || 0,
-//         }));
-//         setRows(processedData);
-//       } else {
-//         throw new Error("Failed to fetch data");
-//       }
-//     } catch (error) {
-//       console.error("Error fetching data:", error);
-//       setRows([]);
-//       setError(error.message || "An unexpected error occurred.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-//   const handleFetchData = () => {
-//     if (startDate && endDate) {
-//       fetchData(startDate, endDate, 1, pageSize); // Pass selected dates and pagination params
-//     }
-//   };
-//   const columns = [
-//     { field: "ist_timestamp", headerName: "IST Timestamp", width: 200 },
-//     { field: "MK_2_Test_Name", headerName: "Mark2 Test Name", width: 170 },
-//     {
-//       field: "LICR_0101_PV",
-//       headerName: "LICR-0101-PV",
-//       width: 80,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "LICR_0102_PV",
-//       headerName: "LICR-0102-PV",
-//       width: 90,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "LICR_0103_PV",
-//       headerName: "LICR-0103-PV",
-//       width: 90,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "PICR_0101_PV1",
-//       headerName: "PICR-0101-PV",
-//       width: 90,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "PICR_0102_PV",
-//       headerName: "PICR-0102-PV",
-//       width: 90,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "PICR_0103_PV",
-//       headerName: "PICR-0103-PV",
-//       width: 90,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "TICR_0101_PV",
-//       headerName: "TICR-0101-PV",
-//       width: 90,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "ABB_Flow_Meter",
-//       headerName: "ABB-Flow-Meter",
-//       width: 100,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "H2_Flow",
-//       headerName: "H2-Flow",
-//       width: 70,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "O2_Flow",
-//       headerName: "O2-Flow",
-//       width: 70,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//     {
-//       field: "Cell_back_pressure",
-//       headerName: "Cell-back-pressure",
-//       width: 120,
-//       valueFormatter: (params) => Number(params.value).toFixed(4),
-//     },
-//   ];
-//   return (
-//     <Box m="15px" mt="-60px">
-//       <LocalizationProvider dateAdapter={AdapterDateFns}>
-//         <Header
-//           title="Historical Data Table"
-//           subtitle="Fetch data using start_time and end_time"
-//         />
-//         <Grid container spacing={2} alignItems="center">
-//           <Grid item xs={3}>
-//             <DateTimePicker
-//               label="Start Date and Time"
-//               value={startDate}
-//               onChange={setStartDate}
-//               renderInput={(params) => <TextField {...params} />}
-//             />
-//           </Grid>
-//           <Grid item xs={3}>
-//             <DateTimePicker
-//               label="End Date and Time"
-//               value={endDate}
-//               onChange={setEndDate}
-//               renderInput={(params) => <TextField {...params} />}
-//             />
-//           </Grid>
-//           <Grid item xs={3}>
-//             <Button
-//               variant="contained"
-//               color="secondary"
-//               onClick={handleFetchData}
-//               disabled={!startDate || !endDate}
-//             >
-//               Fetch Data
-//             </Button>
-//           </Grid>
-//         </Grid>
-//         {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
-//         <div style={{ height: 730, width: "100%", marginTop: 20 }}>
-//           <DataGrid
-//             rows={rows}
-//             columns={columns}
-//             pageSize={pageSize}
-//             onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-//             rowsPerPageOptions={[25, 50, 100]}
-//             loading={loading}
-//             components={{
-//               Toolbar: GridToolbar,
-//             }}
-//             componentsProps={{
-//               toolbar: {
-//                 sx: {
-//                   "& .MuiButton-root": {
-//                     color: "rgb(34 197 94)",
-//                   },
-//                 },
-//               },
-//             }}
-//           />
-//         </div>
-//       </LocalizationProvider>
-//     </Box>
-//   );
-// };
-// export default DataTable;
 
 // import React, { useState } from "react";
 // import { DataGrid, GridToolbar } from "@mui/x-data-grid";

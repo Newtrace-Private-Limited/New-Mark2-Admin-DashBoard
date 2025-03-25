@@ -142,7 +142,7 @@ const CustomScatterCharts = () => {
           : format(endDate, "yyyy-MM-dd'T'HH:mm");
   
       const response = await axios.post(
-        "https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data",
+        "https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data/historical-data",
         {
           start_time: formattedStartDate,
           end_time: formattedEndDate,
@@ -165,39 +165,17 @@ const CustomScatterCharts = () => {
             // For aggregated data (>= 3 hours)
             return {
               timestamp: row.time_bucket, // Use time_bucket for aggregated data
-              "LICR-0101-PV": row.licr_0101_pv || 0,
-              "LICR-0102-PV": row.licr_0102_pv || 0,
-              "LICR-0103-PV": row.licr_0103_pv || 0,
-              "PICR-0101-PV": row.picr_0101_pv || 0,
-              "PICR-0102-PV": row.picr_0102_pv || 0,
-              "PICR-0103-PV": row.picr_0103_pv || 0,
               "TICR-0101-PV": row.ticr_0101_pv || 0,
-              "ABB-Flow-Meter": row.abb_flow_meter || 0,
-              "H2-Flow": row.h2_flow || 0,
-              "O2-Flow": row.o2_flow || 0,
-              "Cell-back-pressure": row.cell_back_pressure || 0,
-              "H2-Pressure-outlet": row.h2_pressure_outlet || 0,
-              "O2-Pressure-outlet": row.o2_pressure_outlet || 0,
-              "H2-Stack-pressure-difference": row.h2_stack_pressure_difference || 0,
-              "O2-Stack-pressure-difference": row.o2_stack_pressure_difference || 0,
               "Ly-Rectifier-current": row.ly_rectifier_current || 0,
               "Ly-Rectifier-voltage": row.ly_rectifier_voltage || 0,
-              "Cell-Voltage-Multispan": row.cell_voltage_multispan || 0         
-
             };
           }
         });
-  
         // console.log("Fetched Data for Scatter Chart:", historicalData); // Debugging
-  
-        setData((prevData) => ({
+          setData((prevData) => ({
           ...prevData,
           [chartId]: historicalData,
         }));
-  
-        if (mode === "B") {
-          setupRealTimeWebSocket(chartId);
-        }
       } else {
         console.error("Failed to fetch historical data. Status:", response.status);
       }
@@ -209,58 +187,6 @@ const CustomScatterCharts = () => {
   };
   
 
-  const setupRealTimeWebSocket = (chartId) => {
-    if (wsClientRefs.current[chartId]) {
-      wsClientRefs.current[chartId].close();
-    }
-
-    wsClientRefs.current[chartId] = new WebSocketClient(
-      "wss://otiq3un7zb.execute-api.us-east-1.amazonaws.com/dev/"
-    );
-
-    wsClientRefs.current[chartId].onopen = () => {
-      // console.log(`WebSocket connection established for chart ${chartId}`);
-    };
-
-    wsClientRefs.current[chartId].onmessage = (message) => {
-      try {
-        const receivedData = JSON.parse(message.data);
-        const newData = {
-         timestamp: parseISO(receivedData["PLC-TIME-STAMP"]) || new Date(),
-         "LICR-0101-PV": receivedData["LICR-0101-PV"] || null,
-         "LICR-0102-PV": receivedData["LICR-0102-PV"] || null,
-         "LICR-0103-PV": receivedData["LICR-0103-PV"] || null,
-         "PICR-0101-PV": receivedData["PICR-0101-PV"] || null,
-         "PICR-0102-PV": receivedData["PICR-0102-PV"] || null,
-         "PICR-0103-PV": receivedData["PICR-0103-PV"] || null,
-         "TICR-0101-PV": receivedData["TICR-0101-PV"] || null,
-         "ABB-Flow-Meter": receivedData["ABB-Flow-Meter"] || null,
-         "H2-Flow": receivedData["H2-Flow"] || null,
-         "O2-Flow": receivedData["O2-Flow"] || null,
-         "Cell-back-pressure": receivedData["Cell-back-pressure"] || null,
-         "H2-Pressure-outlet": receivedData["H2-Pressure-outlet"] || null,
-         "O2-Pressure-outlet": receivedData["O2-Pressure-outlet"] || null,
-         "H2-Stack-pressure-difference": receivedData["H2-Stack-pressure-difference"] || null,
-         "O2-Stack-pressure-difference": receivedData["O2-Stack-pressure-difference"] || null,
-         "Ly-Rectifier-current": receivedData["Ly-Rectifier-current"] || null,
-         "Ly-Rectifier-voltage": receivedData["Ly-Rectifier-voltage"] || null,
-         "Cell-Voltage-Multispan": receivedData["Cell-Voltage-Multispan"] || null
-        };
-
-        setData((prevData) => ({
-          ...prevData,
-          [chartId]: [...(prevData[chartId] || []), newData],
-        }));
-      } catch (error) {
-        console.error("Error processing WebSocket message:", error);
-      }
-    };
-
-    wsClientRefs.current[chartId].onclose = () => {
-      console.warn(`WebSocket connection closed for chart ${chartId}. Reconnecting...`);
-      setTimeout(() => setupRealTimeWebSocket(chartId), 1000);
-    };
-  };
 
   const addCustomChart = () => {
     const newChartId = Date.now();
@@ -435,24 +361,9 @@ const CustomScatterCharts = () => {
               value={tempChartData?.xAxisDataKey || ""}
               onChange={(e) => setTempChartData((prevChart) => ({ ...prevChart, xAxisDataKey: e.target.value }))}
             >
-            <MenuItem value="LICR-0101-PV">LICR-0101-PV</MenuItem>
-            <MenuItem value="LICR-0102-PV">LICR-0102-PV</MenuItem>
-            <MenuItem value="LICR-0103-PV">LICR-0103-PV</MenuItem>
-            <MenuItem value="PICR-0101-PV">PICR-0101-PV</MenuItem>
-            <MenuItem value="PICR-0102-PV">PICR-0102-PV</MenuItem>
-            <MenuItem value="PICR-0103-PV">PICR-0103-PV</MenuItem>
             <MenuItem value="TICR-0101-PV">TICR-0101-PV</MenuItem>
-            <MenuItem value="ABB-Flow-Meter">ABB-Flow-Meter</MenuItem>
-            <MenuItem value="H2-Flow">H2-Flow</MenuItem>
-            <MenuItem value="O2-Flow">O2-Flow</MenuItem>
-            <MenuItem value="Cell-back-pressure">Cell-back-pressure</MenuItem>
-            <MenuItem value="H2-Pressure-outlet">H2-Pressure-outlet</MenuItem>
-            <MenuItem value="O2-Pressure-outlet">O2-Pressure-outlet</MenuItem>
-            <MenuItem value="H2-Stack-pressure-difference">H2-Stack-pressure-difference</MenuItem>
-            <MenuItem value="O2-Stack-pressure-difference">O2-Stack-pressure-difference</MenuItem>
             <MenuItem value="Ly-Rectifier-current">Ly-Rectifier-current</MenuItem>
-            <MenuItem value="Ly-Rectifier-voltage">Ly-Rectifier-voltage</MenuItem>
-            <MenuItem value="Cell-Voltage-Multispan">Cell-Voltage-Multispan</MenuItem>            
+            <MenuItem value="Ly-Rectifier-voltage">Ly-Rectifier-voltage</MenuItem>                      
             </Select>
           </FormControl>
 
@@ -462,25 +373,9 @@ const CustomScatterCharts = () => {
               value={tempChartData?.yAxisDataKey || ""}
               onChange={(e) => setTempChartData((prevChart) => ({ ...prevChart, yAxisDataKey: e.target.value }))}
             >
-            <MenuItem value="LICR-0101-PV">LICR-0101-PV</MenuItem>
-            <MenuItem value="LICR-0102-PV">LICR-0102-PV</MenuItem>
-            <MenuItem value="LICR-0103-PV">LICR-0103-PV</MenuItem>
-            <MenuItem value="PICR-0101-PV">PICR-0101-PV</MenuItem>
-            <MenuItem value="PICR-0102-PV">PICR-0102-PV</MenuItem>
-            <MenuItem value="PICR-0103-PV">PICR-0103-PV</MenuItem>
             <MenuItem value="TICR-0101-PV">TICR-0101-PV</MenuItem>
-            <MenuItem value="ABB-Flow-Meter">ABB-Flow-Meter</MenuItem>
-            <MenuItem value="H2-Flow">H2-Flow</MenuItem>
-            <MenuItem value="O2-Flow">O2-Flow</MenuItem>
-            <MenuItem value="Cell-back-pressure">Cell-back-pressure</MenuItem>
-            <MenuItem value="H2-Pressure-outlet">H2-Pressure-outlet</MenuItem>
-            <MenuItem value="O2-Pressure-outlet">O2-Pressure-outlet</MenuItem>
-            <MenuItem value="H2-Stack-pressure-difference">H2-Stack-pressure-difference</MenuItem>
-            <MenuItem value="O2-Stack-pressure-difference">O2-Stack-pressure-difference</MenuItem>
             <MenuItem value="Ly-Rectifier-current">Ly-Rectifier-current</MenuItem>
-            <MenuItem value="Ly-Rectifier-voltage">Ly-Rectifier-voltage</MenuItem>
-            <MenuItem value="Cell-Voltage-Multispan">Cell-Voltage-Multispan</MenuItem>
-            
+            <MenuItem value="Ly-Rectifier-voltage">Ly-Rectifier-voltage</MenuItem>            
             </Select>
           </FormControl>
 
@@ -500,7 +395,6 @@ const CustomScatterCharts = () => {
           <FormControl component="fieldset">
             <RadioGroup row value={mode} onChange={(e) => setMode(e.target.value)}>
               <FormControlLabel value="C" control={<Radio />} label="Select Date Range" />
-              <FormControlLabel value="B" control={<Radio />} label="Start Date & Continue Real-Time" />
             </RadioGroup>
           </FormControl>
           <Grid container spacing={2} alignItems="center" className="w-10">
@@ -568,6 +462,580 @@ const CustomScatterCharts = () => {
 };
 
 export default CustomScatterCharts;
+
+
+
+
+
+// import React, { useState, useEffect, useRef } from "react";
+// import GridLayout from "react-grid-layout";
+// import { w3cwebsocket as WebSocketClient } from "websocket";
+// import {
+//   ScatterChart,
+//   Scatter,
+//   XAxis,
+//   YAxis,
+//   CartesianGrid,
+//   Tooltip,
+//   Legend,
+//   ResponsiveContainer,
+// } from "recharts";
+// import {
+//   DateTimePicker,
+// } from "@mui/x-date-pickers/DateTimePicker";
+// import DragHandleIcon from "@mui/icons-material/DragHandle";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import {
+//   Box,
+//   Button,
+//   Dialog,
+//   DialogActions,
+//   DialogContent,
+//   DialogTitle,
+//   FormControl,
+//   InputLabel,
+//   Select,
+//   MenuItem,
+//   TextField,
+//   Grid,
+//   RadioGroup,
+//   FormControlLabel,
+//   Radio,
+// } from "@mui/material";
+// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+// import { SketchPicker } from "react-color";
+// import DeleteIcon from "@mui/icons-material/Delete";
+// import IconButton from "@mui/material/IconButton";
+// import axios from "axios";
+// import {
+//   format,
+//   subMinutes,
+//   subHours,
+//   subDays,
+//   subWeeks, 
+//   subMonths,
+//   parseISO
+// } from "date-fns";
+// import { useSelector, useDispatch } from "react-redux";
+// import { addChart, removeChart, setLayout, updateChart } from "../../redux/layoutActions";
+// import { debounce } from "lodash";
+// import Header from "src/component/Header";
+
+// const CustomScatterCharts = () => {
+//   const [data, setData] = useState({});
+//   const [chartDialogOpen, setChartDialogOpen] = useState(false);
+//   const [dialogOpen, setDialogOpen] = useState(false);
+//   const [tempChartData, setTempChartData] = useState(null);
+//   const [chartDateRanges, setChartDateRanges] = useState({});
+//   const [mode, setMode] = useState("C");
+//   const [dateDialogOpen, setDateDialogOpen] = useState(false);
+//   const [selectedChartId, setSelectedChartId] = useState(null);
+//   const wsClientRefs = useRef({});
+//   const [loading, setLoading] = useState(false);
+
+//   const dispatch = useDispatch();
+//   const layout = useSelector((state) => state.layout.scatterLayout) || JSON.parse(localStorage.getItem("scatterChartsLayout")) || [];
+//   const charts = useSelector((state) => state.layout.scatterCharts) || JSON.parse(localStorage.getItem("scatterCharts")) || [];
+
+
+//   useEffect(() => {
+//     // Sync layout from localStorage to Redux state on component mount
+//     if (!layout.length) {
+//       const savedLayout = JSON.parse(localStorage.getItem("scatterChartsLayout")) || [];
+//       dispatch(setLayout(savedLayout, "scatter"));
+//     }
+//   }, [dispatch, layout.length]);
+
+//   const saveLayout = debounce((newLayout) => {
+//     dispatch(setLayout(newLayout, "scatter"));
+//     localStorage.setItem("scatterChartsLayout", JSON.stringify(newLayout)); // Update localStorage
+//   }, 500);
+
+//   useEffect(() => {
+//     if (selectedChartId && chartDateRanges[selectedChartId]) {
+//       fetchHistoricalData(selectedChartId);
+//     }
+//   }, [chartDateRanges, selectedChartId]);
+
+//   const handleTimeRangeChange = (chartId, value) => {
+//     let start;
+//     switch (value) {
+//       case "20_minute":
+//         start = subMinutes(new Date(), 20);
+//         break;
+//       case "30_minutes":
+//         start = subMinutes(new Date(), 30);
+//         break;
+//       case "1_hour":
+//         start = subHours(new Date(), 1);
+//         break;
+//       case "6_hours":
+//         start = subHours(new Date(), 6);
+//         break;
+//       case "12_hours":
+//         start = subHours(new Date(), 12);
+//         break;
+//       case "1_day":
+//         start = subDays(new Date(), 1);
+//         break;
+//       case "2_day":
+//         start = subDays(new Date(), 2);
+//         break;
+//       case "1_week":
+//         start = subWeeks(new Date(), 1);
+//         break;
+//       case "1_month":
+//         start = subMonths(new Date(), 1);
+//         break;
+//       default:
+//         start = subMinutes(new Date(), 1);
+//     }
+
+//     setChartDateRanges((prevRanges) => ({
+//       ...prevRanges,
+//       [chartId]: { startDate: start, endDate: new Date() },
+//     }));
+//   };
+
+//   const fetchHistoricalData = async (chartId) => {
+//     const { startDate, endDate } = chartDateRanges[chartId] || {};
+//     if (!startDate) return;
+//     setLoading(true);
+  
+//     try {
+//       const formattedStartDate = format(startDate, "yyyy-MM-dd'T'HH:mm");
+//       const formattedEndDate =
+//         mode === "C"
+//           ? format(new Date(), "yyyy-MM-dd'T'HH:mm")
+//           : format(endDate, "yyyy-MM-dd'T'HH:mm");
+  
+//       const response = await axios.post(
+//         "https://aq8yus9f31.execute-api.us-east-1.amazonaws.com/dev/iot-data",
+//         {
+//           start_time: formattedStartDate,
+//           end_time: formattedEndDate,
+//         },
+//         { headers: { "Content-Type": "application/json" } }
+//       );
+  
+//       if (response.status === 200) {
+//         const parsedBody = response.data; // Assume the response is already parsed
+//         const historicalData = (parsedBody.data || []).map((row) => {
+//           // Determine if the row contains detailed or aggregated data
+//           if (row.device_data) {
+//             // For detailed data (< 3 hours)
+//             const { device_data, ...rest } = row;
+//             return {
+//               timestamp: rest.ist_timestamp || rest.time_bucket, // Use appropriate timestamp
+//               ...device_data, // Spread device_data keys
+//             };
+//           } else {
+//             // For aggregated data (>= 3 hours)
+//             return {
+//               timestamp: row.time_bucket, // Use time_bucket for aggregated data
+//               "LICR-0101-PV": row.licr_0101_pv || 0,
+//               "LICR-0102-PV": row.licr_0102_pv || 0,
+//               "LICR-0103-PV": row.licr_0103_pv || 0,
+//               "PICR-0101-PV": row.picr_0101_pv || 0,
+//               "PICR-0102-PV": row.picr_0102_pv || 0,
+//               "PICR-0103-PV": row.picr_0103_pv || 0,
+//               "TICR-0101-PV": row.ticr_0101_pv || 0,
+//               "ABB-Flow-Meter": row.abb_flow_meter || 0,
+//               "H2-Flow": row.h2_flow || 0,
+//               "O2-Flow": row.o2_flow || 0,
+//               "Cell-back-pressure": row.cell_back_pressure || 0,
+//               "H2-Pressure-outlet": row.h2_pressure_outlet || 0,
+//               "O2-Pressure-outlet": row.o2_pressure_outlet || 0,
+//               "H2-Stack-pressure-difference": row.h2_stack_pressure_difference || 0,
+//               "O2-Stack-pressure-difference": row.o2_stack_pressure_difference || 0,
+//               "Ly-Rectifier-current": row.ly_rectifier_current || 0,
+//               "Ly-Rectifier-voltage": row.ly_rectifier_voltage || 0,
+//               "Cell-Voltage-Multispan": row.cell_voltage_multispan || 0         
+
+//             };
+//           }
+//         });
+  
+//         // console.log("Fetched Data for Scatter Chart:", historicalData); // Debugging
+  
+//         setData((prevData) => ({
+//           ...prevData,
+//           [chartId]: historicalData,
+//         }));
+  
+//         if (mode === "B") {
+//           setupRealTimeWebSocket(chartId);
+//         }
+//       } else {
+//         console.error("Failed to fetch historical data. Status:", response.status);
+//       }
+//     } catch (error) {
+//       console.error("Error fetching historical data:", error);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+  
+
+//   const setupRealTimeWebSocket = (chartId) => {
+//     if (wsClientRefs.current[chartId]) {
+//       wsClientRefs.current[chartId].close();
+//     }
+
+//     wsClientRefs.current[chartId] = new WebSocketClient(
+//       "wss://otiq3un7zb.execute-api.us-east-1.amazonaws.com/dev/"
+//     );
+
+//     wsClientRefs.current[chartId].onopen = () => {
+//       // console.log(`WebSocket connection established for chart ${chartId}`);
+//     };
+
+//     wsClientRefs.current[chartId].onmessage = (message) => {
+//       try {
+//         const receivedData = JSON.parse(message.data);
+//         const newData = {
+//          timestamp: parseISO(receivedData["PLC-TIME-STAMP"]) || new Date(),
+//          "LICR-0101-PV": receivedData["LICR-0101-PV"] || null,
+//          "LICR-0102-PV": receivedData["LICR-0102-PV"] || null,
+//          "LICR-0103-PV": receivedData["LICR-0103-PV"] || null,
+//          "PICR-0101-PV": receivedData["PICR-0101-PV"] || null,
+//          "PICR-0102-PV": receivedData["PICR-0102-PV"] || null,
+//          "PICR-0103-PV": receivedData["PICR-0103-PV"] || null,
+//          "TICR-0101-PV": receivedData["TICR-0101-PV"] || null,
+//          "ABB-Flow-Meter": receivedData["ABB-Flow-Meter"] || null,
+//          "H2-Flow": receivedData["H2-Flow"] || null,
+//          "O2-Flow": receivedData["O2-Flow"] || null,
+//          "Cell-back-pressure": receivedData["Cell-back-pressure"] || null,
+//          "H2-Pressure-outlet": receivedData["H2-Pressure-outlet"] || null,
+//          "O2-Pressure-outlet": receivedData["O2-Pressure-outlet"] || null,
+//          "H2-Stack-pressure-difference": receivedData["H2-Stack-pressure-difference"] || null,
+//          "O2-Stack-pressure-difference": receivedData["O2-Stack-pressure-difference"] || null,
+//          "Ly-Rectifier-current": receivedData["Ly-Rectifier-current"] || null,
+//          "Ly-Rectifier-voltage": receivedData["Ly-Rectifier-voltage"] || null,
+//          "Cell-Voltage-Multispan": receivedData["Cell-Voltage-Multispan"] || null
+//         };
+
+//         setData((prevData) => ({
+//           ...prevData,
+//           [chartId]: [...(prevData[chartId] || []), newData],
+//         }));
+//       } catch (error) {
+//         console.error("Error processing WebSocket message:", error);
+//       }
+//     };
+
+//     wsClientRefs.current[chartId].onclose = () => {
+//       console.warn(`WebSocket connection closed for chart ${chartId}. Reconnecting...`);
+//       setTimeout(() => setupRealTimeWebSocket(chartId), 1000);
+//     };
+//   };
+
+//   const addCustomChart = () => {
+//     const newChartId = Date.now();
+//     const newChart = {
+//       id: newChartId,
+//       xAxisDataKey: "Ly-Rectifier-voltage",
+//       yAxisDataKey: "Ly-Rectifier-current",
+//       xAxisRange: ["auto", "auto"],
+//       yAxisRange: ["auto", "auto"],
+//       color: "#ca33e8",
+//     };
+//     dispatch(addChart(newChart, "scatter"));
+//     const updatedLayout = [...layout, { i: newChartId.toString(), x: 0, y: Infinity, w: 6, h: 8 }];
+//     dispatch(setLayout(updatedLayout, "scatter"));
+//     localStorage.setItem("scatterChartsLayout", JSON.stringify(updatedLayout)); // Sync layout change to localStorage
+//   };
+
+//   const deleteChart = (chartId) => {
+//     dispatch(removeChart(chartId, "scatter"));
+//     const updatedLayout = layout.filter((l) => l.i !== chartId.toString());
+//     dispatch(setLayout(updatedLayout, "scatter"));
+//     localStorage.setItem("scatterChartsLayout", JSON.stringify(updatedLayout)); // Sync layout change to localStorage
+//   };
+
+//   const saveConfiguration = () => {
+//     if (tempChartData) {
+//       dispatch(updateChart(tempChartData, "scatter")); // Pass chartType "scatter"
+//       setDialogOpen(false);
+//     }
+//   };
+
+//   const handleDateRangeApply = () => {
+//     setDateDialogOpen(false);
+//     if (mode === "B" || mode === "C") {
+//       fetchHistoricalData(selectedChartId);
+//     }
+//   };
+
+//   const renderChart = (chart) => (
+//     <Box sx={{ height: "calc(100% - 80px)" }}>
+//       <ResponsiveContainer width="100%" height="100%">
+//         <ScatterChart>
+//           <CartesianGrid strokeDasharray="3 3" />
+//           <XAxis
+//             type="number"
+//             dataKey={chart.xAxisDataKey}
+//             name={chart.xAxisDataKey}
+//             domain={chart.xAxisRange}
+//             tickFormatter={(tick) => (chart.xAxisDataKey === "timestamp" ? new Date(tick).toLocaleString() : tick)}
+//           />
+//           <YAxis
+//             type="number"
+//             dataKey={chart.yAxisDataKey}
+//             name={chart.yAxisDataKey}
+//             domain={chart.yAxisRange}
+//           />
+//           <Tooltip
+//             cursor={{ strokeDasharray: "3 3" }}
+//             content={({ payload }) => {
+//               if (payload && payload.length) {
+//                 const point = payload[0].payload;
+       
+//                 return (
+//                   <div className="custom-tooltip">
+//                     <p>{`X (${chart.xAxisDataKey}): ${point[chart.xAxisDataKey]}`}</p>
+//                     <p>{`Y (${chart.yAxisDataKey}): ${point[chart.yAxisDataKey]}`}</p>
+//                     <p>{`Timestamp: ${point.timestamp}`}</p>
+//                   </div>
+//                 );
+//               }
+//               return null;
+//             }}
+//           />
+//           <Legend />
+//           <Scatter
+//             name={`${chart.xAxisDataKey} vs ${chart.yAxisDataKey}`}
+//             data={data[chart.id] || []}
+//             fill={chart.color}
+//           />
+//         </ScatterChart>
+//       </ResponsiveContainer>
+//     </Box>
+//   );
+  
+//   return (
+//     <LocalizationProvider dateAdapter={AdapterDateFns}>
+//     <Box m="15px" mt="-60px">
+//     <Header
+//         title="Historical Scatter Analytics"
+//         subtitle="Welcome to your Historical Scatter Analytics"
+//       />
+//       <Box display="flex" justifyContent="flex-end" marginBottom={4}>
+//         <Button variant="contained" color="secondary" onClick={() => setChartDialogOpen(true)}>
+//           Add Scatter Chart
+//         </Button>
+//       </Box>
+//       <GridLayout
+//         className="layout"
+//         layout={layout}
+//         cols={12}
+//         rowHeight={45}
+//         width={1630}
+//         onLayoutChange={(newLayout) => dispatch(setLayout(newLayout, "scatter"))}
+//         onResizeStop={(newLayout) => saveLayout(newLayout)}
+//         onDragStop={(newLayout) => saveLayout(newLayout)}
+//         draggableHandle=".drag-handle"
+//         isResizable
+//         isDraggable
+//       >
+//         {charts.map((chart) => (
+//           <Box
+//             key={chart.id}
+//             data-grid={layout.find((l) => l.i === chart.id.toString()) || { x: 0, y: 0, w: 6, h: 8 }}
+//             sx={{ 
+//               position: "relative", 
+//               border: "1px solid #ccc",  
+//               borderRadius: "8px", 
+//               overflow: "hidden", 
+//               padding: 2, 
+//               height: "100%" 
+//             }}
+//           >
+//             <Box display="flex" justifyContent="space-between" p={1}>
+//               <IconButton className="drag-handle" aria-label="drag" size="small">
+//                 <DragHandleIcon />
+//               </IconButton>
+//               <IconButton aria-label="delete" onClick={() => deleteChart(chart.id)} size="small" >
+//                 <DeleteIcon />
+//               </IconButton>
+//             </Box>
+            
+//             {renderChart(chart)}
+            
+//             <Box display="flex" justifyContent="space-around" mt={1}>
+//               <Button variant="contained" color="secondary" onClick={() => {
+//                 setTempChartData(chart);
+//                 setDialogOpen(true);
+//               }}>
+//                 Configure Chart
+//               </Button>
+//               <Button
+//                 variant="contained"
+//                 color="secondary"
+//                 onClick={() => {
+//                   setSelectedChartId(chart.id);
+//                   setDateDialogOpen(true);
+//                 }}
+//               >
+//                 Select Date Range
+//               </Button>
+//             </Box>
+//           </Box>
+//         ))}
+//       </GridLayout>
+
+//       <Dialog open={chartDialogOpen} onClose={() => setChartDialogOpen(false)}>
+//         <DialogTitle>Select Chart Type</DialogTitle>
+//         <DialogContent>
+//           <Button variant="contained" onClick={addCustomChart}>Add XY Chart</Button>
+//         </DialogContent>
+//         <DialogActions>
+//           <Button onClick={() => setChartDialogOpen(false)} color="secondary">Cancel</Button>
+//         </DialogActions>
+//       </Dialog>
+
+//       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth maxWidth="md">
+//         <DialogTitle>Configure Chart</DialogTitle>
+//         <DialogContent>
+//           <FormControl fullWidth margin="normal">
+//             <InputLabel>X-Axis Data Key</InputLabel>
+//             <Select
+//               value={tempChartData?.xAxisDataKey || ""}
+//               onChange={(e) => setTempChartData((prevChart) => ({ ...prevChart, xAxisDataKey: e.target.value }))}
+//             >
+//             <MenuItem value="LICR-0101-PV">LICR-0101-PV</MenuItem>
+//             <MenuItem value="LICR-0102-PV">LICR-0102-PV</MenuItem>
+//             <MenuItem value="LICR-0103-PV">LICR-0103-PV</MenuItem>
+//             <MenuItem value="PICR-0101-PV">PICR-0101-PV</MenuItem>
+//             <MenuItem value="PICR-0102-PV">PICR-0102-PV</MenuItem>
+//             <MenuItem value="PICR-0103-PV">PICR-0103-PV</MenuItem>
+//             <MenuItem value="TICR-0101-PV">TICR-0101-PV</MenuItem>
+//             <MenuItem value="ABB-Flow-Meter">ABB-Flow-Meter</MenuItem>
+//             <MenuItem value="H2-Flow">H2-Flow</MenuItem>
+//             <MenuItem value="O2-Flow">O2-Flow</MenuItem>
+//             <MenuItem value="Cell-back-pressure">Cell-back-pressure</MenuItem>
+//             <MenuItem value="H2-Pressure-outlet">H2-Pressure-outlet</MenuItem>
+//             <MenuItem value="O2-Pressure-outlet">O2-Pressure-outlet</MenuItem>
+//             <MenuItem value="H2-Stack-pressure-difference">H2-Stack-pressure-difference</MenuItem>
+//             <MenuItem value="O2-Stack-pressure-difference">O2-Stack-pressure-difference</MenuItem>
+//             <MenuItem value="Ly-Rectifier-current">Ly-Rectifier-current</MenuItem>
+//             <MenuItem value="Ly-Rectifier-voltage">Ly-Rectifier-voltage</MenuItem>
+//             <MenuItem value="Cell-Voltage-Multispan">Cell-Voltage-Multispan</MenuItem>            
+//             </Select>
+//           </FormControl>
+
+//           <FormControl fullWidth margin="normal">
+//             <InputLabel>Y-Axis Data Key</InputLabel>
+//             <Select
+//               value={tempChartData?.yAxisDataKey || ""}
+//               onChange={(e) => setTempChartData((prevChart) => ({ ...prevChart, yAxisDataKey: e.target.value }))}
+//             >
+//             <MenuItem value="LICR-0101-PV">LICR-0101-PV</MenuItem>
+//             <MenuItem value="LICR-0102-PV">LICR-0102-PV</MenuItem>
+//             <MenuItem value="LICR-0103-PV">LICR-0103-PV</MenuItem>
+//             <MenuItem value="PICR-0101-PV">PICR-0101-PV</MenuItem>
+//             <MenuItem value="PICR-0102-PV">PICR-0102-PV</MenuItem>
+//             <MenuItem value="PICR-0103-PV">PICR-0103-PV</MenuItem>
+//             <MenuItem value="TICR-0101-PV">TICR-0101-PV</MenuItem>
+//             <MenuItem value="ABB-Flow-Meter">ABB-Flow-Meter</MenuItem>
+//             <MenuItem value="H2-Flow">H2-Flow</MenuItem>
+//             <MenuItem value="O2-Flow">O2-Flow</MenuItem>
+//             <MenuItem value="Cell-back-pressure">Cell-back-pressure</MenuItem>
+//             <MenuItem value="H2-Pressure-outlet">H2-Pressure-outlet</MenuItem>
+//             <MenuItem value="O2-Pressure-outlet">O2-Pressure-outlet</MenuItem>
+//             <MenuItem value="H2-Stack-pressure-difference">H2-Stack-pressure-difference</MenuItem>
+//             <MenuItem value="O2-Stack-pressure-difference">O2-Stack-pressure-difference</MenuItem>
+//             <MenuItem value="Ly-Rectifier-current">Ly-Rectifier-current</MenuItem>
+//             <MenuItem value="Ly-Rectifier-voltage">Ly-Rectifier-voltage</MenuItem>
+//             <MenuItem value="Cell-Voltage-Multispan">Cell-Voltage-Multispan</MenuItem>
+            
+//             </Select>
+//           </FormControl>
+
+//           <SketchPicker color={tempChartData?.color || "#000"} onChangeComplete={(color) => {
+//             setTempChartData((prevChart) => ({ ...prevChart, color: color.hex }));
+//           }} />
+//         </DialogContent>
+//         <DialogActions>
+//           <Button onClick={() => setDialogOpen(false)} color="secondary">Cancel</Button>
+//           <Button onClick={saveConfiguration} color="secondary">Save</Button>
+//         </DialogActions>
+//       </Dialog>
+
+//       <Dialog open={dateDialogOpen} onClose={() => setDateDialogOpen(false)} fullWidth maxWidth="sm">
+//         <DialogTitle>Select Date Range</DialogTitle>
+//         <DialogContent>
+//           <FormControl component="fieldset">
+//             <RadioGroup row value={mode} onChange={(e) => setMode(e.target.value)}>
+//               <FormControlLabel value="C" control={<Radio />} label="Select Date Range" />
+//               <FormControlLabel value="B" control={<Radio />} label="Start Date & Continue Real-Time" />
+//             </RadioGroup>
+//           </FormControl>
+//           <Grid container spacing={2} alignItems="center" className="w-10">
+//             <Grid item xs={6}>
+//               <DateTimePicker
+//                 label="Start Date and Time"
+//                 value={chartDateRanges[selectedChartId]?.startDate || null}
+//                 onChange={(date) =>
+//                   setChartDateRanges((prevRanges) => ({
+//                     ...prevRanges,
+//                     [selectedChartId]: { ...prevRanges[selectedChartId], startDate: date },
+//                   }))
+//                 }
+//                 renderInput={(params) => <TextField {...params} fullWidth />}
+//               />
+//             </Grid>
+//             <Grid item xs={6}>
+//               <DateTimePicker
+//                 label="End Date and Time"
+//                 value={chartDateRanges[selectedChartId]?.endDate || null}
+//                 onChange={(date) =>
+//                   setChartDateRanges((prevRanges) => ({
+//                     ...prevRanges,
+//                     [selectedChartId]: { ...prevRanges[selectedChartId], endDate: date },
+//                   }))
+//                 }
+//                 renderInput={(params) => <TextField {...params} fullWidth />}
+//                 disabled={mode === "B"}
+//               />
+//             </Grid>
+//           </Grid>
+//           <Box display="flex" justifyContent="flex-end" marginBottom={2}>
+//             <FormControl className="w-28 top-3">
+//               <InputLabel id="time-range-label">Time Range</InputLabel>
+//               <Select
+//                 labelId="time-range-label"
+//                 value={chartDateRanges[selectedChartId]?.range || ""}
+//                 onChange={(e) => handleTimeRangeChange(selectedChartId, e.target.value)}
+//               >
+//                 <MenuItem value="20_minute">Last 20 minute</MenuItem>
+//                 <MenuItem value="30_minutes">Last 30 minutes</MenuItem>
+//                 <MenuItem value="1_hour">Last 1 hour</MenuItem>
+//                 <MenuItem value="6_hours">Last 6 hour</MenuItem>
+//                 <MenuItem value="12_hours">Last 12 hours</MenuItem>
+//                 <MenuItem value="1_day">Last 1 day</MenuItem>
+//                 <MenuItem value="2_day">Last 2 day</MenuItem> 
+//                 <MenuItem value="1_week">Last 1 week</MenuItem>
+//                 <MenuItem value="1_month">Last 1 month</MenuItem>
+//               </Select>
+//             </FormControl>
+//           </Box>
+//         </DialogContent>
+//         <DialogActions>
+//           <Button onClick={() => setDateDialogOpen(false)} color="secondary">
+//             Cancel
+//           </Button>
+//           <Button onClick={handleDateRangeApply} color="secondary">
+//             Apply
+//           </Button>
+//         </DialogActions>
+//       </Dialog>
+//       </Box>
+//     </LocalizationProvider>
+//   );
+// };
+
+// export default CustomScatterCharts;
 
 
 
