@@ -8,7 +8,7 @@ function TodoList() {
     if (task.trim()) {
       setTasks([...tasks, task]);
       setTask("");
-    }
+    }  
   };
   const removeTask = (index) => {
     setTasks(tasks.filter((_, i) => i !== index));
@@ -27,13 +27,13 @@ function TodoList() {
         {tasks.map((t, index) => (
           <li key={index}>
             {t} <button onClick={() => removeTask(index)}>Remove</button>
+
           </li>
         ))}
       </ul>
     </div>
   );
 }
-
 export default TodoList;
 
 

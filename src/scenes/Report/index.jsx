@@ -11,6 +11,10 @@ import {
     TextField,
     Grid,
     Typography,
+    DialogTitle,
+    DialogContent,
+    Dialog,
+    DialogActions,
 } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
@@ -27,6 +31,16 @@ import {
     ResponsiveContainer,
     Cell,
 } from "recharts";
+
+
+
+const allDataKeys = [
+    "LICR_0101_PV", "LICR_0102_PV", "LICR_0103_PV", "PICR_0101_PV", "PICR_0102_PV", "PICR_0103_PV",
+    "TICR_0101_PV", "ABB_Flow_Meter", "H2_Flow", "O2_Flow", "Cell_Back_Pressure",
+    "H2_Pressure_Outlet", "H2_Stack_Pressure_Difference", "O2_Stack_Pressure_Difference",
+    "Ly_Rectifier_Current", "Ly_Rectifier_Voltage", "Cell_Voltage_Multispan",
+    "MK_2_Test_Name", "MK_2_Test_Description", "MK_2_Test_Remarks"
+];
 
 function IoTDataViewer() {
     const [startTime, setStartTime] = useState(null);
@@ -58,33 +72,33 @@ function IoTDataViewer() {
                 const processedData = (result.data || []).map((row, index) => ({
                     id: index,
                     ist_timestamp: row.ist_timestamp || row.time_bucket,
-                    "LICR_0101_PV": row.device_data?.["LICR-0101-PV"] || row["licr_0101_pv"],
-                    "LICR_0102_PV": row.device_data?.["LICR-0102-PV"] || row["licr_0102_pv"],
-                    "LICR_0103_PV": row.device_data?.["LICR-0103-PV"] || row["licr_0103_pv"],
-                    "PICR_0101_PV": row.device_data?.["PICR-0101-PV"] || row["picr_0101_pv"],
-                    "PICR_0102_PV": row.device_data?.["PICR-0102-PV"] || row["picr_0102_pv"],
-                    "PICR_0103_PV": row.device_data?.["PICR-0103-PV"] || row["picr_0103_pv"],
-                    "TICR_0101_PV": row.device_data?.["TICR-0101-PV"] || row["ticr_0101_pv"],
-                    "ABB_Flow_Meter": row.device_data?.["ABB-Flow-Meter"] || row["abb_flow_meter"],
-                    "H2_Flow": row.device_data?.["H2-Flow"] || row["h2_flow"],
-                    "O2_Flow": row.device_data?.["O2-Flow"] || row["o2_flow"],
-                    "Cell_Back_Pressure": row.device_data?.["Cell-back-pressure"] || row["cell_back_pressure"],
-                    "H2_Pressure_Outlet": row.device_data?.["H2-Pressure-outlet"] || row["h2_pressure_outlet"],
-                    "O2_Pressure_Outlet": row.device_data?.["O2-Pressure-outlet"] || row["o2_pressure_outlet"],
-                    "H2_Stack_Pressure_Difference": row.device_data?.["H2-Stack-pressure-difference"] || row["h2_stack_pressure_difference"],
-                    "O2_Stack_Pressure_Difference": row.device_data?.["O2-Stack-pressure-difference"] || row["o2_stack_pressure_difference"],
-                    "Ly_Rectifier_Current": row.device_data?.["Ly-Rectifier-current"] || row["ly_rectifier_current"],
-                    "Ly_Rectifier_Voltage": row.device_data?.["Ly-Rectifier-voltage"] || row["ly_rectifier_voltage"],
-                    "Cell_Voltage_Multispan": row.device_data?.["Cell-Voltage-Multispan"] || row["cell_voltage_multispan"],
-                    "MK_2_Test_Name": row.device_data?.["MK_2_Test_Name"] || row["mk_2_test_name"],
-                    "MK_2_Test_Description": row.device_data?.["MK_2_Test_Description"] || row["mk_2_test_description"],
-                    "MK_2_Test_Remarks": row.device_data?.["MK_2_Test_Remarks"] || row["mk_2_test_remarks"]
+                    "LICR_0101_PV": row.device_data?.["LICR-0101-PV"] || row["licr_0101_pv"] || 0,
+                    "LICR_0102_PV": row.device_data?.["LICR-0102-PV"] || row["licr_0102_pv"] || 0,
+                    "LICR_0103_PV": row.device_data?.["LICR-0103-PV"] || row["licr_0103_pv"] || 0,
+                    "PICR_0101_PV": row.device_data?.["PICR-0101-PV"] || row["picr_0101_pv"] || 0,
+                    "PICR_0102_PV": row.device_data?.["PICR-0102-PV"] || row["picr_0102_pv"] || 0,
+                    "PICR_0103_PV": row.device_data?.["PICR-0103-PV"] || row["picr_0103_pv"] || 0,
+                    "TICR_0101_PV": row.device_data?.["TICR-0101-PV"] || row["ticr_0101_pv"]|| 0,
+                    "ABB_Flow_Meter": row.device_data?.["ABB-Flow-Meter"] || row["abb_flow_meter"]||0,
+                    "H2_Flow": row.device_data?.["H2-Flow"] || row["h2_flow"] || 0,
+                    "O2_Flow": row.device_data?.["O2-Flow"] || row["o2_flow"] || 0,
+                    "Cell_Back_Pressure": row.device_data?.["Cell-back-pressure"] || row["cell_back_pressure"] || 0,
+                    "H2_Pressure_Outlet": row.device_data?.["H2-Pressure-outlet"] || row["h2_pressure_outlet"] || 0,
+                    "O2_Pressure_Outlet": row.device_data?.["O2-Pressure-outlet"] || row["o2_pressure_outlet"] || 0,
+                    "H2_Stack_Pressure_Difference": row.device_data?.["H2-Stack-pressure-difference"] || row["h2_stack_pressure_difference"] || 0,
+                    "O2_Stack_Pressure_Difference": row.device_data?.["O2-Stack-pressure-difference"] || row["o2_stack_pressure_difference"] || 0,
+                    "Ly_Rectifier_Current": row.device_data?.["Ly-Rectifier-current"] || row["ly_rectifier_current"] || 0,
+                    "Ly_Rectifier_Voltage": row.device_data?.["Ly-Rectifier-voltage"] || row["ly_rectifier_voltage"] || 0,
+                    "Cell_Voltage_Multispan": row.device_data?.["Cell-Voltage-Multispan"] || row["cell_voltage_multispan"] || 0,
+                    "MK_2_Test_Name": row.device_data?.["MK_2_Test_Name"] || row["mk_2_test_name"] ,
+                    "MK_2_Test_Description": row.device_data?.["MK_2_Test_Description"] || row["mk_2_test_description"] ,
+                    "MK_2_Test_Remarks": row.device_data?.["MK_2_Test_Remarks"] || row["mk_2_test_remarks"] 
                 }));
 
                 setAllData(processedData);
                 setData(processedData);
                 setError("");
-            } else {
+            } else {  
                 setAllData([]);
                 setData([]);
                 setError(result.message || "Failed to fetch data");
@@ -98,7 +112,6 @@ function IoTDataViewer() {
             setIsFetching(false);
         }
     };
-
     const uniqueTestNames = [...new Set(allData.map((row) => row.MK_2_Test_Name))];
 
     const filteredRows = selectedTestName
@@ -110,19 +123,19 @@ function IoTDataViewer() {
                 const dataPoint = payload[0].payload; // Ensure we get the correct data point
         
                 // Check if the timestamp is available in the data point
-                const timestamp = dataPoint.ist_timestamp ? dataPoint.ist_timestamp : 'N/A';
+                const timestamp = dataPoint.ist_timestamp ? dataPoint.ist_timestamp : 'N/A'; 
         
-                return (
+                return ( 
                     <div style={{ background: "#fff", padding: "8px", border: "1px solid #ccc", borderRadius: "5px" }}>
                         <p><strong>Timestamp:</strong> {timestamp}</p>
                         <p><strong>Voltage:</strong> {dataPoint.Cell_Voltage_Multispan}</p>
                         <p><strong>Current:</strong> {dataPoint.Ly_Rectifier_Current}</p>
+                        
                     </div>
                 );
             }
             return null;
         }
-        
         function CustomTooltip2({ active, payload }) {
             if (active && payload && payload.length) {
                 const dataPoint = payload[0].payload;
@@ -131,12 +144,30 @@ function IoTDataViewer() {
                         <p><strong>Timestamp:</strong> {dataPoint.ist_timestamp}</p>
                         <p><strong>Voltage:</strong> {dataPoint.Cell_Voltage_Multispan}</p>
                         <p><strong>Current:</strong> {dataPoint.Ly_Rectifier_Current}</p>
-                        <p><strong>Temperature:</strong> {dataPoint.TICR_0101_PV}</p>
+                        <p><strong>Temperature:</strong> {dataPoint.TICR_0101_PV}</p>                      
                     </div>
                 );
             }
             return null;
         }
+
+        function CustomTooltip3({ active, payload, xKey, yKey }) {
+            if (active && payload && payload.length) {
+                const dataPoint = payload[0].payload;
+                const timestamp = dataPoint.ist_timestamp ? dataPoint.ist_timestamp : 'N/A';
+        
+                return (
+                    <div style={{ background: "#fff", padding: "8px", border: "1px solid #ccc", borderRadius: "5px" }}>
+                        <p><strong>Timestamp:</strong> {timestamp}</p>
+                        <p><strong>{xKey}:</strong> {dataPoint[xKey]}</p>
+                        <p><strong>{yKey}:</strong> {dataPoint[yKey]}</p>
+                    </div>
+                );
+            }
+            return null;
+        }
+        
+
     const columns = [
         { field: "ist_timestamp", headerName: "IST Timestamp", width: 200 },
         { field: "LICR_0101_PV", headerName: "LICR-0101-PV", width: 80, valueFormatter: (params) => Number(params.value).toFixed(4) },
@@ -162,53 +193,104 @@ function IoTDataViewer() {
         { field: "MK_2_Test_Remarks", headerName: "MK_2_Test_Remarks", width: 180 }
     ];
 
-//     // 3) approach 
-// Define the specific current values to plot
-const specificCurrents = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
+    // 4) approacb 
+    // Identify the unique current values in the dataset to include all transitions
+const uniqueCurrents = [...new Set(filteredRows.map(row => row.Ly_Rectifier_Current))].sort((a, b) => a - b);
 
-// Filter data for Graph 1 to only include specific current values
-let dataForGraph1 = specificCurrents.map((current) => {
+// Filter data for Graph 1 to include all unique current values
+let dataForGraph1 = uniqueCurrents.map((current) => {
     return filteredRows.find((row) => row.Ly_Rectifier_Current === current);
 }).filter((row) => row !== undefined); // Ensure only valid rows are included
 
-// Find the first occurrence where Ly_Rectifier_Current equals 500 and include it in Graph 1
-const first500Index = filteredRows.findIndex((row) => row.Ly_Rectifier_Current === 500);
-if (first500Index !== -1) {
-    dataForGraph1.push(filteredRows[first500Index]);
-}
-
 let plotData = [];
 
-// Track if the current is increasing or decreasing
-let isIncreasing = true;
+// Track previous current value to determine increasing or decreasing trend
+let prevCurrent = null;
 
-// Iterate over the filtered data to assign colors and add timestamp
 for (let i = 0; i < dataForGraph1.length; i++) {
     const currentRow = dataForGraph1[i];
-
-    // Check if the current value is increasing or decreasing compared to the previous value
-    if (i > 0) {
-        const prevRow = dataForGraph1[i - 1];
-        if (currentRow.Ly_Rectifier_Current < prevRow.Ly_Rectifier_Current) {
-            isIncreasing = false;  // It's decreasing
+    
+    let color = 'green';  // Default to green
+    
+    if (prevCurrent !== null) {
+        if (currentRow.Ly_Rectifier_Current < prevCurrent) {
+            color = 'red';  // Decreasing trend
         } else {
-            isIncreasing = true;  // It's increasing
+            color = 'green'; // Increasing trend
         }
     }
-
-    // Set color based on increase or decrease
-    const color = isIncreasing ? 'green' : 'red';
 
     // Add the point with the color and timestamp
     plotData.push({
         Ly_Rectifier_Current: currentRow.Ly_Rectifier_Current,
         Cell_Voltage_Multispan: currentRow.Cell_Voltage_Multispan,
-        ist_timestamp: currentRow.ist_timestamp,  // Make sure this is part of the data
+        ist_timestamp: currentRow.ist_timestamp,  // Ensure this is part of the data
         color: color
     });
+
+    // Update previous current value
+    prevCurrent = currentRow.Ly_Rectifier_Current;
 }
+
 // For dataForGraph2, filter based on Ly_Rectifier_Current === 500
 const dataForGraph2 = filteredRows.filter((row) => row.Ly_Rectifier_Current === 500);
+
+
+        // State for third scatter plot selection
+        const [isDialogOpen, setDialogOpen] = useState(false);
+        const [selectedX, setSelectedX] = useState("Ly_Rectifier_Current");
+        const [selectedY, setSelectedY] = useState("Ly_Rectifier_Voltage");
+    
+        const handleOpenDialog = () => setDialogOpen(true);
+        const handleCloseDialog = () => setDialogOpen(false);
+  
+//     // 3) approach 
+// Define the specific current values to plot
+// const specificCurrents = [0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600];
+
+// // Filter data for Graph 1 to only include specific current values
+// let dataForGraph1 = specificCurrents.map((current) => {
+//     return filteredRows.find((row) => row.Ly_Rectifier_Current === current);
+// }).filter((row) => row !== undefined); // Ensure only valid rows are included
+
+// // Find the first occurrence where Ly_Rectifier_Current equals 500 and include it in Graph 1
+// const first500Index = filteredRows.findIndex((row) => row.Ly_Rectifier_Current === 500);
+// if (first500Index !== -1) {
+//     dataForGraph1.push(filteredRows[first500Index]);
+// }
+
+// let plotData = [];
+
+// // Track if the current is increasing or decreasing
+// let isIncreasing = true;
+
+// // Iterate over the filtered data to assign colors and add timestamp
+// for (let i = 0; i < dataForGraph1.length; i++) {
+//     const currentRow = dataForGraph1[i];
+
+//     // Check if the current value is increasing or decreasing compared to the previous value
+//     if (i > 0) {
+//         const prevRow = dataForGraph1[i - 1];
+//         if (currentRow.Ly_Rectifier_Current < prevRow.Ly_Rectifier_Current) {
+//             isIncreasing = false;  // It's decreasing
+//         } else {
+//             isIncreasing = true;  // It's increasing
+//         }
+//     }
+
+//     // Set color based on increase or decrease
+//     const color = isIncreasing ? 'green' : 'red';
+
+//     // Add the point with the color and timestamp
+//     plotData.push({
+//         Ly_Rectifier_Current: currentRow.Ly_Rectifier_Current,
+//         Cell_Voltage_Multispan: currentRow.Cell_Voltage_Multispan,
+//         ist_timestamp: currentRow.ist_timestamp,  // Make sure this is part of the data
+//         color: color
+//     });
+// }
+// // For dataForGraph2, filter based on Ly_Rectifier_Current === 500
+// const dataForGraph2 = filteredRows.filter((row) => row.Ly_Rectifier_Current === 500);
 
 
 //     // 2) Approach 
@@ -248,7 +330,6 @@ const dataForGraph2 = filteredRows.filter((row) => row.Ly_Rectifier_Current === 
     return (
         <Box m="15px">
             <Header title="Report Analytics" subtitle="Fetch Report using Start Date-time and End Date-time" />
-
             <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <Grid container spacing={2} alignItems="center">
                     <Grid item xs={3}>
@@ -275,7 +356,6 @@ const dataForGraph2 = filteredRows.filter((row) => row.Ly_Rectifier_Current === 
                 </Grid>
             </LocalizationProvider>
             {error && <p style={{ color: "red" }}>{error}</p>}
-
             {/* Dropdown for selecting Test Name */}
             {allData.length > 0 && (
                 <FormControl fullWidth sx={{ mt: 2 }}>
@@ -290,7 +370,6 @@ const dataForGraph2 = filteredRows.filter((row) => row.Ly_Rectifier_Current === 
                     </Select>
                 </FormControl>
             )}
-
             {/* Data Table */}
             {filteredRows.length > 0 && (
                 <Box sx={{ height: 400, width: "100%", mt: 2 }}>
@@ -351,6 +430,56 @@ const dataForGraph2 = filteredRows.filter((row) => row.Ly_Rectifier_Current === 
                             <Scatter name="Data" data={dataForGraph2} fill="#82ca9d" />
                         </ScatterChart>
                     </ResponsiveContainer>
+
+
+                    
+            <Button variant="contained" sx={{ mt: 3 }} onClick={handleOpenDialog}>
+                Configure Charts
+            </Button>
+
+            <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+                <DialogTitle>Select X-axis and Y-axis Data Keys</DialogTitle>
+                <DialogContent>
+                    <FormControl fullWidth sx={{ my: 2 }}>
+                        <InputLabel>X-Axis Data Key</InputLabel>
+                        <Select value={selectedX} onChange={(e) => setSelectedX(e.target.value)}>
+                            {allDataKeys.map(key => (
+                                <MenuItem key={key} value={key}>{key}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl fullWidth sx={{ my: 2 }}>
+                        <InputLabel>Y-Axis Data Key</InputLabel>
+                        <Select value={selectedY} onChange={(e) => setSelectedY(e.target.value)}>
+                            {allDataKeys.map(key => (
+                                <MenuItem key={key} value={key}>{key}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>Cancel</Button>
+                    <Button onClick={handleCloseDialog} variant="contained">
+                        Save & Plot
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            
+  Third Scatter Plot (Dynamic Selection) 
+ <Typography variant="h6" sx={{ mt: 4 }}>
+ Graph 3: {selectedX} vs {selectedY}
+</Typography>
+<ResponsiveContainer width="100%" height={400}>
+ <ScatterChart>
+     <CartesianGrid />
+     <XAxis type="number" dataKey={selectedX} name={selectedX} />
+     <YAxis type="number" dataKey={selectedY} name={selectedY} />
+    <Tooltip content={<CustomTooltip3 xKey={selectedX} yKey={selectedY} />} />
+
+     <Scatter name="Dynamic Data" data={data} fill="#ff7300" />
+ </ScatterChart>
+</ResponsiveContainer>
                 </>
             )}
         </Box>
@@ -647,42 +776,44 @@ export default IoTDataViewer;
 //                         </ScatterChart>
 //                     </ResponsiveContainer>
 //                 </>
-//             )}           
-//                    {/* Configure Scatter Plot
-//             // <Button variant="contained" sx={{ mt: 3 }} onClick={handleOpenDialog}>
-//             //     Configure Charts
-//             // </Button>
+            // )}
 
-//             // <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
-//             //     <DialogTitle>Select X-axis and Y-axis Data Keys</DialogTitle>
-//             //     <DialogContent>
-//             //         <FormControl fullWidth sx={{ my: 2 }}>
-//             //             <InputLabel>X-Axis Data Key</InputLabel>
-//             //             <Select value={selectedX} onChange={(e) => setSelectedX(e.target.value)}>
-//             //                 {allDataKeys.map(key => (
-//             //                     <MenuItem key={key} value={key}>{key}</MenuItem>
-//             //                 ))}
-//             //             </Select>
-//             //         </FormControl>
-//             //         <FormControl fullWidth sx={{ my: 2 }}>
-//             //             <InputLabel>Y-Axis Data Key</InputLabel>
-//             //             <Select value={selectedY} onChange={(e) => setSelectedY(e.target.value)}>
-//             //                 {allDataKeys.map(key => (
-//             //                     <MenuItem key={key} value={key}>{key}</MenuItem>
-//             //                 ))}
-//             //             </Select>
-//             //         </FormControl>
-//             //     </DialogContent>
-//             //     <DialogActions>
-//             //         <Button onClick={handleCloseDialog}>Cancel</Button>
-//             //         <Button onClick={handleCloseDialog} variant="contained">
-//             //             Save & Plot
-//             //         </Button>
-//             //     </DialogActions>
-//             // </Dialog>
+
+
+//             <Button variant="contained" sx={{ mt: 3 }} onClick={handleOpenDialog}>
+//                 Configure Charts
+//             </Button>
+
+//             <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+//                 <DialogTitle>Select X-axis and Y-axis Data Keys</DialogTitle>
+//                 <DialogContent>
+//                     <FormControl fullWidth sx={{ my: 2 }}>
+//                         <InputLabel>X-Axis Data Key</InputLabel>
+//                         <Select value={selectedX} onChange={(e) => setSelectedX(e.target.value)}>
+//                             {allDataKeys.map(key => (
+//                                 <MenuItem key={key} value={key}>{key}</MenuItem>
+//                             ))}
+//                         </Select>
+//                     </FormControl>
+//                     <FormControl fullWidth sx={{ my: 2 }}>
+//                         <InputLabel>Y-Axis Data Key</InputLabel>
+//                         <Select value={selectedY} onChange={(e) => setSelectedY(e.target.value)}>
+//                             {allDataKeys.map(key => (
+//                                 <MenuItem key={key} value={key}>{key}</MenuItem>
+//                             ))}
+//                         </Select>
+//                     </FormControl>
+//                 </DialogContent>
+//                 <DialogActions>
+//                     <Button onClick={handleCloseDialog}>Cancel</Button>
+//                     <Button onClick={handleCloseDialog} variant="contained">
+//                         Save & Plot
+//                     </Button>
+//                 </DialogActions>
+//             </Dialog>
 
             
-//  {/* Third Scatter Plot (Dynamic Selection) 
+//   Third Scatter Plot (Dynamic Selection) 
 //  <Typography variant="h6" sx={{ mt: 4 }}>
 //  Graph 3: {selectedX} vs {selectedY}
 // </Typography>
@@ -695,7 +826,7 @@ export default IoTDataViewer;
 //      <Scatter name="Dynamic Data" data={data} fill="#ff7300" />
 //  </ScatterChart>
 // </ResponsiveContainer>
-// */}
+// 
 //         </Box>
 //     );
 // }
